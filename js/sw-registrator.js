@@ -6,7 +6,7 @@
     } else {
       // Register the service worker
       navigator.serviceWorker
-        .register("./service-worker.js", { scope: "../" })
+        .register("./service-worker.js", { scope: "./" })
         .then(function (reg) {
           console.log("[PWA] Service worker has been registered");
         });
