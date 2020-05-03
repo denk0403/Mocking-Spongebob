@@ -12,12 +12,15 @@ const staticAssets = [
   // Display files
   "./css/styles.css",
   "./index.html",
-  "./",
 
   // JS files
   "./js/controller.js",
   "./js/darkmode.js",
   "./js/sw-registrator.js",
+
+  // Other
+  "./",
+  "./manifest.json",
 ];
 
 // During the installation phase, you'll usually want to cache static assets.
