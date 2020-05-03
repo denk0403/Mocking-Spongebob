@@ -1,0 +1,16 @@
+{
+    "name": "Spongebob Mocking Meme Generator",
+    "short_name": "Mocking Meme Generator",
+    "description": "An app to quickly create Spongebob Mocking memes!",
+    "start_url": "./meme.html",
+    "display": "standalone",
+    "background_color": "#b7e9b4",
+    "theme_color": "#b7e9b4",
+    "icons": [
+        {
+            "src": "./img/icon-144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ]
+}
