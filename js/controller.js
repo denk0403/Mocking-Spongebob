@@ -12,15 +12,6 @@
     location.replace(`${location.origin}${location.pathname}`);
   };
 
-  let processHashV1 = (hash) => {
-    if (hash) {
-      const original = hash.slice(1).split("%20").join(" ");
-      location.replace(
-        `${location.origin}${location.pathname}?v=2#${hashify(original)}`
-      );
-    }
-  };
-
   let processHashV2 = (hash) => {
     if (hash) {
       input.value = hash
@@ -49,16 +40,10 @@
         .map((param) => param.split("="))
         .map((arr) => ({ [arr[0]]: arr[1] }))
     );
-    if (searchParams && searchParams.v && searchParams.v === "2") {
-      console.log("Using version 2!");
-      processHashV2(location.hash);
-    } else {
-      if (!location.hash) {
-        location.replace(`${location.origin}${location.pathname}?v=2`);
-      } else {
-        processHashV1(location.hash);
-      }
-    }
+
+    // Check searchParams for modified behavior
+    // (None implemented yet)
+    processHashV2(location.hash);
   };
 
   window.onhashchange = () => {
@@ -68,7 +53,7 @@
   input.oninput = (event) => {
     imagein.value = "";
     location.replace(
-      `${location.origin}${location.pathname}?v=2#${hashify(
+      `${location.origin}${location.pathname}#${hashify(
         event.currentTarget.value.trim()
       )}`
     );
@@ -210,7 +195,7 @@
 
   imagein.onchange = (event) => {
     input.value = "";
-    location.replace(`${location.origin}${location.pathname}?v=2#`);
+    location.replace(`${location.origin}${location.pathname}#`);
     if (imagein.files[0]) {
       reader.readAsDataURL(imagein.files[0]);
     } else {
