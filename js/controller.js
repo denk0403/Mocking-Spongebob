@@ -1,4 +1,4 @@
-(function () {
+(() => {
   let canvas = document.getElementById("output");
   let ctx = canvas.getContext("2d");
   let img = document.getElementById("meme");

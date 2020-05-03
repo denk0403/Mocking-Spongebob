@@ -3,12 +3,20 @@ const cacheName = "mockSpongebob-v2";
 
 // Assets to be used for offline availability
 const staticAssets = [
-  "./background.JPG",
+  // Image files
+  "./img/background.jpg",
   "./img/icon.png",
   "./img/icon-144.png",
-  "./meme.css",
-  "./meme.html",
-  "./meme.js",
+  "./img/apple_app_icon.png",
+
+  // Display files
+  "./css/styles.css",
+  "./index.html",
+
+  // JS files
+  "./js/controller.js",
+  "./js/darkmode.js",
+  "./js/sw-registrator.js",
 ];
 
 // During the installation phase, you'll usually want to cache static assets.

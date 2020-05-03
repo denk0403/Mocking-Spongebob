@@ -1,11 +1,12 @@
 <!doctype html>
-<html>
 
+<html>
+    
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mocking Spongebob Generator</title>
-    <link href="./meme.css" rel="stylesheet" type="text/css" />
+    <link href="./css/styles.css" rel="stylesheet" type="text/css" />
     <link rel="manifest" href="./manifest.json">
 
     <!-- generic icon -->
@@ -38,46 +39,22 @@
     
         <canvas id="output" width="500" height="350">
         </canvas>
-        <img id="meme" src="./background.JPG" alt="spongebob meme" />
-        <img id="mirror" src="./background.JPG" alt="spongebob meme" />
+        <img id="meme" src="./img/background.jpg" alt="spongebob meme" />
+        <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
         <img id="upload" src="" />
         <div class="btn-group btn-primary">
             <button class="btn darkmode-ignore" id="cpy-text-btn" title="Copy the mocking form of the text">Copy Mocking Text</button>
             <button class="btn darkmode-ignore" id="cpy-link-btn" title="Copy the link for this meme to your clipboard">Copy Link</button>
             <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your local files">Save Image</button>
-            <a id="sv-link" href="./background.JPG" download="img.png">Save Image</a>
+            <a id="sv-link" href="./img/background.jpg" download="img.png">Save Image</a>
         </div>
         <div class="darkmode-ignore" id="note">Note: Link copying is supported for caption memes only. <br/> You can save the image also by right clicking (holding down on mobile) on the image.</div>
     
         <p>Made by Dennis Kats <br /> for his friends</p>
-        <script type="text/javascript" src="./meme.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
-        <script> // Darkmode support
-            new Darkmode({
-                time: '0.5s', // default: '0.3s'
-                buttonColorDark: '#dddddd',  // default: '#100f2c'
-                buttonColorLight: '#dddddd',
-                label: '🌓', // default: ''
-                }).showWidget();
-        </script>
-        <script> // Offline PWA support
-            // Check compatibility for the browser we're running this in
-            if ("serviceWorker" in navigator) {
-                if (navigator.serviceWorker.controller) {
-                    console.log("[PWA] Service Worker already found, skipping register");
-                } else {
-                    // Register the service worker
-                    navigator.serviceWorker
-                        .register("./service-worker.js", {scope: "./"})
-                        .then(function (reg) {
-                            console.log("[PWA] Service worker has been registered");
-                        });
-                }
-            } else {
-                console.log('[PWA] Service workers are not supported');
-            }
-        </script>
     </div>
+    <script type="text/javascript" src="./js/controller.js"></script> <!-- Website controller-->
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script> <!-- Darkmode library-->
+    <script type="text/javascript" src="./js/darkmode.js"></script>  <!-- Darkmode support -->
+    <script type="text/javascript" src="./js/sw-registrator.js"></script> <!-- Offline PWA support -->
 </body>
-
 </html>
