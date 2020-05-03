@@ -12,6 +12,7 @@ const staticAssets = [
   // Display files
   "./css/styles.css",
   "./index.html",
+  "./",
 
   // JS files
   "./js/controller.js",
