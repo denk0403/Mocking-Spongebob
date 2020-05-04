@@ -11,8 +11,8 @@ This website serves as a generator for the mocking Spongebob meme that became po
 - [x] Compatible with all mobile devices featuring a modern web browser.
 - [x] Offers a toggleable dark mode 🌓 style of the website based on your device preferences and preferences between sessions.
 - [x] Available as a Progressive Web App (PWA) that can be installed from most modern browsers onto most devices and **accessed offline** *(after loading the page at least once)*.
-    - From Safari on iOS: Go to the [website]((https://denk0403.github.io/Mocking-Spongebob/)) and open the Share options ![image](https://user-images.githubusercontent.com/3473945/80953640-ebaabe80-8dc9-11ea-9583-871afab55a1b.png), and then simply select "Add to Home Screen" ![image](https://user-images.githubusercontent.com/3473945/80954188-e601a880-8dca-11ea-926a-e7d5cb671fc0.png).
-    - From Google Chrome on Desktops: Go to the [website]((https://denk0403.github.io/Mocking-Spongebob/)) and watch for a plus icon ![image](https://user-images.githubusercontent.com/3473945/80954476-717b3980-8dcb-11ea-9cdc-3f7538182342.png) on the address bar. Click on it and then simply select "Install".
+    - From Safari on iOS: Go to the [website](https://denk0403.github.io/Mocking-Spongebob/) and open the Share options ![image](https://user-images.githubusercontent.com/3473945/80953640-ebaabe80-8dc9-11ea-9583-871afab55a1b.png), and then simply select "Add to Home Screen" ![image](https://user-images.githubusercontent.com/3473945/80954188-e601a880-8dca-11ea-926a-e7d5cb671fc0.png).
+    - From Google Chrome on Desktops: Go to the [website](https://denk0403.github.io/Mocking-Spongebob/) and watch for a plus icon ![image](https://user-images.githubusercontent.com/3473945/80954476-717b3980-8dcb-11ea-9cdc-3f7538182342.png) on the address bar. Click on it and then simply select "Install".
 
 ### [**Try It Out!**](https://denk0403.github.io/Mocking-Spongebob/)
 
