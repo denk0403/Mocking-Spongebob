@@ -10,6 +10,7 @@ const staticAssets = [
   "./img/apple_app_icon.png",
   "./img/camera-icon.png",
   "./img/camera-trigger.png",
+  "./img/camera-flip.png",
 
   // Display files
   "./css/styles.css",

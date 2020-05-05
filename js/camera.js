@@ -5,6 +5,7 @@ let cameraStop;
     cameraSensor = document.querySelector("#camera--sensor"),
     cameraTrigger = document.querySelector("#camera--trigger"),
     cameraToggle = document.querySelector("#camera--toggle"),
+    cameraFlip = document.querySelector("#camera--flip"),
     upload = document.querySelector("#upload"),
     input = document.querySelector("#caption");
 
@@ -14,6 +15,11 @@ let cameraStop;
 
   if (navigator.mediaDevices.getUserMedia) {
     cameraToggle.style.display = "inline";
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      if (devices.filter((device) => device.kind === "videoinput").length > 1) {
+        cameraFlip.style.display = "inline";
+      }
+    });
   }
 
   function cameraStart() {
@@ -25,9 +31,19 @@ let cameraStop;
           cameraView.srcObject = stream;
         })
         .catch(function (error) {
-          console.error("Oops. Something is broken.", error);
+          console.error("Oops. Something went wrong.", error);
         });
     }
+  }
+
+  function flipCamera() {
+    if (constraints.video.facingMode === "front") {
+      constraints.video.facingMode = "environment";
+    } else {
+      constraints.video.facingMode = "front";
+    }
+    cameraFlip.classList.add("disabled");
+    cameraStart();
   }
 
   cameraStop = function () {
@@ -40,6 +56,7 @@ let cameraStop;
 
   cameraView.addEventListener("loadeddata", () => {
     cameraFrame.style.display = "initial";
+    cameraFlip.classList.remove("disabled");
   });
 
   cameraToggle.onclick = function () {
@@ -48,6 +65,11 @@ let cameraStop;
     } else {
       cameraStart();
     }
+  };
+
+  cameraFlip.onclick = function () {
+    cameraFlip.disabled = true;
+    flipCamera();
   };
 
   cameraTrigger.onclick = function () {
