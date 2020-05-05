@@ -116,6 +116,8 @@ label {
   max-width: 100%;
   height: max(auto, 350px);
   object-position: center;
+  transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
 }
 
 #camera--toggle:hover {
