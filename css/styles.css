@@ -87,6 +87,25 @@ label {
   filter: brightness(0.6);
 }
 
+#camera--flip {
+  position: absolute;
+  width: 10%;
+  bottom: 10px;
+  right: 10px;
+}
+
+#camera--flip.disabled {
+  opacity: 0;
+}
+
+#camera--flip:hover {
+  filter: brightness(0.9);
+}
+
+#camera--flip:active {
+  filter: brightness(0.6);
+}
+
 #camera--frame {
   margin: 0;
   padding: 0;
