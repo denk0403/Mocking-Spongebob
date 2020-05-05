@@ -8,6 +8,8 @@ const staticAssets = [
   "./img/icon.png",
   "./img/icon-144.png",
   "./img/apple_app_icon.png",
+  "./img/camera-icon.png",
+  "./img/camera-trigger.png",
 
   // Display files
   "./css/styles.css",
@@ -17,6 +19,7 @@ const staticAssets = [
   "./js/controller.js",
   "./js/darkmode.js",
   "./js/sw-registrator.js",
+  "./js/camera.js",
 
   // Other
   "./",

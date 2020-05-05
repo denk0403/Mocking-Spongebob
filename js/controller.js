@@ -1,12 +1,12 @@
 (() => {
-  let canvas = document.getElementById("output");
-  let ctx = canvas.getContext("2d");
-  let img = document.getElementById("meme");
-  let mirror = document.getElementById("mirror");
-  let input = document.getElementById("caption");
-  let imagein = document.getElementById("imagein");
-  let upload = document.getElementById("upload");
-  let reader = new FileReader();
+  const canvas = document.getElementById("output"),
+    ctx = canvas.getContext("2d"),
+    img = document.getElementById("meme"),
+    mirror = document.getElementById("mirror"),
+    input = document.getElementById("caption"),
+    imagein = document.getElementById("imagein"),
+    upload = document.getElementById("upload"),
+    reader = new FileReader();
 
   document.getElementById("title").onclick = () => {
     location.replace(`${location.origin}${location.pathname}`);
@@ -51,6 +51,7 @@
   };
 
   input.oninput = (event) => {
+    cameraStop();
     imagein.value = "";
     location.replace(
       `${location.origin}${location.pathname}#${hashify(

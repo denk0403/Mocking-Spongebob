@@ -28,22 +28,46 @@
         <br />
         <br />
         <form>
-            <label id="captionLabel" for="caption">
+            <label id="captionLabel" class="inputField" for="caption">
                 Caption:
                 <input class="darkmode-ignore" id="caption" placeholder="aDd A cApTiOn..."></input>
             </label>
-            <label id="imageinLabel" for="imagein" style="display: none;">
-                Image:
-                <input id="imagein" type="file" accept="image/*" />
-            </label>
+            <div id="imageinLabel" class="inputField" style="display: none;">
+                <label for="imagein">
+                    Image:
+                    <input id="imagein" type="file" accept="image/*" />
+                </label>
+                <img id="camera--toggle" class="icon invisible" src="./img/camera-icon.png" alt="camera toggle"/>
+            </div>
+            
+
         </form>
         <br />
     
-        <canvas id="output" width="500" height="350">
-        </canvas>
-        <img id="meme" src="./img/background.jpg" alt="spongebob meme" />
+        <canvas id="output" width="500" height="350"></canvas>
+        <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="invisible"/>
         <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
-        <img id="upload" src="" />
+        <img id="upload" src="" style="display: none;"/>
+
+        <!-- Camera -->
+        <div id="camera">
+            <!-- Camera sensor -->
+            <canvas id="camera--sensor" class="invisible"></canvas>
+            <div id="camera--frame" style="display: none;">
+                <!-- Camera view -->
+                <video id="camera--view" 
+                    class="darkmode-ignore" 
+                    width="500" 
+                    height="350" 
+                    autoplay muted playsinline>
+                </video>
+                <!-- Camera trigger -->
+                <img id="camera--trigger" src="img/camera-trigger.png">
+                <!-- <button id="camera--trigger"> -->
+                </button>
+            </div>
+        </div>
+
         <div class="btn-group btn-primary">
             <button class="btn darkmode-ignore" id="cpy-text-btn" title="Copy the mocking form of the text">Copy Mocking Text</button>
             <button class="btn darkmode-ignore" id="cpy-link-btn" title="Copy the link for this meme to your clipboard">Copy Link</button>
@@ -58,5 +82,6 @@
     <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script> <!-- Darkmode library-->
     <script type="text/javascript" src="./js/darkmode.js"></script>  <!-- Darkmode support -->
     <script type="text/javascript" src="./js/sw-registrator.js"></script> <!-- Offline PWA support -->
+    <script type="text/javascript" src="./js/camera.js"></script> <!-- Camera support -->
 </body>
 </html>

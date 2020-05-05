@@ -22,6 +22,7 @@ body {
 
 label {
   font-size: x-large;
+  margin: auto;
 }
 
 #caption,
@@ -63,6 +64,62 @@ label {
   background-color: #97adb6;
 }
 
+#camera--frame {
+  position: relative;
+}
+
+#camera {
+  display: inline-block;
+}
+
+#camera--trigger {
+  position: absolute;
+  width: 10%;
+  bottom: 10px;
+  left: 45%;
+}
+
+#camera--trigger:hover {
+  filter: brightness(0.9);
+}
+
+#camera--trigger:active {
+  filter: brightness(0.6);
+}
+
+#camera--frame {
+  margin: 0;
+  padding: 0;
+}
+
+#camera--view {
+  object-fit: cover;
+  max-width: 100%;
+  height: max(auto, 350px);
+  object-position: center;
+}
+
+#camera--toggle:hover {
+  filter: brightness(0.9);
+}
+
+#camera--toggle:active {
+  filter: brightness(0.6);
+}
+
+.invisible {
+  display: none;
+}
+
+.icon {
+  max-width: min(10%, 30px);
+  vertical-align: middle;
+}
+
+#camera--sensor {
+  display: none;
+}
+
 #sv-link {
   display: none;
 }
@@ -83,15 +140,19 @@ label {
 body {
   --top-color: #b7e9b4;
   --bottom-color: #ebebad;
-  background: linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
-  background: -webkit-linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
+  background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
+    no-repeat;
+  background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
+    fixed no-repeat;
 }
 
 div.darkmode-background {
   --top-color: #ffffff;
   --bottom-color: rgb(225, 225, 225);
-  background: linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
-  background: -webkit-linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
+  background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
+    no-repeat;
+  background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
+    fixed no-repeat;
 
   opacity: 0;
   transition: opacity 0.3s linear;
