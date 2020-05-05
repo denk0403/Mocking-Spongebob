@@ -22,6 +22,7 @@
       drawMemeText(input.value);
       repaint();
     } else {
+      location.replace(`${location.origin}${location.pathname}#`);
       drawMemeText("");
       repaint();
     }
@@ -175,15 +176,9 @@
         if (modes[i].id == "captionRadio") {
           document.getElementById("cpy-text-btn").disabled = false;
           document.getElementById("cpy-link-btn").disabled = false;
-
-          // document.getElementById("cpy-text-btn").style.display = "initial";
-          // document.getElementById("cpy-link-btn").style.display = "initial";
         } else {
           document.getElementById("cpy-text-btn").disabled = true;
           document.getElementById("cpy-link-btn").disabled = true;
-
-          // document.getElementById("cpy-text-btn").style.display = "none";
-          // document.getElementById("cpy-link-btn").style.display = "none";
         }
       }
     }
