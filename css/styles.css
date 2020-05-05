@@ -120,6 +120,11 @@ label {
   -webkit-transform: scaleX(-1);
 }
 
+#camera--view::-webkit-media-controls {
+  display: none;
+  pointer-events: none;
+}
+
 #camera--toggle:hover {
   filter: brightness(0.9);
 }
