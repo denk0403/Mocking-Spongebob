@@ -1,199 +1,199 @@
 html {
-  min-height: 100%;
+	min-height: 100%;
 }
 
 body {
-  min-height: 100%;
-  text-align: center;
+	min-height: 100%;
+	text-align: center;
 }
 
 #output,
 #meme,
 #upload {
-  display: none;
-  visibility: hidden;
-  align-self: center;
+	display: none;
+	visibility: hidden;
+	align-self: center;
 }
 
 #mirror {
-  max-width: 100%;
-  height: auto;
+	max-width: 100%;
+	height: auto;
 }
 
 label {
-  font-size: x-large;
-  margin: auto;
+	font-size: x-large;
+	margin: auto;
 }
 
 #caption,
 #imagein {
-  border: 2px solid black;
-  padding: 10px;
-  border-radius: 5px;
-  min-width: 200px;
-  width: 20vw;
-  font-size: large;
+	border: 2px solid black;
+	padding: 10px;
+	border-radius: 5px;
+	min-width: 200px;
+	width: 20vw;
+	font-size: large;
 }
 
 #note {
-  color: red;
+	color: red;
 }
 
 .btn {
-  height: 45px;
-  border-radius: 5px;
-  font-size: large;
-  margin: 5px 20px;
-  background-color: #00a6e3;
-  box-shadow: inset 0 -3px 8px 2px #414b72;
-  color: white;
-  font-weight: bold;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+	height: 45px;
+	border-radius: 5px;
+	font-size: large;
+	margin: 5px 20px;
+	background-color: #00a6e3;
+	box-shadow: inset 0 -3px 8px 2px #414b72;
+	color: white;
+	font-weight: bold;
+	font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+		"Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
 .btn:hover {
-  background-color: #21c201;
+	background-color: #21c201;
 }
 
 .btn:active {
-  background-color: #28e103;
+	background-color: #28e103;
 }
 
 .btn:disabled {
-  background-color: #97adb6;
+	background-color: #97adb6;
 }
 
 #camera--frame {
-  position: relative;
+	position: relative;
 }
 
 #camera {
-  display: inline-block;
+	display: inline-block;
 }
 
 #camera--trigger {
-  position: absolute;
-  width: 10%;
-  bottom: 10px;
-  left: 45%;
+	position: absolute;
+	width: 10%;
+	bottom: 10px;
+	left: 45%;
 }
 
 #camera--trigger:hover {
-  filter: brightness(0.9);
+	filter: brightness(0.9);
 }
 
 #camera--trigger:active {
-  filter: brightness(0.6);
+	filter: brightness(0.6);
 }
 
 #camera--flip {
-  position: absolute;
-  width: 10%;
-  bottom: 10px;
-  right: 10px;
+	position: absolute;
+	width: 10%;
+	bottom: 10px;
+	right: 10px;
 }
 
 #camera--flip.disabled {
-  opacity: 0;
+	opacity: 0;
 }
 
 #camera--flip:hover {
-  filter: brightness(0.9);
+	filter: brightness(0.9);
 }
 
 #camera--flip:active {
-  filter: brightness(0.6);
+	filter: brightness(0.6);
 }
 
 #camera--frame {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 #camera--view {
-  object-fit: cover;
-  max-width: 100%;
-  height: max(auto, 350px);
-  object-position: center;
-  transform: scaleX(-1);
-  -webkit-transform: scaleX(-1);
+	object-fit: cover;
+	max-width: 100%;
+	height: max(auto, 350px);
+	object-position: center;
+	transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
 }
 
 #camera--view::-webkit-media-controls {
-  display: none;
-  pointer-events: none;
+	display: none;
+	pointer-events: none;
 }
 
 #camera--toggle:hover {
-  filter: brightness(0.9);
+	filter: brightness(0.9);
 }
 
 #camera--toggle:active {
-  filter: brightness(0.6);
+	filter: brightness(0.6);
 }
 
 .invisible {
-  display: none;
+	display: none;
 }
 
 .icon {
-  max-width: min(10%, 30px);
-  vertical-align: middle;
+	max-width: min(10%, 30px);
+	vertical-align: middle;
 }
 
 #camera--sensor {
-  display: none;
+	display: none;
 }
 
 #sv-link {
-  display: none;
+	display: none;
 }
 
 .box {
-  display: inline-block;
-  width: 85vw;
-  background-color: rgba(255, 233, 210, 0.85);
-  border-radius: 2%;
-  padding: 0 15px 10px 15px;
-  transition: background-color 0.4s linear;
+	display: inline-block;
+	width: 85vw;
+	background-color: rgba(255, 233, 210, 0.85);
+	border-radius: 2%;
+	padding: 0 15px 10px 15px;
+	transition: background-color 0.4s linear;
 }
 
 .darkmode--activated .box {
-  background-color: rgba(255, 215, 170, 0.75);
+	background-color: rgba(255, 215, 170, 0.75);
 }
 
 body {
-  --top-color: #b7e9b4;
-  --bottom-color: #ebebad;
-  background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
-    no-repeat;
-  background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
-    fixed no-repeat;
+	--top-color: #b7e9b4;
+	--bottom-color: #ebebad;
+	background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
+		no-repeat;
+	background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
+		fixed no-repeat;
 }
 
 div.darkmode-background {
-  --top-color: #ffffff;
-  --bottom-color: rgb(225, 225, 225);
-  background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
-    no-repeat;
-  background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
-    fixed no-repeat;
+	--top-color: #ffffff;
+	--bottom-color: rgb(225, 225, 225);
+	background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
+		no-repeat;
+	background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
+		fixed no-repeat;
 
-  opacity: 0;
-  transition: opacity 0.3s linear;
-  min-height: 100%;
+	opacity: 0;
+	transition: opacity 0.3s linear;
+	min-height: 100%;
 }
 
 .darkmode--activated .darkmode-background {
-  opacity: 1;
+	opacity: 1;
 }
 
 .darkmode-toggle {
-  z-index: 5;
-  font-size: larger;
+	z-index: 5;
+	font-size: larger;
 }
 
 .darkmode-toggle:hover {
-  filter: brightness(0.9);
+	filter: brightness(0.9);
 }

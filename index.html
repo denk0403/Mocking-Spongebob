@@ -1,7 +1,7 @@
 <!doctype html>
 
 <html>
-    
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,32 +22,33 @@
 <body>
     <div class="box">
         <h1 id="title">Mocking Spongebob Meme Generator</h1>
-    
-        <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel" checked="checked">Caption</input>
-        <input class="darkmode-ignore" id="imageinRadio" name="mode" type="radio" value="imageinLabel">Image</input>
+
+        <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel"
+            checked="checked" />Caption
+        <input class="darkmode-ignore" id="imageinRadio" name="mode" type="radio" value="imageinLabel" />Image
         <br />
         <br />
         <form>
             <label id="captionLabel" class="inputField" for="caption">
                 Caption:
-                <input class="darkmode-ignore" id="caption" placeholder="aDd A cApTiOn..."></input>
+                <input class="darkmode-ignore" id="caption" placeholder="aDd A cApTiOn...">
             </label>
             <div id="imageinLabel" class="inputField" style="display: none;">
                 <label for="imagein">
                     Image:
                     <input id="imagein" type="file" accept="image/*" />
                 </label>
-                <img id="camera--toggle" class="icon invisible" src="./img/camera-icon.png" alt="camera toggle"/>
+                <img id="camera--toggle" class="icon invisible" src="./img/camera-icon.png" alt="camera toggle" />
             </div>
-            
+
 
         </form>
         <br />
-    
+
         <canvas id="output" width="500" height="350"></canvas>
-        <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="invisible"/>
+        <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="invisible" />
         <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
-        <img id="upload" src="" style="display: none;"/>
+        <img id="upload" src="" style="display: none;" />
 
         <!-- Camera -->
         <div id="camera">
@@ -55,11 +56,7 @@
             <canvas id="camera--sensor" class="invisible"></canvas>
             <div id="camera--frame" style="display: none;">
                 <!-- Camera view -->
-                <video id="camera--view" 
-                    class="darkmode-ignore" 
-                    width="500" 
-                    height="350" 
-                    autoplay muted playsinline>
+                <video id="camera--view" class="darkmode-ignore" width="500" height="350" autoplay muted playsinline>
                 </video>
                 <!-- Camera trigger -->
                 <img id="camera--trigger" src="img/camera-trigger.png">
@@ -68,19 +65,25 @@
         </div>
 
         <div class="btn-group btn-primary">
-            <button class="btn darkmode-ignore" id="cpy-text-btn" title="Copy the mocking form of the text">Copy Mocking Text</button>
-            <button class="btn darkmode-ignore" id="cpy-link-btn" title="Copy the link for this meme to your clipboard">Copy Link</button>
-            <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your local files">Save Image</button>
+            <button class="btn darkmode-ignore" id="cpy-text-btn" title="Copy the mocking form of the text">Copy Mocking
+                Text</button>
+            <button class="btn darkmode-ignore" id="cpy-link-btn"
+                title="Copy the link for this meme to your clipboard">Copy Link</button>
+            <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your local files">Save
+                Image</button>
             <a id="sv-link" href="./img/background.jpg" download="img.png">Save Image</a>
         </div>
-        <div class="darkmode-ignore" id="note">Note: Link copying is supported for caption memes only. <br/> You can save the image also by right clicking (holding down on mobile) on the image.</div>
-    
+        <div class="darkmode-ignore" id="note">Note: Link copying is supported for caption memes only. <br /> You can
+            save the image also by right clicking (holding down on mobile) on the image.</div>
+
         <p>Made by Dennis Kats <br /> for his friends</p>
     </div>
     <script type="text/javascript" src="./js/controller.js"></script> <!-- Website controller-->
-    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script> <!-- Darkmode library-->
-    <script type="text/javascript" src="./js/darkmode.js"></script>  <!-- Darkmode support -->
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
+    <!-- Darkmode library-->
+    <script type="text/javascript" src="./js/darkmode.js"></script> <!-- Darkmode support -->
     <script type="text/javascript" src="./js/sw-registrator.js"></script> <!-- Offline PWA support -->
     <script type="text/javascript" src="./js/camera.js"></script> <!-- Camera support -->
 </body>
+
 </html>
