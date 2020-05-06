@@ -7,6 +7,26 @@ body {
 	text-align: center;
 }
 
+#title {
+	transition: color 0.33s ease;
+}
+
+#title:hover {
+	color: rgb(0, 94, 255);
+}
+
+#title:active {
+	color: rgb(0, 66, 181);
+}
+
+.darkmode--activated #title:hover {
+	color: blue;
+}
+
+.darkmode--activated #title:active {
+	color: rgb(80, 80, 255)
+}
+
 #output,
 #meme,
 #upload {
