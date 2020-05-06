@@ -9,6 +9,7 @@ body {
 
 #title {
 	transition: color 0.33s ease;
+	-webkit-transition: color 0.33s ease;
 }
 
 #title:hover {
@@ -24,7 +25,7 @@ body {
 }
 
 .darkmode--activated #title:active {
-	color: rgb(80, 80, 255)
+	color: rgb(80, 80, 255);
 }
 
 #output,
@@ -51,8 +52,18 @@ label {
 	border: 2px solid black;
 	padding: 10px;
 	border-radius: 5px;
-	max-width: 200px;
+	max-width: 400px;
 	width: 45vw;
+}
+
+#imagein {
+	background-color: white;
+	transition: all 0.3s ease;
+}
+
+.darkmode--activated #imagein {
+	background-color: rgba(0, 0, 0, 0);
+	color: black;
 }
 
 #caption,
