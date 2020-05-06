@@ -21,6 +21,8 @@ const staticAssets = [
 	"./js/darkmode.js",
 	"./js/sw-registrator.js",
 	"./js/camera.js",
+	"./js/math.js",
+	"./js/sharedWebsiteObj.js",
 
 	// Other
 	"./",

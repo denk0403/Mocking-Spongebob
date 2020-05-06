@@ -21,17 +21,22 @@ body {
 }
 
 label {
-	font-size: x-large;
+	font-size: large;
 	margin: auto;
 }
 
 #caption,
-#imagein {
+#imagein,
+#mathin {
 	border: 2px solid black;
 	padding: 10px;
 	border-radius: 5px;
-	min-width: 200px;
-	width: 20vw;
+	max-width: 200px;
+	width: 45vw;
+}
+
+#caption,
+#mathin {
 	font-size: large;
 }
 
