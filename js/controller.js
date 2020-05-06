@@ -4,35 +4,63 @@
 		img = document.getElementById("meme"),
 		mirror = document.getElementById("mirror"),
 		input = document.getElementById("caption"),
+		captionRadio = document.getElementById("captionRadio"),
 		imagein = document.getElementById("imagein"),
+		imageinRadio = document.getElementById("imageinRadio"),
 		upload = document.getElementById("upload"),
+		mathin = document.querySelector("#mathin"),
+		mathinRadio = document.querySelector("#mathinRadio"),
+		title = document.getElementById("title"),
+		cameraStop = mockingSpongebob.cameraStop,
 		reader = new FileReader();
 
-	document.getElementById("title").onclick = () => {
-		location.replace(`${location.origin}${location.pathname}`);
+	title.onclick = () => {
+		location.replace(`${location.origin}${location.pathname}#`);
+		captionRadio.click();
+		clear();
+	};
+
+	let clear;
+	clear = mockingSpongebob.clear = () => {
+		input.value = "";
+		imagein.value = "";
+		mathin.value = "";
+		drawMemeText("");
+		repaint();
 	};
 
 	let processHashV2 = (hash) => {
 		if (hash) {
-			input.value = hash
-				.slice(1)
-				.split(":")
-				.map((char) => String.fromCodePoint(parseInt(char, 16)))
-				.join("");
-			drawMemeText(input.value);
-			repaint();
+			if (hash.includes("#math:")) {
+				// math.js will handle behavior
+			} else if (hash.includes("#math")) {
+				location.replace(`${location.origin}${location.pathname}#math:`);
+			} else {
+				try {
+					input.value = hash
+						.slice(1) // hash includes '#' when present
+						.split(":")
+						.map((char) => String.fromCodePoint(parseInt(char, 16)))
+						.join("");
+					drawMemeText(input.value);
+					repaint();
+				} catch (err) {
+					title.click();
+				}
+			}
 		} else {
 			location.replace(`${location.origin}${location.pathname}#`);
-			drawMemeText("");
-			repaint();
+			input.value = "";
+			mathin.value = "";
 		}
 	};
 
-	let hashify = (str) => {
+	let hashify;
+	hashify = mockingSpongebob.hashify = (str) => {
 		return [...str].map((char) => char.codePointAt(0).toString(16)).join(":");
 	};
 
-	window.onload = () => {
+	window.addEventListener("load", () => {
 		const searchParams = Object.assign(
 			{},
 			...location.search
@@ -45,15 +73,16 @@
 		// Check searchParams for modified behavior
 		// (None implemented yet)
 		processHashV2(location.hash);
-	};
+	});
 
-	window.onhashchange = () => {
+	window.addEventListener("hashchange", () => {
 		processHashV2(location.hash);
-	};
+	});
 
 	input.oninput = (event) => {
 		cameraStop();
 		imagein.value = "";
+		mathin.value = "";
 		location.replace(
 			`${location.origin}${location.pathname}#${hashify(
 				event.currentTarget.value.trim()
@@ -150,11 +179,14 @@
 	};
 
 	function drawMemeImage() {
+		const MAX_HEIGHT = 105;
+		const MAX_WIDTH = 450;
+
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(img, 0, 0);
-		let newHeight = 105;
-		let scale = newHeight / upload.height;
+		let scale = Math.min(MAX_WIDTH / upload.width, MAX_HEIGHT / upload.height);
 		let newWidth = upload.width * scale;
+		let newHeight = upload.height * scale;
 		ctx.drawImage(
 			upload,
 			250 - newWidth / 2,
@@ -164,7 +196,8 @@
 		);
 	}
 
-	function repaint() {
+	let repaint;
+	repaint = mockingSpongebob.repaint = () => {
 		var dataURL = canvas.toDataURL("image/png");
 		mirror.src = dataURL;
 		mirror.alt = input.value;
@@ -176,6 +209,9 @@
 				if (modes[i].id == "captionRadio") {
 					document.getElementById("cpy-text-btn").disabled = false;
 					document.getElementById("cpy-link-btn").disabled = false;
+				} else if (modes[i].id == "mathinRadio") {
+					document.getElementById("cpy-text-btn").disabled = true;
+					document.getElementById("cpy-link-btn").disabled = false;
 				} else {
 					document.getElementById("cpy-text-btn").disabled = true;
 					document.getElementById("cpy-link-btn").disabled = true;
@@ -185,12 +221,13 @@
 
 		document.getElementById("sv-link").href = mirror.src;
 		document.getElementById("sv-link").download = `${
-			input.value ? altText(input.value) : "img"
+			input.value ? altText(input.value) : mathin.value || "img"
 		}.png`;
-	}
+	};
 
 	imagein.onchange = (event) => {
 		input.value = "";
+		mathin.value = "";
 		location.replace(`${location.origin}${location.pathname}#`);
 		if (imagein.files[0]) {
 			reader.readAsDataURL(imagein.files[0]);
@@ -202,14 +239,16 @@
 	};
 
 	function updateMode() {
-		var modes = document.getElementsByName("mode");
-
+		let modes = document.getElementsByName("mode");
 		for (i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
-				document.getElementById(modes[i].value).style.display = "initial";
+				document.getElementById(modes[i].value).style.display = "inline-block";
 			} else {
 				document.getElementById(modes[i].value).style.display = "none";
 			}
+		}
+		if (!imageinRadio.checked) {
+			cameraStop();
 		}
 	}
 
@@ -243,8 +282,9 @@
 		document.getElementById("sv-link").click();
 	}
 
-	document.getElementById("imageinRadio").onclick = updateMode;
-	document.getElementById("captionRadio").onclick = updateMode;
+	imageinRadio.onclick = updateMode;
+	captionRadio.onclick = updateMode;
+	mathinRadio.onclick = updateMode;
 	document.getElementById("cpy-text-btn").onclick = copyMockText;
 	document.getElementById("cpy-link-btn").onclick = copyLink;
 	document.getElementById("sv-btn").onclick = save;

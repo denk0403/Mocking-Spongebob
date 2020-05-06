@@ -11,6 +11,15 @@
     <link href="./css/styles.css" rel="stylesheet" type="text/css" />
     <link rel="manifest" href="./manifest.json">
 
+    <!-- Darkmode library-->
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
+
+    <!-- Math support-->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
     <!-- generic icon -->
     <link rel="icon" href="./img/icon.png" />
     <!-- Android icon -->
@@ -26,12 +35,16 @@
         <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel"
             checked="checked" />Caption
         <input class="darkmode-ignore" id="imageinRadio" name="mode" type="radio" value="imageinLabel" />Image
+        <span id="mathinRadioSpan" class="invisible">
+            <input class="darkmode-ignore" id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
+            Math
+        </span>
         <br />
         <br />
         <form>
             <label id="captionLabel" class="inputField" for="caption">
                 Caption:
-                <input class="darkmode-ignore" id="caption" placeholder="aDd A cApTiOn...">
+                <input id="caption" class="darkmode-ignore" type="text" placeholder="aDd A cApTiOn...">
             </label>
             <div id="imageinLabel" class="inputField" style="display: none;">
                 <label for="imagein">
@@ -40,8 +53,10 @@
                 </label>
                 <img id="camera--toggle" class="icon invisible" src="./img/camera-icon.png" alt="camera toggle" />
             </div>
-
-
+            <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
+                Math:
+                <input id="mathin" class="darkmode-ignore" type="text" placeholder="aDd SoMe TeX..." />
+            </label>
         </form>
         <br />
 
@@ -73,17 +88,22 @@
                 Image</button>
             <a id="sv-link" href="./img/background.jpg" download="img.png">Save Image</a>
         </div>
-        <div class="darkmode-ignore" id="note">Note: Link copying is supported for caption memes only. <br /> You can
-            save the image also by right clicking (holding down on mobile) on the image.</div>
+        <div class="darkmode-ignore" id="note">
+            Note: Link copying is supported for caption and math memes only.
+            <br />
+            You can save the image also by right clicking (holding down on mobile) on the image.
+        </div>
 
         <p>Made by Dennis Kats <br /> for his friends</p>
     </div>
-    <script type="text/javascript" src="./js/controller.js"></script> <!-- Website controller-->
-    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
-    <!-- Darkmode library-->
-    <script type="text/javascript" src="./js/darkmode.js"></script> <!-- Darkmode support -->
-    <script type="text/javascript" src="./js/sw-registrator.js"></script> <!-- Offline PWA support -->
+    <script type="text/javascript" src="./js/sharedWebsiteObj.js"></script>
     <script type="text/javascript" src="./js/camera.js"></script> <!-- Camera support -->
+    <script type="text/javascript" src="./js/controller.js"></script> <!-- Website controller-->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
+    Darkmode library -->
+    <script type="text/javascript" async src="./js/darkmode.js"></script> <!-- Darkmode support -->
+    <script type="text/javascript" async src="./js/sw-registrator.js"></script> <!-- Offline PWA support -->
+    <script type="text/javascript" src="./js/math.js"></script> <!-- Maths support -->
 </body>
 
 </html>
