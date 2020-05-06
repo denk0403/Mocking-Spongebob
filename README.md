@@ -6,8 +6,8 @@ This website serves as a generator for the mocking Spongebob meme that became po
 
 # Features!
 
-- [x] Automatically alternates the casing and paints the text on the meme.
-- [x] Supports uploading other images for the caption.
+- [x] Automatically alternates the casing of text and paints the meme.
+- [x] Also supports uploading other images and inputting TeX typesetting for the caption.
   - Built-in camera app for taking pictures even faster!
 - [x] Includes options for copying mock text, link sharing, and saving images.
 - [x] Compatible with all mobile devices featuring a modern web browser.

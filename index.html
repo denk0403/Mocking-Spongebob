@@ -8,17 +8,31 @@
     <meta name="keywords" content="Spongebob, meme generator, meme, mock">
     <meta name="author" content="Dennis Kats">
     <title>Mocking Spongebob Generator</title>
+
+    <!-- Stylesheets -->
     <link href="./css/styles.css" rel="stylesheet" type="text/css" />
+    <!-- Manifest file for PWA -->
     <link rel="manifest" href="./manifest.json">
 
+    <!-- Shared object across scripts for website -->
+    <script type="text/javascript" src="./js/sharedWebsiteObj.js"></script>
     <!-- Darkmode library-->
-    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
 
     <!-- Math support-->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script type="text/javascript" id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-        </script>
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <!-- Offline PWA support -->
+    <script type="text/javascript" async src="./js/sw-registrator.js"></script>
+
+    <!-- Darkmode support -->
+    <script type="text/javascript" defer src="./js/darkmode.js"></script>
+    <!-- Camera support -->
+    <script type="text/javascript" defer src="./js/camera.js"></script>
+    <!-- Website controller-->
+    <script type="text/javascript" defer src="./js/controller.js"></script>
+    <!-- Math support -->
+    <script type="text/javascript" async defer src="./js/math.js"></script>
 
     <!-- generic icon -->
     <link rel="icon" href="./img/icon.png" />
@@ -93,17 +107,8 @@
             <br />
             You can save the image also by right clicking (holding down on mobile) on the image.
         </div>
-
         <p>Made by Dennis Kats <br /> for his friends</p>
     </div>
-    <script type="text/javascript" src="./js/sharedWebsiteObj.js"></script>
-    <script type="text/javascript" src="./js/camera.js"></script> <!-- Camera support -->
-    <script type="text/javascript" src="./js/controller.js"></script> <!-- Website controller-->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
-    Darkmode library -->
-    <script type="text/javascript" async src="./js/darkmode.js"></script> <!-- Darkmode support -->
-    <script type="text/javascript" async src="./js/sw-registrator.js"></script> <!-- Offline PWA support -->
-    <script type="text/javascript" src="./js/math.js"></script> <!-- Maths support -->
 </body>
 
 </html>
