@@ -20,13 +20,20 @@
 		clear();
 	};
 
-	let clear;
-	clear = mockingSpongebob.clear = () => {
+	let clearFields;
+	clearFields = mockingSpongebob.clearFields = () => {
 		input.value = "";
 		imagein.value = "";
 		mathin.value = "";
+	};
+
+	let clear;
+	clear = mockingSpongebob.clear = () => {
+		// 
+		clearFields();
 		drawMemeText("");
 		repaint();
+		// 
 	};
 
 	let processHashV2 = (hash) => {
@@ -35,11 +42,13 @@
 				// math.js will handle behavior
 			} else {
 				try {
+					clearFields();
 					input.value = hash
 						.slice(1) // hash includes '#' when present
 						.split(":")
 						.map((char) => String.fromCodePoint(parseInt(char, 16)))
 						.join("");
+					captionRadio.click();
 					drawMemeText(input.value);
 					repaint();
 				} catch (err) {

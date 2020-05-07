@@ -8,11 +8,13 @@
 		title = document.getElementById("title"),
 		cameraStop = mockingSpongebob.cameraStop,
 		hashify = mockingSpongebob.hashify,
+		clearFields = mockingSpongebob.clearFields,
 		repaint = mockingSpongebob.repaint,
 		xmlSerializer = new XMLSerializer();
 
 	function processMathHash(hash) {
 		try {
+			clearFields();
 			mathin.value = hash
 				.slice(6) // hash includes '#' when present
 				.split(":")
