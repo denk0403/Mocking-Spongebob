@@ -2,7 +2,7 @@
 
 ![HitCount](http://hits.dwyl.com/denk0403/Mocking-Spongebob.svg)
 ![LastCommit](https://img.shields.io/github/last-commit/denk0403/Mocking-Spongebob)
-![WebsiteStatus](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fdenk0403.github.io%2FMocking-Spongebob%2F%23)
+[![WebsiteStatus](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fdenk0403.github.io%2FMocking-Spongebob%2F%23)](https://denk0403.github.io/Mocking-Spongebob/#)
 ![CodeSize](https://img.shields.io/github/languages/code-size/denk0403/Mocking-Spongebob)
 ![Languages](https://img.shields.io/github/languages/count/denk0403/Mocking-Spongebob)
 ![TopLanguage](https://img.shields.io/github/languages/top/denk0403/Mocking-Spongebob)
