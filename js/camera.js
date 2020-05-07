@@ -14,38 +14,6 @@
 
 	let track;
 
-	if (navigator.mediaDevices?.getUserMedia) {
-		cameraToggle.style.display = "inline";
-	}
-
-	function cameraStart(callback) {
-		if (navigator.mediaDevices.getUserMedia) {
-			navigator.mediaDevices
-				.getUserMedia(constraints)
-				.then(function (stream) {
-					track = stream.getTracks()[0];
-					cameraView.srcObject = stream;
-				})
-				.then(callback)
-				.catch(function (error) {
-					console.error("Oops. Something went wrong.", error);
-				});
-		}
-	}
-
-	function flipCamera() {
-		let callback;
-		if (constraints.video.facingMode === "front") {
-			constraints.video.facingMode = "environment";
-			callback = () => (cameraView.style.transform = "scaleX(1)");
-		} else {
-			constraints.video.facingMode = "front";
-			callback = () => (cameraView.style.transform = "scaleX(-1)");
-		}
-		cameraFlip.classList.add("disabled");
-		cameraStart(callback);
-	}
-
 	let cameraStop;
 	cameraStop = mockingSpongebob.cameraStop = () => {
 		cameraFrame.style.display = "none";
@@ -55,32 +23,74 @@
 		}
 	};
 
-	cameraView.addEventListener("loadeddata", () => {
-		cameraFrame.style.display = "initial";
-		cameraFlip.classList.remove("disabled");
-	});
+	if (
+		navigator.mediaDevices &&
+		navigator.mediaDevices.enumerateDevices &&
+		navigator.mediaDevices.getUserMedia
+	) {
+		navigator.mediaDevices.enumerateDevices().then((devices) => {
+			if (devices.filter((device) => device.kind === "videoinput").length) {
+				cameraToggle.style.display = "inline";
 
-	cameraToggle.onclick = function () {
-		if (cameraFrame.style.display != "none") {
-			cameraStop();
-		} else {
-			cameraStart();
-		}
-	};
+				function cameraStart(callback) {
+					if (navigator.mediaDevices.getUserMedia) {
+						navigator.mediaDevices
+							.getUserMedia(constraints)
+							.then(function (stream) {
+								track = stream.getTracks()[0];
+								cameraView.srcObject = stream;
+							})
+							.then(callback)
+							.catch(function (error) {
+								console.error("Oops. Something went wrong.", error);
+							});
+					}
+				}
 
-	cameraFlip.onclick = function () {
-		cameraFlip.disabled = true;
-		flipCamera();
-	};
+				function flipCamera() {
+					let callback;
+					if (constraints.video.facingMode === "front") {
+						constraints.video.facingMode = "environment";
+						callback = () => (cameraView.style.transform = "scaleX(1)");
+					} else {
+						constraints.video.facingMode = "front";
+						callback = () => (cameraView.style.transform = "scaleX(-1)");
+					}
+					cameraFlip.classList.add("disabled");
+					cameraTrigger.classList.add("disabled");
+					cameraStart(callback);
+				}
 
-	cameraTrigger.onclick = function () {
-		cameraSensor.width = cameraView.videoWidth;
-		cameraSensor.height = cameraView.videoHeight;
-		cameraSensor.getContext("2d").drawImage(cameraView, 0, 0);
-		upload.src = cameraSensor.toDataURL("image/webp");
-		input.value = "";
-		imagein.value = "";
-		mathin.value = "";
-		location.replace(`${location.origin}${location.pathname}#`);
-	};
+				cameraView.addEventListener("loadeddata", () => {
+					cameraFrame.style.display = "initial";
+					cameraFlip.classList.remove("disabled");
+					cameraTrigger.classList.remove("disabled");
+				});
+
+				cameraToggle.onclick = function () {
+					if (cameraFrame.style.display != "none") {
+						cameraStop();
+					} else {
+						cameraStart();
+					}
+				};
+
+				cameraFlip.onclick = function () {
+					cameraFlip.disabled = true;
+					flipCamera();
+				};
+
+				cameraTrigger.onclick = function () {
+					cameraSensor.width = cameraView.videoWidth;
+					cameraSensor.height = cameraView.videoHeight;
+					cameraSensor.getContext("2d").drawImage(cameraView, 0, 0);
+					upload.src = cameraSensor.toDataURL("image/webp");
+					input.value = "";
+					imagein.value = "";
+					mathin.value = "";
+					location.replace(`${location.origin}${location.pathname}#`);
+				};
+			}
+		});
+	}
 })();

@@ -123,6 +123,10 @@ label {
 	filter: brightness(0.6);
 }
 
+#camera--trigger.disabled {
+	opacity: 0;
+}
+
 #camera--flip {
 	position: absolute;
 	width: 10%;

@@ -20,8 +20,14 @@ This website serves as a generator for the mocking Spongebob meme that became po
 
 # Built With
 
-- HTML, CSS, JavaScript, and Web APIs
+- **Technologies**: HTML, CSS, JavaScript, and Web APIs
+- **Libraries**: [Darkmode.js](https://darkmodejs.learn.uno/), [MathJax](https://www.mathjax.org/)
 
 # License
 
 Mocking Spongebob Meme Generator is licensed under the MIT License - see the [LICENSE](https://github.com/denk0403/Mocking-Spongebob/blob/master/LICENSE) file for details.
+
+# Acknowledgements
+
+- My friends who had to endure probably hundreds of versions of this meme while I was building and testing the website.
+- Writers of Spongebob Squarepants for creating this pillar of television history.

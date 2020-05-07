@@ -27,21 +27,47 @@
 	}
 
 	window.addEventListener("load", () => {
-		if (window.MathJax) {
+		if (window.MathJax && MathJax.tex2svgPromise) {
+			if (location.hash === "#math") {
+				location.replace(`${location.origin}${location.pathname}#math:`);
+			}
+
+			window.addEventListener("hashchange", () => {
+				if (location.hash === "#math") {
+					location.replace(`${location.origin}${location.pathname}#math:`);
+				}
+			});
+
+			window.addEventListener("hashchange", () => {
+				if (location.hash.startsWith("#math:")) {
+					processMathHash(location.hash);
+					mathinRadio.click();
+				}
+			});
+
+			mathin.oninput = (event) => {
+				cameraStop();
+				input.value = "";
+				imagein.value = "";
+				location.replace(
+					`${location.origin}${location.pathname}#math:${hashify(
+						event.currentTarget.value.trim()
+					)}`
+				);
+			};
+
 			mathinRadioSpan.style.display = "inline";
 			if (location.hash.startsWith("#math:")) {
 				mathinRadio.click();
 				processMathHash(location.hash);
 			}
 		} else {
+			window.addEventListener("hashchange", () => {
+				if (location.hash.startsWith("#math")) {
+					location.replace(`${location.origin}${location.pathname}#`);
+				}
+			});
 			title.click();
-		}
-	});
-
-	window.addEventListener("hashchange", () => {
-		if (location.hash.startsWith("#math:")) {
-			processMathHash(location.hash);
-			mathinRadio.click();
 		}
 	});
 
@@ -70,15 +96,4 @@
 				console.error("Oops. Something went wrong.", err);
 			});
 	}
-
-	mathin.oninput = (event) => {
-		cameraStop();
-		input.value = "";
-		imagein.value = "";
-		location.replace(
-			`${location.origin}${location.pathname}#math:${hashify(
-				event.currentTarget.value.trim()
-			)}`
-		);
-	};
 })();

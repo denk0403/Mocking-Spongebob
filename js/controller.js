@@ -31,10 +31,8 @@
 
 	let processHashV2 = (hash) => {
 		if (hash) {
-			if (hash.includes("#math:")) {
+			if (hash.startsWith("#math")) {
 				// math.js will handle behavior
-			} else if (hash.includes("#math")) {
-				location.replace(`${location.origin}${location.pathname}#math:`);
 			} else {
 				try {
 					input.value = hash
