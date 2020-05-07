@@ -36,7 +36,7 @@
 
 ### [**Try It Out!**](https://denk0403.github.io/Mocking-Spongebob/)
 
-###### _<sup><sup>[1][2]</sup> Features are disabled under compatibility issues.</sup>_
+###### _<sup><sup>[1][2]</sup> Features may be disabled under compatibility issues.</sup>_
 
 # Built With
 
