@@ -39,9 +39,38 @@ body {
 #mirror {
 	max-width: 100%;
 	height: auto;
+	max-height: 350px;
 }
 
-label {
+#note p {
+	margin: 6px;
+}
+
+label * {
+	vertical-align: middle;
+}
+
+#modeRadios {
+	display: inline-block;
+	width: 100%;
+}
+
+#modeRadios > * {
+	margin: min(3%, 30px);
+	white-space: nowrap;
+	font-size: min(22px, 5vw);
+}
+
+input[type="radio"] {
+	height: 20px;
+	width: 20px;
+}
+
+label.inputField {
+	width: 100%;
+}
+
+.inputField > * {
 	font-size: large;
 	margin: auto;
 }
@@ -53,7 +82,7 @@ label {
 	padding: 10px;
 	border-radius: 5px;
 	max-width: 400px;
-	width: 45vw;
+	width: 59%;
 }
 
 #imagein {
@@ -100,6 +129,21 @@ label {
 	background-color: #97adb6;
 }
 
+#views {
+	display: inline-block;
+	width: 100%;
+	max-width: 1200px;
+	justify-items: center;
+	align-items: center;
+	margin: 0;
+}
+
+#views * {
+	margin: 0px 0.25% 5px 0.25%;
+	max-height: 350px;
+	box-sizing: content-box;
+}
+
 #camera--frame {
 	position: relative;
 }
@@ -110,9 +154,10 @@ label {
 
 #camera--trigger {
 	position: absolute;
-	width: 10%;
+	min-width: 3.5rem;
+	width: 13%;
 	bottom: 10px;
-	left: 45%;
+	left: min(43.5%, 50% - 1.75rem);
 }
 
 #camera--trigger:hover {
@@ -129,7 +174,8 @@ label {
 
 #camera--flip {
 	position: absolute;
-	width: 10%;
+	min-width: 3.5rem;
+	width: 13%;
 	bottom: 10px;
 	right: 10px;
 }
@@ -192,6 +238,7 @@ label {
 
 .box {
 	display: inline-block;
+	max-width: 800rem;
 	width: 85vw;
 	background-color: rgba(255, 233, 210, 0.85);
 	border-radius: 2%;

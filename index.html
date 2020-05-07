@@ -46,12 +46,22 @@
     <div class="box">
         <h1 id="title">Mocking Spongebob Meme Generator</h1>
 
-        <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel"
-            checked="checked" />Caption
-        <input class="darkmode-ignore" id="imageinRadio" name="mode" type="radio" value="imageinLabel" />Image
-        <span id="mathinRadioSpan" class="invisible">
-            <input class="darkmode-ignore" id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
-            Math
+        <span id="modeRadios">
+            <label for="captionRadio">
+                <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel"
+                    checked="checked" />
+                Caption
+            </label>
+            <label for="imageinRadio">
+                <input class="darkmode-ignore" id="imageinRadio" name="mode" type="radio" value="imageinLabel" />
+                Image
+            </label>
+            <label for="mathinRadio">
+                <span id="mathinRadioSpan" class="invisible">
+                    <input class="darkmode-ignore" id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
+                    Math
+                </span>
+            </label>
         </span>
         <br />
         <br />
@@ -73,23 +83,25 @@
             </label>
         </form>
         <br />
+        <div id="views">
+            <canvas id="output" width="500" height="350"></canvas>
+            <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="invisible" />
+            <img id="upload" src="" style="display: none;" />
+            <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
 
-        <canvas id="output" width="500" height="350"></canvas>
-        <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="invisible" />
-        <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
-        <img id="upload" src="" style="display: none;" />
-
-        <!-- Camera -->
-        <div id="camera">
-            <!-- Camera sensor -->
-            <canvas id="camera--sensor" class="invisible"></canvas>
-            <div id="camera--frame" style="display: none;">
-                <!-- Camera view -->
-                <video id="camera--view" class="darkmode-ignore" width="500" height="350" autoplay muted playsinline>
-                </video>
-                <!-- Camera trigger -->
-                <img id="camera--trigger" src="img/camera-trigger.png">
-                <img id="camera--flip" src="img/camera-flip.png">
+            <!-- Camera -->
+            <div id="camera">
+                <!-- Camera sensor -->
+                <canvas id="camera--sensor" class="invisible"></canvas>
+                <div id="camera--frame" style="display: none;">
+                    <!-- Camera view -->
+                    <video id="camera--view" class="darkmode-ignore" width="500" height="350" autoplay muted
+                        playsinline>
+                    </video>
+                    <!-- Camera trigger -->
+                    <img id="camera--trigger" src="img/camera-trigger.png">
+                    <img id="camera--flip" src="img/camera-flip.png">
+                </div>
             </div>
         </div>
 
@@ -103,9 +115,12 @@
             <a id="sv-link" href="./img/background.jpg" download="img.png">Save Image</a>
         </div>
         <div class="darkmode-ignore" id="note">
-            Note: Link copying is supported for caption and math memes only.
-            <br />
-            You can save the image also by right clicking (holding down on mobile) on the image.
+            <p>
+                Note: Link copying is supported for caption and math memes only.
+            </p>
+            <p>
+                You can save the image also by right clicking (holding down on mobile) on the image.
+            </p>
         </div>
         <p>Made by Dennis Kats <br /> for his friends</p>
     </div>
