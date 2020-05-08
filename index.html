@@ -89,17 +89,20 @@
             <img id="upload" src="" style="display: none;" />
             <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
 
-            <!-- Camera -->
-            <div id="camera">
+            <!-- Camera App -->
+            <div id="cameraApp" style="display: none;">
                 <!-- Camera sensor -->
                 <canvas id="camera--sensor" class="invisible"></canvas>
-                <div id="camera--frame" style="display: none;">
+
+                <!-- Frame for containing camera functionality-->
+                <div id="camera--frame">
                     <!-- Camera view -->
                     <video id="camera--view" class="darkmode-ignore" width="500" height="350" autoplay muted
                         playsinline>
                     </video>
-                    <!-- Camera trigger -->
+                    <!-- Take picture trigger -->
                     <img id="camera--trigger" src="img/camera-trigger.png">
+                    <!-- Flip camera trigger -->
                     <img id="camera--flip" src="img/camera-flip.png">
                 </div>
             </div>

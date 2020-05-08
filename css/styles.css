@@ -163,7 +163,7 @@ label.inputField {
 	position: absolute;
 	min-width: 3.5rem;
 	width: 13%;
-	bottom: 10px;
+	bottom: 0;
 	left: min(43.5%, 50% - 1.75rem);
 }
 
@@ -183,8 +183,8 @@ label.inputField {
 	position: absolute;
 	min-width: 3.5rem;
 	width: 13%;
-	bottom: 10px;
-	right: 10px;
+	bottom: -3px;
+	right: 7px;
 }
 
 #camera--flip.disabled {
@@ -296,7 +296,9 @@ div.darkmode-background {
 	.btn {
 		width: 100%;
 		margin: 0;
-		margin-top: -10px;
-		margin-bottom: 17px;
+	}
+
+	.btn + .btn {
+		margin-top: 7px;
 	}
 }

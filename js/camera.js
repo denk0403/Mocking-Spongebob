@@ -1,6 +1,6 @@
 (() => {
-	const cameraView = document.querySelector("#camera--view"),
-		cameraFrame = document.querySelector("#camera--frame"),
+	const cameraApp = document.querySelector("#cameraApp"),
+		cameraView = document.querySelector("#camera--view"),
 		cameraSensor = document.querySelector("#camera--sensor"),
 		cameraTrigger = document.querySelector("#camera--trigger"),
 		cameraToggle = document.querySelector("#camera--toggle"),
@@ -16,7 +16,7 @@
 
 	let cameraStop;
 	cameraStop = mockingSpongebob.cameraStop = () => {
-		cameraFrame.style.display = "none";
+		cameraApp.style.display = "none";
 		if (track) {
 			track.stop();
 			track = undefined;
@@ -62,13 +62,13 @@
 				}
 
 				cameraView.addEventListener("loadeddata", () => {
-					cameraFrame.style.display = "initial";
+					cameraApp.style.display = "inline-block";
 					cameraFlip.classList.remove("disabled");
 					cameraTrigger.classList.remove("disabled");
 				});
 
 				cameraToggle.onclick = function () {
-					if (cameraFrame.style.display != "none") {
+					if (cameraApp.style.display != "none") {
 						cameraStop();
 					} else {
 						cameraStart();
