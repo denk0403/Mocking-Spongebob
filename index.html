@@ -32,7 +32,7 @@
     <!-- Website controller-->
     <script type="text/javascript" defer src="./js/controller.js"></script>
     <!-- Math support -->
-    <script id="mathHandler" type="text/javascript" defer src="./js/math.js"></script>
+    <script type="text/javascript" defer src="./js/math.js"></script>
 
     <!-- generic icon -->
     <link rel="icon" href="./img/icon.png" />
@@ -50,11 +50,11 @@
             <label for="captionRadio">
                 <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel"
                     checked="checked" />
-                Caption
+                <span>Caption</span>
             </label>
             <label for="imageinRadio">
                 <input class="darkmode-ignore" id="imageinRadio" name="mode" type="radio" value="imageinLabel" />
-                Image
+                <span>Image</span>
             </label>
             <label for="mathinRadio">
                 <span id="mathinRadioSpan" class="invisible">
@@ -67,18 +67,18 @@
         <br />
         <form>
             <label id="captionLabel" class="inputField" for="caption">
-                Caption:
+                <span>Caption:</span>
                 <input id="caption" class="darkmode-ignore" type="text" placeholder="aDd A cApTiOn...">
             </label>
             <div id="imageinLabel" class="inputField" style="display: none;">
                 <label for="imagein">
-                    Image:
+                    <span>Image:</span>
                     <input id="imagein" type="file" accept="image/*" />
                 </label>
                 <img id="camera--toggle" class="icon invisible" src="./img/camera-icon.png" alt="camera toggle" />
             </div>
             <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
-                Math:
+                <span>Math:</span>
                 <input id="mathin" class="darkmode-ignore" type="text" placeholder="aDd SoMe TeX..." />
             </label>
         </form>

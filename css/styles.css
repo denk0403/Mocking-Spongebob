@@ -5,6 +5,12 @@ html {
 body {
 	min-height: 100%;
 	text-align: center;
+	margin: 0;
+	margin-top: 7px;
+}
+
+body:nth-last-child(n) {
+	margin-bottom: 7px;
 }
 
 #title {
@@ -70,9 +76,8 @@ label.inputField {
 	width: 100%;
 }
 
-.inputField > * {
+.inputField span {
 	font-size: large;
-	margin: auto;
 }
 
 #caption,
@@ -105,10 +110,12 @@ label.inputField {
 }
 
 .btn {
-	height: 45px;
+	min-height: 45px;
+	padding: 0 15px;
+	min-width: 172px;
 	border-radius: 5px;
 	font-size: large;
-	margin: 5px 20px;
+	margin: 0 10px 5px 10px;
 	background-color: #00a6e3;
 	box-shadow: inset 0 -3px 8px 2px #414b72;
 	color: white;
@@ -242,7 +249,7 @@ label.inputField {
 	width: 85vw;
 	background-color: rgba(255, 233, 210, 0.85);
 	border-radius: 2%;
-	padding: 0 15px 10px 15px;
+	padding: 0 15px 0 15px;
 	transition: background-color 0.4s linear;
 }
 
@@ -283,4 +290,13 @@ div.darkmode-background {
 
 .darkmode-toggle:hover {
 	filter: brightness(0.9);
+}
+
+@media screen and (max-width: 500px) {
+	.btn {
+		width: 100%;
+		margin: 0;
+		margin-top: -10px;
+		margin-bottom: 17px;
+	}
 }
