@@ -1,5 +1,6 @@
 html {
 	min-height: 100%;
+	min-width: 100%;
 }
 
 body {
@@ -7,6 +8,16 @@ body {
 	text-align: center;
 	margin: 0;
 	margin-top: 7px;
+
+	padding: env(safe-area-inset-top) env(safe-area-inset-right)
+		env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+	--top-color: #b7e9b4;
+	--bottom-color: #ebebad;
+	background: linear-gradient(var(--top-color), var(--bottom-color)) no-repeat
+		center center fixed;
+	background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
+		no-repeat center center fixed;
 }
 
 body:nth-last-child(n) {
@@ -246,7 +257,7 @@ label.inputField {
 
 .box {
 	display: inline-block;
-	max-width: 800rem;
+	max-width: 80rem;
 	width: 85vw;
 	background-color: rgba(255, 233, 210, 0.85);
 	border-radius: 2%;
@@ -256,15 +267,6 @@ label.inputField {
 
 .darkmode--activated .box {
 	background-color: rgba(255, 215, 170, 0.75);
-}
-
-body {
-	--top-color: #b7e9b4;
-	--bottom-color: #ebebad;
-	background: linear-gradient(var(--top-color), var(--bottom-color)) fixed
-		no-repeat;
-	background: -webkit-linear-gradient(var(--top-color), var(--bottom-color))
-		fixed no-repeat;
 }
 
 div.darkmode-background {
