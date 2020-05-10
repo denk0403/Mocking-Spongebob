@@ -75,7 +75,8 @@
                     <span>Image:</span>
                     <input id="imagein" type="file" accept="image/*" />
                 </label>
-                <img id="camera--toggle" class="icon invisible" src="./img/camera-icon.png" alt="camera toggle" />
+                <img id="camera--toggle" class="icon invisible" title="Toggle camera" src="./img/camera-icon.png"
+                    alt="camera toggle" onContextMenu="return false;" />
             </div>
             <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
                 <span>Math:</span>
@@ -101,9 +102,10 @@
                         playsinline>
                     </video>
                     <!-- Take picture trigger -->
-                    <img id="camera--trigger" src="img/camera-trigger.png">
+                    <img id="camera--trigger" src="img/camera-trigger.png" title="Take picture"
+                        onContextMenu="return false;">
                     <!-- Flip camera trigger -->
-                    <img id="camera--flip" src="img/camera-flip.png">
+                    <img id="camera--flip" src="img/camera-flip.png" title="Flip camera" onContextMenu="return false;">
                 </div>
             </div>
         </div>
