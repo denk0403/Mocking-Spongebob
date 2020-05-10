@@ -42,8 +42,10 @@
 
 			window.addEventListener("hashchange", () => {
 				if (location.hash.startsWith("#math:")) {
+					let currentPosition = mathin.selectionStart;
 					processMathHash(location.hash);
 					mathinRadio.click();
+					mathin.selectionEnd = currentPosition;
 				}
 			});
 

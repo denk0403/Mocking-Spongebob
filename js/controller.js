@@ -9,7 +9,7 @@
 		imageinRadio = document.getElementById("imageinRadio"),
 		upload = document.getElementById("upload"),
 		mathin = document.querySelector("#mathin"),
-		mathinRadio = document.querySelector("#mathinRadio"),
+		mathinRadio = document.getElementById("mathinRadio"),
 		title = document.getElementById("title"),
 		cameraStop = mockingSpongebob.cameraStop,
 		reader = new FileReader();
@@ -29,11 +29,11 @@
 
 	let clear;
 	clear = mockingSpongebob.clear = () => {
-		// 
+		//
 		clearFields();
 		drawMemeText("");
 		repaint();
-		// 
+		//
 	};
 
 	let processHashV2 = (hash) => {
@@ -59,6 +59,7 @@
 			location.replace(`${location.origin}${location.pathname}#`);
 			input.value = "";
 			mathin.value = "";
+			captionRadio.click();
 		}
 	};
 
@@ -83,10 +84,12 @@
 	});
 
 	window.addEventListener("hashchange", () => {
+		let currentPosition = input.selectionStart;
 		processHashV2(location.hash);
+		input.selectionEnd = currentPosition;
 	});
 
-	input.oninput = (event) => {
+	input.addEventListener("input", (event) => {
 		cameraStop();
 		imagein.value = "";
 		mathin.value = "";
@@ -95,7 +98,7 @@
 				event.currentTarget.value.trim()
 			)}`
 		);
-	};
+	});
 
 	input.onkeydown = (event) => {
 		if (event.keyCode == 13) {
@@ -250,6 +253,7 @@
 		for (i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
 				document.getElementById(modes[i].value).style.display = "inline-block";
+				document.getElementById(modes[i].value).focus();
 			} else {
 				document.getElementById(modes[i].value).style.display = "none";
 			}
@@ -268,7 +272,7 @@
 			document.execCommand("copy");
 			document.body.removeChild(temp);
 		} else {
-			navigator.clipboard.writeText(`${location.href}`);
+			navigator.clipboard && navigator.clipboard.writeText(`${location.href}`);
 		}
 	}
 
