@@ -59,6 +59,9 @@ body:nth-last-child(n) {
 	max-width: 100%;
 	height: auto;
 	max-height: 350px;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 }
 
 #note p {
