@@ -23,6 +23,7 @@ const staticAssets = [
 	"./js/camera.js",
 	"./js/math.js",
 	"./js/sharedWebsiteObj.js",
+	"./js/errorDisplay.js",
 
 	// Other
 	"./",
