@@ -29,8 +29,9 @@
 		}, 2750);
 	};
 
-	upload.onerror = () => {
-		!document.getElementById("errorBox") &&
+	upload.onerror = (event) => {
+		event.type === "error" &&
+			!document.getElementById("errorBox") &&
 			document.body.insertAdjacentHTML("beforeend", errorBoxString);
 		errorBox = document.getElementById("errorBox");
 		errorBox
