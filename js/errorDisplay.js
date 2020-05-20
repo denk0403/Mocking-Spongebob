@@ -1,13 +1,19 @@
 (() => {
 	const upload = document.getElementById("upload"),
-		errorBox = document.getElementById("errorBox");
+		errorBoxString = `
+        <div id="errorBox" style="display: flex;">
+            <div id="errorBoxMessage">
+                There was an issue loading in the requested image. Make sure you have the correct permissions for that
+                image.
+            </div>
+            <button id="errorCloseButton">×</button>
+        </div>
+    `;
 
-	document.getElementById("errorCloseButton").addEventListener("click", () => {
-		errorBox.remove();
-	});
-
+	let errorBox;
 	let cancelHoverTimer;
 	let initialTimer;
+
 	const mouseenterHandler = () => {
 		clearTimeout(initialTimer);
 		clearTimeout(cancelHoverTimer);
@@ -23,11 +29,15 @@
 		}, 2750);
 	};
 
-	errorBox.remove();
-
 	upload.onerror = () => {
-		!document.body.contains(errorBox) && document.body.appendChild(errorBox);
-		errorBox.style.display = "flex";
+		!document.getElementById("errorBox") &&
+			document.body.insertAdjacentHTML("beforeend", errorBoxString);
+		errorBox = document.getElementById("errorBox");
+		errorBox
+			.querySelector("#errorCloseButton")
+			.addEventListener("click", () => {
+				errorBox.remove();
+			});
 		initialTimer = setTimeout(mouseleaveHandler, 7500);
 		errorBox.addEventListener("mouseenter", mouseenterHandler);
 		errorBox.addEventListener("mouseleave", () => {
