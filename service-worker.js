@@ -11,6 +11,7 @@ const staticAssets = [
 	"./img/camera-icon.png",
 	"./img/camera-trigger.png",
 	"./img/camera-flip.png",
+	"./img/transparent.png",
 
 	// Display files
 	"./css/styles.css",
