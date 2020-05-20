@@ -300,6 +300,38 @@ div.darkmode-background {
 	filter: brightness(0.9);
 }
 
+#errorBox {
+	display: flex;
+	position: fixed;
+	background-color: rgba(255, 0, 0, 0.85);
+	height: 100px;
+	width: 400px;
+	bottom: 15px;
+	left: 15px;
+	border-radius: 7px;
+	transition: opacity linear 2s;
+	align-items: center;
+	box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+	z-index: 5;
+}
+
+.fade {
+	opacity: 0;
+}
+
+#errorCloseButton {
+	align-self: stretch;
+	border-radius: 7px;
+	width: 75px;
+	font-size: xx-large;
+}
+
+#errorBoxMessage {
+	padding: 0 5px;
+	color: white;
+	text-shadow: 1px 1px 2px black;
+}
+
 @media screen and (max-width: 500px) {
 	.btn {
 		width: 100%;
@@ -312,5 +344,9 @@ div.darkmode-background {
 
 	#views + * {
 		margin-top: 7px;
+	}
+
+	#errorBox {
+		width: calc(100% - 30px);
 	}
 }
