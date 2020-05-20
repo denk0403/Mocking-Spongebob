@@ -8,7 +8,8 @@
 		upload = document.querySelector("#upload"),
 		imagein = document.querySelector("#imagein"),
 		mathin = document.querySelector("#mathin"),
-		input = document.querySelector("#caption");
+		input = document.querySelector("#caption"),
+		mirror = document.querySelector("#mirror");
 
 	const constraints = { video: { facingMode: "front" }, audio: false };
 
@@ -21,6 +22,10 @@
 			track.stop();
 			track = undefined;
 		}
+		mirror.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+		});
 	};
 
 	if (
@@ -65,6 +70,10 @@
 					cameraApp.style.display = "inline-block";
 					cameraFlip.classList.remove("disabled");
 					cameraTrigger.classList.remove("disabled");
+					cameraView.scrollIntoView({
+						behavior: "smooth",
+						block: "center",
+					});
 				});
 
 				cameraToggle.onclick = function () {
@@ -81,6 +90,7 @@
 				};
 
 				cameraTrigger.onclick = function () {
+					const scrollParams = [window.scrollX, window.scrollY];
 					cameraSensor.width = cameraView.videoWidth;
 					cameraSensor.height = cameraView.videoHeight;
 					cameraSensor.getContext("2d").drawImage(cameraView, 0, 0);
@@ -89,6 +99,7 @@
 					imagein.value = "";
 					mathin.value = "";
 					location.replace(`${location.origin}${location.pathname}#`);
+					window.scroll(...scrollParams);
 				};
 			}
 		});
