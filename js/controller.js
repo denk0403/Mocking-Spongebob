@@ -69,14 +69,16 @@
 	};
 
 	window.addEventListener("load", () => {
-		const searchParams = Object.assign(
-			{},
-			...location.search
-				.slice(1)
-				.split("&")
-				.map((param) => param.split("="))
-				.map((arr) => ({ [arr[0]]: arr[1] }))
-		);
+		document.body.classList.remove("preload");
+
+		// const searchParams = Object.assign(
+		// 	{},
+		// 	...location.search
+		// 		.slice(1)
+		// 		.split("&")
+		// 		.map((param) => param.split("="))
+		// 		.map((arr) => ({ [arr[0]]: arr[1] }))
+		// );
 
 		// Check searchParams for modified behavior
 		// (None implemented yet)

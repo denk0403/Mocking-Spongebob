@@ -26,6 +26,10 @@ body:nth-last-child(n) {
 	margin-bottom: 7px;
 }
 
+.preload * {
+	transition: none !important;
+}
+
 #title {
 	transition: color 0.33s ease;
 	-webkit-transition: color 0.33s ease;
@@ -55,17 +59,20 @@ body:nth-last-child(n) {
 	align-self: center;
 }
 
-#mirror {
-	max-width: 100%;
-	height: auto;
-	max-height: 350px;
+img {
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
 
+#mirror {
+	max-width: 100%;
+	height: auto;
+	max-height: 350px;
+}
+
 #note p {
-	margin: 5px;
+	margin: 7px;
 }
 
 label * {
@@ -330,6 +337,26 @@ div.darkmode-background {
 	padding: 0 5px;
 	color: white;
 	text-shadow: 1px 1px 2px black;
+}
+
+.external-link:any-link {
+	color: blue;
+	font-weight: bold;
+	text-decoration: none;
+	transition: color linear 0.2s;
+}
+
+.external-link:hover {
+	color: #21c201;
+	text-decoration: underline;
+}
+
+.darkmode--activated .external-link:any-link {
+	color: yellow;
+}
+
+.darkmode--activated .external-link:hover {
+	color: #21c201;
 }
 
 @media screen and (max-width: 500px) {

@@ -5,9 +5,19 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="keywords" content="Spongebob, meme generator, meme, mock">
+    <meta name="keywords" content="SpongeBob, meme generator, meme, mock">
     <meta name="author" content="Dennis Kats">
-    <title>Mocking Spongebob Generator</title>
+    <title>Mocking SpongeBob Meme Generator</title>
+
+    <!-- Open Graph protocol support-->
+    <meta property="og:title" content="Mocking SpongeBob Meme Generator" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="An online generator for the Mocking SpongeBob meme." />
+    <meta property="og:image" content="./img/background.jpg" />
+    <meta property="og:image:alt" content="Mocking SpongeBob" />
+
+    <!-- Twitter Card support-->
+    <meta name="twitter:card" content="summary" />
 
     <!-- Stylesheets -->
     <link href="./css/styles.css" rel="stylesheet" type="text/css" />
@@ -44,9 +54,9 @@
     <link rel="apple-touch-icon" href="./img/apple_app_icon.png" sizes="144x144">
 </head>
 
-<body>
+<body class="preload">
     <div class="box">
-        <h1 id="title">Mocking Spongebob Meme Generator</h1>
+        <h1 id="title">Mocking SpongeBob Meme Generator</h1>
 
         <span id="modeRadios">
             <label for="captionRadio">
@@ -105,9 +115,10 @@
                     </video>
                     <!-- Take picture trigger -->
                     <img id="camera--trigger" src="img/camera-trigger.png" title="Take picture"
-                        onContextMenu="return false;">
+                        onContextMenu="return false;" draggable="false">
                     <!-- Flip camera trigger -->
-                    <img id="camera--flip" src="img/camera-flip.png" title="Flip camera" onContextMenu="return false;">
+                    <img id="camera--flip" src="img/camera-flip.png" title="Flip camera" onContextMenu="return false;"
+                        draggable="false">
                 </div>
             </div>
         </div>
@@ -123,13 +134,18 @@
         </div>
         <div class="darkmode-ignore" id="note">
             <p>
-                Note: Link copying is supported for caption and math memes only.
+                You can save the image also by right clicking (holding down on mobile) on the meme.
             </p>
             <p>
-                You can save the image also by right clicking (holding down on mobile) on the image.
+                Also check out the <i>new</i> <a class="external-link"
+                    href="https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno"
+                    title="Chrome Web Store">Mocking Spongebob Google Chrome extension</a> <img
+                    src="./img/chrome_store_logo.png" width="18px" onContextMenu="return false;" draggable="false"> for
+                desktops!
             </p>
         </div>
-        <p>Made by Dennis Kats <br /> for his friends</p>
+        <p>Made by <a class="external-link darkmode-ignore" href="https://github.com/denk0403"
+                title="GitHub Page">Dennis Kats</a> <br /> for his friends</p>
     </div>
 </body>
 

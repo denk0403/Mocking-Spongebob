@@ -1,4 +1,4 @@
-# Mocking Spongebob Meme Generator ![image](https://user-images.githubusercontent.com/3473945/80951825-9a4d0000-8dc6-11ea-8842-1e420c1891d0.png)
+# Mocking SpongeBob Meme Generator ![image](https://user-images.githubusercontent.com/3473945/80951825-9a4d0000-8dc6-11ea-8842-1e420c1891d0.png)
 
 <p align="center">
   <img src="http://hits.dwyl.com/denk0403/Mocking-Spongebob.svg">
@@ -19,7 +19,7 @@
   <img src="https://user-images.githubusercontent.com/3473945/80951922-c799ae00-8dc6-11ea-89ff-84fdd4cc5a1d.png">
 </p>
 <p align="center">
-  This website serves as a generator for the mocking Spongebob meme that became popular around 2017.
+  This website serves as a generator for the Mocking SpongeBob meme that became popular around 2017.
 </p>
 
 # Features!
@@ -30,6 +30,8 @@
 - [x] Includes options for copying mock text, link sharing, and saving images.
 - [x] Compatible with all mobile devices featuring a modern web browser.
 - [x] Offers a toggleable dark mode 🌓 style of the website based on your device preferences and preferences between sessions.
+- [x] Pairs well with ["Mocking Spongebob Selection Shortcut" Chrome extension](https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno) to generate memes faster from other online content. 
+  - View on GitHub: [Click Here](https://github.com/denk0403/Mocking-Spongebob-Chrome-Extension)
 - [x] Available as a Progressive Web App (PWA) that can be installed from most modern browsers onto most devices and **accessed offline** _(after loading the page at least once)_.
   - From Safari on iOS: Go to the [website](https://denk0403.github.io/Mocking-Spongebob/) and open the Share options ![share](https://user-images.githubusercontent.com/3473945/81280920-2e1d0700-9027-11ea-8cf9-0d01023137d7.png), and then select "Add to Home Screen" ![square-plus](https://user-images.githubusercontent.com/3473945/81280919-2e1d0700-9027-11ea-993c-b1e2f7192ad6.png).
   - From Google Chrome on Desktops: Go to the [website](https://denk0403.github.io/Mocking-Spongebob/) and watch for a plus icon ![circle-plus](https://user-images.githubusercontent.com/3473945/81280918-2e1d0700-9027-11ea-8221-5679a3382109.png) on the address bar. Click on it and then simply select "Install".
@@ -45,9 +47,9 @@
 
 # License
 
-Mocking Spongebob Meme Generator is licensed under the MIT License - see the [LICENSE](https://github.com/denk0403/Mocking-Spongebob/blob/master/LICENSE) file for details.
+Mocking SpongeBob Meme Generator is licensed under the MIT License - see the [LICENSE](https://github.com/denk0403/Mocking-Spongebob/blob/master/LICENSE) file for details.
 
 # Acknowledgements
 
 - My friends who had to endure probably hundreds of versions of this meme while I was building and testing the website.
-- Writers of Spongebob Squarepants for creating this pillar of television history.
+- Writers of SpongeBob SquarePants for creating this pillar of television history.

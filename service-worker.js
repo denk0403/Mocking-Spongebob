@@ -12,6 +12,7 @@ const staticAssets = [
 	"./img/camera-trigger.png",
 	"./img/camera-flip.png",
 	"./img/transparent.png",
+	"./img/chrome_store_logo.png",
 
 	// Display files
 	"./css/styles.css",
