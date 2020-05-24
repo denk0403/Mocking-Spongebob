@@ -25,11 +25,13 @@
 # Features!
 
 - [x] Automatically alternates the casing of text and paints the meme.
+- [x] Select from multiple different mocking algorithms.
 - [x] Also supports uploading other images and <sup>[1]</sup>inputting TeX typesetting for the caption.
   - <sup>[2]</sup>Built-in camera app for taking pictures even faster!
 - [x] Includes options for copying mock text, link sharing, and saving images.
 - [x] Compatible with all mobile devices featuring a modern web browser.
 - [x] Offers a toggleable dark mode 🌓 style of the website based on your device preferences and preferences between sessions.
+- [x] On Google Chrome for desktops, use your voice to write the caption in a variety of languages using the Web Speech API.
 - [x] Implements Open Graph protocol for generating shareable cards on various social media sites.
 - [x] Pairs well with ["Mocking Spongebob Selection Shortcut" Chrome extension](https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno) to generate memes faster from other online content.
   - View on GitHub: [Click Here](https://github.com/denk0403/Mocking-Spongebob-Chrome-Extension)
