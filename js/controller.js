@@ -149,46 +149,84 @@
 		);
 	});
 
-	function splitUp(str) {
-		const maxLength = 20;
-		let result = "";
+	/**
+	 *
+	 * @param {String} str
+	 */
+	function formatText(str) {
+		const MAX_HEIGHT = 100; // in pixels
 
-		if (str.length > maxLength) {
-			let lineCount = Math.floor(str.length / maxLength) + 1;
-			let breakPoint = str.length / lineCount;
-			let counter = 0;
-			for (let c of str) {
-				result += c;
-				counter += 1;
-				if (counter >= breakPoint && c === " ") {
-					result += "\n";
-					counter = 0;
-				}
+		if (str.trim() === "")
+			return {
+				lines: [""],
+				size: MAX_HEIGHT,
+			};
+
+		const words = str.split(" ");
+		const scale = 2 / 3;
+		let fontSize = MAX_HEIGHT;
+		let result = [[""]];
+		let lines = 1;
+		let curLine = 0;
+
+		ctx.font = `${fontSize}px Arial`;
+
+		function restartResultArray() {
+			result = [];
+			for (let i = 0; i < lines; i++) {
+				result.push([""]);
 			}
 		}
-		return result || str;
-	}
 
-	function getFontSize(str) {
-		let lines = str.split("\n");
-		let xLength = lines.reduce(
-			(prev, cur) => Math.max(prev, cur.length),
-			lines[0].length
-		);
-		return Math.min(Math.floor(75 - 1.5 * xLength), 100 / lines.length);
-	}
+		while (
+			words.some((word, index) => {
+				if (fontSize < 13) {
+					if (index === words.length - 1) {
+						result[result.length - 1].push("...");
+						fontSize = 12;
+						ctx.font = `${12}px Arial`;
+					}
+					return false;
+				}
+				if (fontSize < MAX_HEIGHT * Math.pow(scale, lines)) {
+					lines += 1;
+					fontSize += 3;
+					restartResultArray();
+					curLine = 0;
+					return true;
+				} else {
+					if (
+						ctx.measureText([...result[curLine], word].join(" ")).width >= 485
+					) {
+						if (ctx.measureText(word).width >= 485) {
+							fontSize -= 3;
+							ctx.font = `${fontSize}px Arial`;
+							curLine = 0;
+							restartResultArray();
+							return true;
+						} else if (curLine + 1 < lines) {
+							curLine++;
+							result[curLine].push(word);
+						} else {
+							fontSize -= 3;
+							ctx.font = `${fontSize}px Arial`;
+							curLine = 0;
+							restartResultArray();
+							return true;
+						}
+					} else {
+						result[curLine].push(word);
+					}
+				}
+			})
+		) {}
 
-	function setFont(str) {
-		str = splitUp(str);
-
-		let size = getFontSize(str);
-
-		ctx.textAlign = "center";
-		ctx.lineWidth = getFontSize(str) / 8;
-		ctx.strokeStyle = "black";
-		ctx.fillStyle = "white";
-		ctx.font = `${size}px Arial`;
-		return str;
+		return {
+			lines: result
+				.map((line) => line.join(" ").trim())
+				.filter((line) => line !== ""),
+			size: fontSize,
+		};
 	}
 
 	function drawMemeText(str) {
@@ -198,16 +236,25 @@
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(img, 0, 0);
-		str = setFont(str);
+		let format = formatText(str);
+		let lines = format.lines;
+		let size = format.size;
+		let maxGap = Math.max(
+			...lines.map(
+				(line) => ctx.measureText(line).actualBoundingBoxDescent || 10
+			)
+		);
 
-		let lines = str.split("\n");
-		let lineheight = getFontSize(str);
+		ctx.textAlign = "center";
+		ctx.lineWidth = size / 8;
+		ctx.strokeStyle = "black";
+		ctx.fillStyle = "white";
 
-		yloc = img.height - (lines.length - 1) * lineheight - 20;
+		yloc = img.height - (lines.length - 1) * size - Math.max(maxGap + 6, 12);
 
 		for (let i = 0; i < lines.length; i++) {
-			ctx.strokeText(lines[i], xloc, yloc + i * lineheight);
-			ctx.fillText(lines[i], xloc, yloc + i * lineheight);
+			ctx.strokeText(lines[i], xloc, yloc + i * size);
+			ctx.fillText(lines[i], xloc, yloc + i * size);
 		}
 	}
 
