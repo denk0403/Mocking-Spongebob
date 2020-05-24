@@ -95,6 +95,7 @@ input[type="radio"] {
 	width: 20px;
 }
 
+div.inputField,
 label.inputField {
 	width: 100%;
 }
@@ -111,6 +112,10 @@ label.inputField {
 	border-radius: 5px;
 	max-width: 400px;
 	width: 59%;
+}
+
+#caption {
+	width: 56%;
 }
 
 #imagein {
@@ -251,6 +256,10 @@ label.inputField {
 }
 
 .invisible {
+	visibility: hidden;
+}
+
+.exclude {
 	display: none;
 }
 
@@ -270,10 +279,10 @@ label.inputField {
 .box {
 	display: inline-block;
 	max-width: 80rem;
-	width: 85vw;
+	width: 88vw;
 	background-color: rgba(255, 233, 210, 0.85);
 	border-radius: 2%;
-	padding: 0 15px 0 15px;
+	padding: 0 10px 0 10px;
 	transition: background-color 0.4s linear;
 }
 
@@ -357,6 +366,36 @@ div.darkmode-background {
 
 .darkmode--activated .external-link:hover {
 	color: #21c201;
+}
+
+.microphone:hover {
+	filter: brightness(0.9);
+}
+
+.microphone:active {
+	filter: brightness(0.6);
+}
+
+#language-label {
+	display: block;
+	position: relative;
+	top: 15px;
+	margin-bottom: 15px;
+	font-size: large;
+}
+
+#language-selector {
+	transform: scale(1.2,1.2);
+	margin-left: 10px;
+}
+
+#mockType-selector {
+	transform: scale(1.2,1.2);
+	margin-top: 15px;
+}
+
+#mockType-selector:focus {
+	
 }
 
 @media screen and (max-width: 500px) {

@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
     <meta name="keywords" content="SpongeBob, meme generator, meme, mock">
     <meta name="author" content="Dennis Kats">
     <title>Mocking SpongeBob Meme Generator</title>
@@ -35,6 +35,8 @@
 
     <!-- Shared object across scripts for website -->
     <script type="text/javascript" src="./js/sharedWebsiteObj.js"></script>
+    <!-- Mock types -->
+    <script type="text/javascript" src="./js/mockTypes.js"></script>
     <!-- Darkmode library-->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
 
@@ -48,6 +50,8 @@
     <script type="text/javascript" defer src="./js/errorDisplay.js"></script>
     <!-- Math support -->
     <script type="text/javascript" defer src="./js/math.js"></script>
+    <!-- Web speech support -->
+    <script type="text/javascript" defer src="./js/webSpeech.js"></script>
 
     <!-- generic icon -->
     <link rel="icon" href="./img/icon.png" />
@@ -63,7 +67,7 @@
 
         <span id="modeRadios">
             <label for="captionRadio">
-                <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionLabel"
+                <input class="darkmode-ignore" id="captionRadio" name="mode" type="radio" value="captionControls"
                     checked="checked" />
                 <span>Caption</span>
             </label>
@@ -72,7 +76,7 @@
                 <span>Image</span>
             </label>
             <label for="mathinRadio">
-                <span id="mathinRadioSpan" class="invisible">
+                <span id="mathinRadioSpan" class="exclude">
                     <input class="darkmode-ignore" id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
                     Math
                 </span>
@@ -81,17 +85,24 @@
         <br />
         <br />
         <form>
-            <label id="captionLabel" class="inputField" for="caption">
-                <span>Caption:</span>
-                <input id="caption" class="darkmode-ignore" type="text" placeholder="aDd A cApTiOn...">
-            </label>
+            <div id="captionControls">
+            	<div id="captionLabel" class="inputField">
+            	    <label for="caption">
+            	        <span>Caption:</span>
+            	        <input id="caption" class="darkmode-ignore" type="text" placeholder="aDd A cApTiOn...">
+            	    </label>
+                </div>
+                <select id="mockType-selector" name="mockTypes">
+                    <option id="asl" value="">Alternating: starting lower</option>
+                </select>
+            </div>
             <div id="imageinLabel" class="inputField" style="display: none;">
                 <label for="imagein">
                     <span>Image:</span>
                     <input id="imagein" type="file" accept="image/*" />
                 </label>
-                <img id="camera--toggle" class="icon invisible" title="Toggle camera" src="./img/camera-icon.png"
-                    alt="camera toggle" onContextMenu="return false;" />
+                <img id="camera--toggle" class="icon exclude" title="Toggle camera" src="./img/camera-icon.png"
+                    alt="camera toggle" onContextMenu="return false;" draggable="false" />
             </div>
             <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
                 <span>Math:</span>
@@ -101,14 +112,14 @@
         <br />
         <div id="views">
             <canvas id="output" width="500" height="350"></canvas>
-            <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="invisible" />
+            <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="exclude" />
             <img id="upload" src="./img/transparent.png" style="display: none;" crossorigin="anonymous" />
             <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
 
             <!-- Camera App -->
             <div id="cameraApp" style="display: none;">
                 <!-- Camera sensor -->
-                <canvas id="camera--sensor" class="invisible"></canvas>
+                <canvas id="camera--sensor" class="exclude"></canvas>
 
                 <!-- Frame for containing camera functionality-->
                 <div id="camera--frame">

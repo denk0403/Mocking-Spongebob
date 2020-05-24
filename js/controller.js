@@ -11,11 +11,13 @@
 		mathin = document.querySelector("#mathin"),
 		mathinRadio = document.getElementById("mathinRadio"),
 		title = document.getElementById("title"),
-		cameraStop = mockingSpongebob.cameraStop,
-		reader = new FileReader();
+		mockSelector = document.getElementById("mockType-selector");
+	(cameraStop = mockingSpongebob.cameraStop), (reader = new FileReader());
 
 	title.onclick = () => {
-		location.replace(`${location.origin}${location.pathname}#`);
+		location.replace(
+			`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
+		);
 		captionRadio.click();
 		clear();
 	};
@@ -36,27 +38,59 @@
 		//
 	};
 
-	let processHashV2 = (hash) => {
+	let processHashV2 = (hash = "") => {
 		if (hash) {
 			if (hash.startsWith("#math")) {
 				// math.js will handle behavior
 			} else {
-				try {
-					clearFields();
-					input.value = hash
-						.slice(1) // hash includes '#' when present
-						.split(":")
-						.map((char) => String.fromCodePoint(parseInt(char, 16)))
-						.join("");
-					captionRadio.click();
-					drawMemeText(input.value);
-					repaint();
-				} catch (err) {
-					title.click();
+				if (hash.startsWith("#mockType:")) {
+					const mockType =
+						mockingSpongebob.mockTypes[hash.slice(10, hash.indexOf(":", 10))] ||
+						mockingSpongebob.mockTypes[hash.slice(10, hash.length)];
+					if (mockType) {
+						document.getElementById(mockType.id).selected = true;
+						mockingSpongebob.currentMock = mockType;
+
+						if (hash.indexOf(":", 10) !== -1) {
+							try {
+								clearFields();
+								input.value = hash
+									.slice(hash.indexOf(":", 10) + 1) // hash includes '#' when present
+									.split(":")
+									.map((char) => String.fromCodePoint(parseInt(char, 16)))
+									.join("");
+								captionRadio.click();
+								drawMemeText(input.value);
+								repaint();
+							} catch (err) {
+								title.click();
+							}
+						} else {
+							location.replace(
+								`${location.origin}${location.pathname}#mockType:${mockType.id}:`
+							);
+						}
+					} else {
+						location.replace(
+							`${location.origin}${location.pathname}#mockType:asl:${hash.slice(
+								hash.indexOf(":", 10) + 1
+							)}`
+						);
+					}
+				} else {
+					location.replace(
+						`${location.origin}${location.pathname}#mockType:asl:${hash.slice(
+							1
+						)}`
+					);
 				}
 			}
 		} else {
-			location.replace(`${location.origin}${location.pathname}#`);
+			location.replace(
+				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
+			);
+			drawMemeText("");
+			repaint();
 			input.value = "";
 			mathin.value = "";
 			captionRadio.click();
@@ -95,11 +129,11 @@
 		cameraStop();
 		imagein.value = "";
 		mathin.value = "";
-		location.replace(
-			`${location.origin}${location.pathname}#${hashify(
-				event.currentTarget.value.trim()
-			)}`
-		);
+		const newHash = hashify(event.currentTarget.value.trim());
+		if (location.hash !== newHash)
+			location.replace(
+				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:${newHash}`
+			);
 	});
 
 	input.onkeydown = (event) => {
@@ -107,6 +141,13 @@
 			event.preventDefault();
 		}
 	};
+
+	mockSelector.addEventListener("input", (event) => {
+		const newHash = hashify(input.value.trim());
+		location.replace(
+			`${location.origin}${location.pathname}#mockType:${event.currentTarget.value}:${newHash}`
+		);
+	});
 
 	function splitUp(str) {
 		const maxLength = 20;
@@ -170,7 +211,7 @@
 		}
 	}
 
-	function altText(str) {
+	function defaultMock(str) {
 		let result = "";
 		let lower = true;
 		for (let c of str) {
@@ -178,6 +219,14 @@
 			if (c.match(/[a-z]/i)) lower = !lower;
 		}
 		return result;
+	}
+
+	function altText(str) {
+		if (mockingSpongebob.currentMock) {
+			return mockingSpongebob.currentMock.apply(str);
+		} else {
+			return defaultMock(str);
+		}
 	}
 
 	reader.onload = function () {
@@ -255,7 +304,11 @@
 		for (i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
 				document.getElementById(modes[i].value).style.display = "inline-block";
-				document.getElementById(modes[i].value).focus();
+				if (document.getElementById(modes[i].value).id === "captionControls") {
+					document.getElementById("caption").focus();
+				} else {
+					document.getElementById(modes[i].value).focus();
+				}
 			} else {
 				document.getElementById(modes[i].value).style.display = "none";
 			}

@@ -43,7 +43,7 @@
 
 # Built With
 
-- **Technologies**: HTML, CSS, JavaScript, and Web APIs
+- **Technologies**: HTML, CSS, JavaScript, and various Web APIs
 - **Libraries**: [Darkmode.js](https://darkmodejs.learn.uno/), [MathJax](https://www.mathjax.org/)
 
 # License

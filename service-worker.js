@@ -13,6 +13,8 @@ const staticAssets = [
 	"./img/camera-flip.png",
 	"./img/transparent.png",
 	"./img/chrome_store_logo.png",
+	"./img/microphoneOff.png",
+	"./img/microphoneOn.png",
 
 	// Display files
 	"./css/styles.css",
@@ -26,6 +28,8 @@ const staticAssets = [
 	"./js/math.js",
 	"./js/sharedWebsiteObj.js",
 	"./js/errorDisplay.js",
+	"./js/webSpeech.js",
+	"./js/mockTypes.js",
 
 	// Other
 	"./",
