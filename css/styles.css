@@ -385,17 +385,22 @@ div.darkmode-background {
 }
 
 #language-selector {
-	transform: scale(1.2,1.2);
+	transform: scale(1.2, 1.2);
 	margin-left: 10px;
 }
 
 #mockType-selector {
-	transform: scale(1.2,1.2);
+	transform: scale(1.2, 1.2);
 	margin-top: 15px;
 }
 
-#mockType-selector:focus {
-	
+#language-label {
+	color: black;
+	transition: color linear 0.15s;
+}
+
+.darkmode--activated #language-label {
+	color: white;
 }
 
 @media screen and (max-width: 500px) {
