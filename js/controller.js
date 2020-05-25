@@ -11,8 +11,18 @@
 		mathin = document.querySelector("#mathin"),
 		mathinRadio = document.getElementById("mathinRadio"),
 		title = document.getElementById("title"),
-		mockSelector = document.getElementById("mockType-selector");
-	(cameraStop = mockingSpongebob.cameraStop), (reader = new FileReader());
+		mockSelector = document.getElementById("mockType-selector"),
+		cameraStop = mockingSpongebob.cameraStop,
+		reader = new FileReader();
+
+	//set-up canvas context
+	ctx.lineJoin = "round";
+	// ctx.miterLimit = 2;
+	ctx.textBaseline = "bottom";
+	ctx.imageSmoothingQuality = "high";
+	ctx.textAlign = "center";
+	ctx.strokeStyle = "black";
+	ctx.fillStyle = "white";
 
 	title.onclick = () => {
 		location.replace(
@@ -154,79 +164,87 @@
 	 * @param {String} str
 	 */
 	function formatText(str) {
-		const MAX_HEIGHT = 100; // in pixels
+		const INITIAL_FONT_SIZE = 100; // in pixels
+		const MIN_FONT_SIZE = 8;
 
-		if (str.trim() === "")
+		if (str.trim() === "") {
 			return {
-				lines: [""],
-				size: MAX_HEIGHT,
+				lines: [],
+				size: INITIAL_FONT_SIZE,
 			};
-
-		const words = str.split(" ");
-		const scale = 2 / 3;
-		let fontSize = MAX_HEIGHT;
-		let result = [[""]];
-		let lines = 1;
-		let curLine = 0;
-
-		ctx.font = `${fontSize}px Arial`;
-
-		function restartResultArray() {
-			result = [];
-			for (let i = 0; i < lines; i++) {
-				result.push([""]);
-			}
 		}
 
-		while (
-			words.some((word, index) => {
-				if (fontSize < 13) {
-					if (index === words.length - 1) {
-						result[result.length - 1].push("...");
-						fontSize = 12;
-						ctx.font = `${12}px Arial`;
-					}
-					return false;
-				}
-				if (fontSize < MAX_HEIGHT * Math.pow(scale, lines)) {
-					lines += 1;
-					fontSize += 3;
-					restartResultArray();
-					curLine = 0;
-					return true;
-				} else {
-					if (
-						ctx.measureText([...result[curLine], word].join(" ")).width >= 485
-					) {
-						if (ctx.measureText(word).width >= 485) {
-							fontSize -= 3;
-							ctx.font = `${fontSize}px Arial`;
-							curLine = 0;
-							restartResultArray();
-							return true;
-						} else if (curLine + 1 < lines) {
-							curLine++;
-							result[curLine].push(word);
+		const words = str.split(" ");
+		let fontSize = INITIAL_FONT_SIZE;
+		let lines = 1;
+
+		function createResultArray() {
+			result = [];
+			for (let i = 0; i < lines; i++) {
+				result.push([]);
+			}
+			return result;
+		}
+
+		let formattedAllWords = false;
+		while (!formattedAllWords && fontSize >= MIN_FONT_SIZE) {
+			// Apply new font-size if neccessary
+			ctx.font = `bold ${fontSize}px Arial`;
+
+			// set up result array of lines
+			const result = createResultArray();
+			let curLine = 0;
+
+			formattedAllWords = !words.some((word) => {
+				// returns true if a word cannot fit (font-size or line count need to change)
+				if (
+					ctx.measureText([...result[curLine], word].join(" ")).width >= 480
+					// checks if adding new word exceeds max line length
+				) {
+					if (ctx.measureText(word).width >= 485) {
+						// a single word is too big
+						fontSize -= 1;
+						return true;
+					} else if (curLine + 1 < lines) {
+						// an extra line is available
+						curLine += 1;
+						result[curLine].push(word);
+					} else {
+						if (fontSize * (lines + 1) < INITIAL_FONT_SIZE) {
+							// check whether to add new line instead of shrinking font
+							lines += 1;
+							curLine += 1;
+							result.push([word]);
 						} else {
-							fontSize -= 3;
-							ctx.font = `${fontSize}px Arial`;
-							curLine = 0;
-							restartResultArray();
+							fontSize -= 1;
 							return true;
 						}
-					} else {
-						result[curLine].push(word);
 					}
+				} else {
+					// add the word if it fits perfectly
+					result[curLine].push(word);
 				}
-			})
-		) {}
+			});
+		}
 
-		return {
-			lines: result
-				.map((line) => line.join(" ").trim())
-				.filter((line) => line !== ""),
-			size: fontSize,
-		};
+		if (fontSize < MIN_FONT_SIZE) {
+			const errorSize = 59;
+			ctx.font = `bold ${errorSize}px Arial`;
+			ctx.fillStyle = "red";
+			return {
+				tooLarge: true,
+				lines: ["Input is too large"],
+				size: errorSize,
+			};
+		} else {
+			ctx.fillStyle = "white";
+			return {
+				lines: result
+					.map((line) => line.join(" "))
+					.filter((line) => line !== ""),
+				size: fontSize,
+			};
+		}
 	}
 
 	function drawMemeText(str) {
@@ -236,25 +254,26 @@
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(img, 0, 0);
+
 		let format = formatText(str);
 		let lines = format.lines;
 		let size = format.size;
-		let maxGap = Math.max(
-			...lines.map(
-				(line) => ctx.measureText(line).actualBoundingBoxDescent || 10
-			)
-		);
 
-		ctx.textAlign = "center";
-		ctx.lineWidth = size / 8;
-		ctx.strokeStyle = "black";
-		ctx.fillStyle = "white";
+		const lineWidthShrinkFactor = 9;
+		ctx.lineWidth = size / lineWidthShrinkFactor;
 
-		yloc = img.height - (lines.length - 1) * size - Math.max(maxGap + 6, 12);
+		const bottomMargin = 4;
+
+		yloc =
+			img.height - // start at bottom of canvas
+			(lines.length - 1) * size - // account for the number of lines to move up
+			ctx.lineWidth / 2 - // account for the outer border thickness
+			ctx.measureText(lines[lines.length - 1]).actualBoundingBoxDescent - // align bottom of bounding boxes
+			bottomMargin; // create a bottom margin
 
 		for (let i = 0; i < lines.length; i++) {
-			ctx.strokeText(lines[i], xloc, yloc + i * size);
-			ctx.fillText(lines[i], xloc, yloc + i * size);
+			ctx.strokeText(lines[i], xloc, yloc + i * size); // draw border
+			ctx.fillText(lines[i], xloc, yloc + i * size); // draw filled texts
 		}
 	}
 
