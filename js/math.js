@@ -51,6 +51,11 @@
 
 			mathin.oninput = (event) => {
 				cameraStop();
+				mathin.scrollIntoView({
+					behavior: "smooth",
+					block: "start",
+				});
+
 				input.value = "";
 				imagein.value = "";
 				location.replace(
