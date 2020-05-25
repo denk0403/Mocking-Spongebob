@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/3473945/80951922-c799ae00-8dc6-11ea-89ff-84fdd4cc5a1d.png">
+  <img src="https://user-images.githubusercontent.com/3473945/82801778-d9152980-9e4b-11ea-84a4-0ffea859e547.png">
 </p>
 <p align="center">
   This website serves as a generator for the Mocking SpongeBob meme that became popular around 2017.
@@ -24,7 +24,7 @@
 
 # Features!
 
-- [x] Automatically alternates the casing of text and paints the meme.
+- [x] Automatically and intelligently resizes and formats caption in the lower region of the meme.
 - [x] Select from multiple different mocking algorithms.
 - [x] Also supports uploading other images and <sup>[1]</sup>inputting TeX typesetting for the caption.
   - <sup>[2]</sup>Built-in camera app for taking pictures even faster!
