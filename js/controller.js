@@ -166,6 +166,7 @@
 	function formatText(str) {
 		const INITIAL_FONT_SIZE = 100; // in pixels
 		const MIN_FONT_SIZE = 8;
+		const MAX_LINE_WIDTH = 480; // in pixels
 
 		if (str.trim() === "") {
 			return {
@@ -175,16 +176,9 @@
 		}
 
 		const words = str.split(" ");
-		let fontSize = INITIAL_FONT_SIZE;
-		let lines = 1;
+		const result = [[]];
 
-		function createResultArray() {
-			result = [];
-			for (let i = 0; i < lines; i++) {
-				result.push([]);
-			}
-			return result;
-		}
+		let fontSize = INITIAL_FONT_SIZE;
 
 		let formattedAllWords = false;
 		while (!formattedAllWords && fontSize >= MIN_FONT_SIZE) {
@@ -192,27 +186,24 @@
 			ctx.font = `bold ${fontSize}px Arial`;
 
 			// set up result array of lines
-			const result = createResultArray();
+			result.length = 0;
+			result.push([]);
 			let curLine = 0;
 
 			formattedAllWords = !words.some((word) => {
 				// returns true if a word cannot fit (font-size or line count need to change)
 				if (
-					ctx.measureText([...result[curLine], word].join(" ")).width >= 480
+					ctx.measureText([...result[curLine], word].join(" ")).width >=
+					MAX_LINE_WIDTH
 					// checks if adding new word exceeds max line length
 				) {
-					if (ctx.measureText(word).width >= 485) {
-						// a single word is too big
+					if (ctx.measureText(word).width >= MAX_LINE_WIDTH) {
+						// check if a single word is too big
 						fontSize -= 1;
 						return true;
-					} else if (curLine + 1 < lines) {
-						// an extra line is available
-						curLine += 1;
-						result[curLine].push(word);
 					} else {
-						if (fontSize * (lines + 1) < INITIAL_FONT_SIZE) {
+						if (fontSize * (curLine + 2) < INITIAL_FONT_SIZE) {
 							// check whether to add new line instead of shrinking font
-							lines += 1;
 							curLine += 1;
 							result.push([word]);
 						} else {
@@ -221,12 +212,13 @@
 						}
 					}
 				} else {
-					// add the word if it fits perfectly
+					// add the word if it fits just fine
 					result[curLine].push(word);
 				}
 			});
 		}
 
+		// check for unreadable text
 		if (fontSize < MIN_FONT_SIZE) {
 			const errorSize = 59;
 			ctx.font = `bold ${errorSize}px Arial`;
@@ -239,9 +231,7 @@
 		} else {
 			ctx.fillStyle = "white";
 			return {
-				lines: result
-					.map((line) => line.join(" "))
-					.filter((line) => line !== ""),
+				lines: result.map((line) => line.join(" ")),
 				size: fontSize,
 			};
 		}
