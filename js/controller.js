@@ -300,7 +300,8 @@
 
 	upload.onload = (event) => {
 		if (
-			event.currentTarget.src !== `${location.origin}/img/transparent.png` &&
+			event.currentTarget.src !==
+				`${location.origin}${location.pathname}img/transparent.png` &&
 			!location.hash.startsWith("#math:")
 		) {
 			location.replace(`${location.origin}${location.pathname}#image`);
