@@ -149,10 +149,11 @@
 		imagein.value = "";
 		mathin.value = "";
 		const newHash = hashify(event.currentTarget.value.trim());
-		if (location.hash !== newHash)
+		if (location.hash !== newHash) {
 			location.replace(
 				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:${newHash}`
 			);
+		}
 	});
 
 	input.onkeydown = (event) => {
@@ -300,8 +301,9 @@
 
 	upload.onload = (event) => {
 		if (
-			event.currentTarget.src !==
-				`${location.origin}${location.pathname}img/transparent.png` &&
+			upload.src !== `${location.origin}/img/transparent.png` &&
+			upload.src !==
+				`${location.origin}/Mocking-Spongebob/img/transparent.png` &&
 			!location.hash.startsWith("#math:")
 		) {
 			location.replace(`${location.origin}${location.pathname}#image`);
