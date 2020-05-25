@@ -1,5 +1,10 @@
 (() => {
 	mockingSpongebob.mockTypes = {
+		cu: {
+			id: "cu",
+			name: "Custom Text",
+			apply: (str = "") => str,
+		},
 		asl: {
 			id: "asl",
 			name: "Alternating: starting lower",
@@ -134,7 +139,12 @@
 				option.innerText = mockingSpongebob.mockTypes[key].name;
 				return option;
 			})
-			.sort((opt1, opt2) => opt1.innerText.length - opt2.innerText.length)
+			.sort((opt1, opt2) => {
+				const compare = opt1.innerText.length - opt2.innerText.length;
+				return compare !== 0
+					? compare
+					: opt1.innerText.localeCompare(opt2.innerText);
+			})
 			.forEach((option) => mockSelector.appendChild(option));
 
 		document.getElementById("asl").selected = true;
