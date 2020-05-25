@@ -299,11 +299,14 @@
 	};
 
 	upload.onload = (event) => {
-		if (event.currentTarget.src !== `${location.origin}/img/transparent.png`) {
+		if (
+			event.currentTarget.src !== `${location.origin}/img/transparent.png` &&
+			!location.hash.startsWith("#math:")
+		) {
 			location.replace(`${location.origin}${location.pathname}#image`);
-			drawMemeImage();
-			repaint();
 		}
+		drawMemeImage();
+		repaint();
 	};
 
 	function drawMemeImage() {
