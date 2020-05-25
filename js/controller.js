@@ -52,6 +52,8 @@
 		if (hash) {
 			if (hash.startsWith("#math")) {
 				// math.js will handle behavior
+			} else if (hash.startsWith("#image")) {
+				imageinRadio.click();
 			} else {
 				if (hash.startsWith("#mockType:")) {
 					const mockType =
@@ -291,6 +293,7 @@
 	};
 
 	upload.onload = (event) => {
+		location.replace(`${location.origin}${location.pathname}#image`);
 		drawMemeImage();
 		repaint();
 	};
@@ -345,7 +348,6 @@
 	imagein.onchange = (event) => {
 		input.value = "";
 		mathin.value = "";
-		location.replace(`${location.origin}${location.pathname}#`);
 		if (imagein.files[0]) {
 			reader.readAsDataURL(imagein.files[0]);
 		} else {

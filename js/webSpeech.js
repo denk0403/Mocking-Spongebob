@@ -139,7 +139,9 @@
 
 			recognition.addEventListener("result", (event) => {
 				location.replace(
-					`${location.origin}${location.pathname}#${hashify(
+					`${location.origin}${location.pathname}#mockType:${
+						mockingSpongebob.currentMock.id
+					}:${hashify(
 						Array.from(event.results)
 							.map((result) => result[0].transcript.trim().capitalize())
 							.join(". ")

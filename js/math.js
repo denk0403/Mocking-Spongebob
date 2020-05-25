@@ -68,7 +68,9 @@
 		} else {
 			window.addEventListener("hashchange", () => {
 				if (location.hash.startsWith("#math")) {
-					location.replace(`${location.origin}${location.pathname}#`);
+					location.replace(
+						`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
+					);
 				}
 			});
 			title.click();

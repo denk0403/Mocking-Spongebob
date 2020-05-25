@@ -98,7 +98,6 @@
 					input.value = "";
 					imagein.value = "";
 					mathin.value = "";
-					location.replace(`${location.origin}${location.pathname}#`);
 					window.scroll(...scrollParams);
 				};
 			}
