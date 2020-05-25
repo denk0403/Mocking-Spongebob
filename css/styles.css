@@ -391,7 +391,26 @@ div.darkmode-background {
 
 #mockType-selector {
 	transform: scale(1.2, 1.2);
-	margin-top: 15px;
+	width: 50%;
+}
+
+#mockTypeLabel {
+	display: inline-flex;
+	vertical-align: middle;
+	align-items: center;
+	justify-content: space-evenly;
+	width: min(100%, 500px);
+	margin-top: 7px;
+	margin-bottom: -8px;
+}
+
+#mockTypeLabel * {
+	vertical-align: middle;
+	max-width: 50%;
+}
+
+#mockTypeLabel > span {
+	font-size: large;
 }
 
 #language-label {

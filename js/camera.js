@@ -21,11 +21,12 @@
 		if (track) {
 			track.stop();
 			track = undefined;
+
+			mirror.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+			});
 		}
-		mirror.scrollIntoView({
-			behavior: "smooth",
-			block: "center",
-		});
 	};
 
 	if (

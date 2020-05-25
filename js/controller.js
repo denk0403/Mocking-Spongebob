@@ -139,6 +139,13 @@
 
 	input.addEventListener("input", (event) => {
 		cameraStop();
+		if ((microphoneOn = document.getElementById("microphone--on"))) {
+			microphoneOn.click();
+		}
+		input.scrollIntoView({
+			behavior: "smooth",
+			block: "start",
+		});
 		imagein.value = "";
 		mathin.value = "";
 		const newHash = hashify(event.currentTarget.value.trim());
@@ -226,7 +233,6 @@
 			ctx.font = `bold ${errorSize}px Arial`;
 			ctx.fillStyle = "red";
 			return {
-				tooLarge: true,
 				lines: ["Input is too large"],
 				size: errorSize,
 			};
@@ -293,9 +299,11 @@
 	};
 
 	upload.onload = (event) => {
-		location.replace(`${location.origin}${location.pathname}#image`);
-		drawMemeImage();
-		repaint();
+		if (event.currentTarget.src !== `${location.origin}/img/transparent.png`) {
+			location.replace(`${location.origin}${location.pathname}#image`);
+			drawMemeImage();
+			repaint();
+		}
 	};
 
 	function drawMemeImage() {
@@ -373,6 +381,9 @@
 		}
 		if (!imageinRadio.checked) {
 			cameraStop();
+		}
+		if ((microphoneOn = document.getElementById("microphone--on"))) {
+			microphoneOn.click();
 		}
 	}
 

@@ -86,15 +86,18 @@
         <br />
         <form>
             <div id="captionControls">
-            	<div id="captionLabel" class="inputField">
-            	    <label for="caption">
-            	        <span>Caption:</span>
-            	        <input id="caption" class="darkmode-ignore" type="text" placeholder="aDd A cApTiOn...">
-            	    </label>
+                <div id="captionLabel" class="inputField">
+                    <label for="caption">
+                        <span>Caption:</span>
+                        <input id="caption" class="darkmode-ignore" type="text" placeholder="aDd A cApTiOn...">
+                    </label>
                 </div>
-                <select id="mockType-selector" name="mockTypes">
-                    <option id="asl" value="">Alternating: starting lower</option>
-                </select>
+                <label id="mockTypeLabel" for="mockType-selector">
+                    <span>Mock Type: </span>
+                    <select id="mockType-selector" name="mockTypes">
+                        <option id="asl" value="">Alternating: starting lower</option>
+                    </select>
+                </label>
             </div>
             <div id="imageinLabel" class="inputField" style="display: none;">
                 <label for="imagein">
