@@ -83,7 +83,7 @@
 			languageLabel.appendChild(languageSelector);
 
 			document.body.insertAdjacentElement("beforeend", languageLabel);
-			document.getElementById("lansguage-selector");
+
 			if (languages[navigator.language]) {
 				document.getElementById(`lang-${navigator.language}`).selected = true;
 				initLanguage = navigator.language;
@@ -131,7 +131,6 @@
 				recognition.stop();
 				microphoneOn.click();
 			});
-			// document.cookie = `language=`
 
 			recognition.addEventListener("speechend", () => {
 				microphoneOn.click();
