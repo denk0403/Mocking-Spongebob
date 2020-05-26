@@ -1,12 +1,14 @@
 <!doctype html>
 
-<html>
+<html lang="en-US">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
     <meta name="keywords" content="SpongeBob, meme generator, meme, mock, mocking, funny">
     <meta name="author" content="Dennis Kats">
+    <meta name="description" content="An excessively multifaceted generator for the Mocking SpongeBob meme." />
+    <meta name="theme-color" content="#28e103">
     <title>Mocking SpongeBob Meme Generator</title>
 
     <!-- Open Graph protocol support-->
@@ -32,14 +34,18 @@
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <!-- Offline PWA support -->
     <script type="text/javascript" async src="./js/sw-registrator.js"></script>
+    <!-- Darkmode library-->
+    <script type="text/javascript" async
+        src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
 
     <!-- Shared object across scripts for website -->
-    <script type="text/javascript" src="./js/sharedWebsiteObj.js"></script>
-    <!-- Mock types -->
-    <script type="text/javascript" src="./js/mockTypes.js"></script>
-    <!-- Darkmode library-->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
+    <script type="text/javascript">
+        "use strict";
+        const mockingSpongebob = Object.create(null);
+    </script>
 
+    <!-- Mock types -->
+    <script type="text/javascript" defer src="./js/mockTypes.js"></script>
     <!-- Darkmode support -->
     <script type="text/javascript" defer src="./js/darkmode.js"></script>
     <!-- Camera support -->
@@ -117,7 +123,7 @@
         <br />
         <div id="views">
             <canvas id="output" width="500" height="350"></canvas>
-            <img id="meme" src="./img/background.jpg" alt="spongebob meme" class="exclude" />
+            <img id="meme" src="./img/background.jpg" alt="spongebob meme" style="display: none;" />
             <img id="upload" src="./img/transparent.png" style="display: none;" crossorigin="anonymous" />
             <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
 
@@ -149,7 +155,7 @@
                 title="Copy the link for this meme to your clipboard">Copy Link</button>
             <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your local files">Save
                 Image</button>
-            <a id="sv-link" href="./img/background.jpg" download="img.png">Save Image</a>
+            <a id="sv-link" href="./img/background.jpg" download="img.png" style="display: none;">Save Image</a>
         </div>
         <div class="darkmode-ignore" id="note">
             <p>
@@ -159,7 +165,8 @@
                 Also check out the <i>new</i> <a class="external-link"
                     href="https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno"
                     title="Chrome Web Store">Mocking Spongebob Google Chrome extension</a> <img
-                    src="./img/chrome_store_logo.png" width="18px" onContextMenu="return false;" draggable="false"> for
+                    src="./img/chrome_store_logo.png" title="Chrome Web Store Logo" alt="Chrome Web Store Logo"
+                    width="18px" onContextMenu="return false;" draggable="false"> for
                 desktops!
             </p>
         </div>

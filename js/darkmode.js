@@ -1,5 +1,5 @@
 "use strict";
-(() => {
+window.addEventListener("load", () => {
 	Darkmode &&
 		new Darkmode({
 			time: "0.5s", // default: '0.3s'
@@ -7,4 +7,5 @@
 			buttonColorLight: "#dddddd",
 			label: "🌓", // default: ''
 		}).showWidget();
-})();
+	document.body.classList.remove("preload");
+});

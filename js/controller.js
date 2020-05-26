@@ -120,7 +120,6 @@
 	};
 
 	window.addEventListener("load", () => {
-		document.body.classList.remove("preload");
 		processHashV2(location.hash);
 	});
 
