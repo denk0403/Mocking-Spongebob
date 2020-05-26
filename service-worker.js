@@ -30,6 +30,7 @@ const staticAssets = [
 	"./js/errorDisplay.js",
 	"./js/webSpeech.js",
 	"./js/mockTypes.js",
+	"./js/demonstration.js",
 
 	// Other
 	"./",

@@ -1,3 +1,4 @@
+"use strict";
 (() => {
 	const mathin = document.querySelector("#mathin"),
 		upload = document.querySelector("#upload"),

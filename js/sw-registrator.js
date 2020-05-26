@@ -1,3 +1,4 @@
+"use strict";
 (() => {
 	// Check compatibility for the browser we're running this in
 	if ("serviceWorker" in navigator) {

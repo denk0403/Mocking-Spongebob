@@ -1,3 +1,4 @@
+"use strict";
 (() => {
 	const languages = {
 			"en-US": "english",

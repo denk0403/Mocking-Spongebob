@@ -1,4 +1,6 @@
+"use strict";
 (() => {
+	// DOM Constants
 	const canvas = document.getElementById("output"),
 		ctx = canvas.getContext("2d"),
 		img = document.getElementById("meme"),
@@ -14,6 +16,9 @@
 		mockSelector = document.getElementById("mockType-selector"),
 		cameraStop = mockingSpongebob.cameraStop,
 		reader = new FileReader();
+
+	const INITIAL_FONT_SIZE = 100; // in pixels
+	const MAX_LINE_BOX_WIDTH = 480; // in pixels
 
 	//set-up canvas context
 	ctx.lineJoin = "round";
@@ -116,18 +121,6 @@
 
 	window.addEventListener("load", () => {
 		document.body.classList.remove("preload");
-
-		// const searchParams = Object.assign(
-		// 	{},
-		// 	...location.search
-		// 		.slice(1)
-		// 		.split("&")
-		// 		.map((param) => param.split("="))
-		// 		.map((arr) => ({ [arr[0]]: arr[1] }))
-		// );
-
-		// Check searchParams for modified behavior
-		// (None implemented yet)
 		processHashV2(location.hash);
 	});
 
@@ -139,6 +132,7 @@
 
 	input.addEventListener("input", (event) => {
 		cameraStop();
+		let microphoneOn;
 		if ((microphoneOn = document.getElementById("microphone--on"))) {
 			microphoneOn.click();
 		}
@@ -157,7 +151,7 @@
 	});
 
 	input.onkeydown = (event) => {
-		if (event.keyCode == 13) {
+		if (event.keyCode === 13) {
 			event.preventDefault();
 		}
 	};
@@ -170,9 +164,7 @@
 	});
 
 	function formatText(str = "") {
-		const INITIAL_FONT_SIZE = 100; // in pixels
 		const MIN_FONT_SIZE = 8;
-		const MAX_LINE_BOX_WIDTH = 480; // in pixels
 
 		if (str.trim() === "") {
 			return {
@@ -181,20 +173,18 @@
 			};
 		}
 
-		// Flags
-		// let TOO_SMALL_FLAG = false;
 		// Set-up font
 		let fontSize = INITIAL_FONT_SIZE;
 
 		// Line box width helper
-		function maxBoxWidthFor(curLine) {
-			const PADDING_SCALE = 2 / 3;
-			const MAX_POSSIBLE_WIDTH_CHANGE = -Math.max(
-				fontSize * PADDING_SCALE,
-				MIN_FONT_SIZE
-			);
-			return MAX_LINE_BOX_WIDTH + MAX_POSSIBLE_WIDTH_CHANGE * (curLine % 2);
-		}
+		// function maxBoxWidthFor(curLine) {
+		// 	const PADDING_SCALE = 2 / 3;
+		// 	const MAX_POSSIBLE_WIDTH_CHANGE = -Math.max(
+		// 		fontSize * PADDING_SCALE,
+		// 		MIN_FONT_SIZE
+		// 	);
+		// 	return MAX_LINE_BOX_WIDTH + MAX_POSSIBLE_WIDTH_CHANGE * (curLine % 2);
+		// }
 
 		const words = str.split(" ");
 		const result = [];
@@ -211,13 +201,12 @@
 
 			formattedAllWords = !words.some((word) => {
 				// returns true if a word cannot fit (font-size or line count need to change)
-				const lineBoxWidth = maxBoxWidthFor(curLine);
 				if (
 					ctx.measureText(result[curLine].concat([word]).join(" ")).width >=
-					lineBoxWidth
+					MAX_LINE_BOX_WIDTH
 					// checks if adding new word exceeds the line's box width
 				) {
-					if (ctx.measureText(word).width >= lineBoxWidth) {
+					if (ctx.measureText(word).width >= MAX_LINE_BOX_WIDTH) {
 						// check if a single word is too big
 						fontSize -= 1;
 						return true;
@@ -225,10 +214,7 @@
 						if (
 							// is there enough veretical room for a new line
 							fontSize * (curLine + 2) <
-							INITIAL_FONT_SIZE //&&
-							// (TOO_SMALL_FLAG ||
-							// 	ctx.measureText(words.slice(index).join(" ")).width > 110)
-							// check whether to add new line instead of shrinking font
+							INITIAL_FONT_SIZE
 						) {
 							curLine += 1;
 							result.push([word]);
@@ -242,10 +228,6 @@
 					result[curLine].push(word);
 				}
 			});
-			// if (!TOO_SMALL_FLAG && fontSize < MIN_FONT_SIZE) {
-			// 	TOO_SMALL_FLAG = true;
-			// 	fontSize += 1;
-			// }
 		}
 
 		// check for unreadable text
@@ -255,40 +237,93 @@
 			ctx.fillStyle = "red";
 			return {
 				lines: ["Input is too large"],
-				size: ERROR_SIZE,
+				fontSize: ERROR_SIZE,
 			};
 		} else {
+			fontSize = optimizeSize(result, fontSize);
 			ctx.fillStyle = "white";
 			return {
-				lines: result.map((line) => line.join(" ")),
-				size: fontSize,
+				lines: result.map((line) => line.join(" ").trim()),
+				fontSize,
 			};
 		}
 	}
 
+	/**
+	 * Optimizes result array and returns best font-size
+	 * @param {[[""]]} result
+	 * @param {number} fontSize
+	 */
+	function optimizeSize(result, fontSize) {
+		for (let lineIndex = result.length - 1; lineIndex >= 1; lineIndex--) {
+			const line2Index = lineIndex - 1;
+			const getLine1Text = () => result[lineIndex].join(" ");
+
+			while (
+				ctx.measureText(`${result[line2Index].slice(-1)[0]} ${getLine1Text()}`)
+					.width <
+				ctx.measureText(result[line2Index].slice(0, -1).join(" ")).width
+			) {
+				result[lineIndex].unshift(result[line2Index].pop());
+			}
+		}
+		return tryToIncreaseFont(result, fontSize);
+	}
+
+	/**
+	 * Tries to increase the font-size as much as possible
+	 * @param {[[""]]} result
+	 * @param {number} fontSize
+	 */
+	function tryToIncreaseFont(result, fontSize) {
+		const tryOneIncrease = () => {
+			const newSize = fontSize + 1;
+			ctx.font = `bold ${newSize}px Arial`;
+			if (
+				result.every(
+					(line) => ctx.measureText(line.join(" ")).width < MAX_LINE_BOX_WIDTH
+				) &&
+				result.length * newSize < INITIAL_FONT_SIZE
+			) {
+				fontSize = newSize;
+				return true;
+			} else {
+				ctx.font = `bold ${fontSize}px Arial`;
+				return false;
+			}
+		};
+
+		let increasePossible = true;
+		while (increasePossible) {
+			increasePossible = tryOneIncrease();
+		}
+
+		return fontSize;
+	}
+
 	function drawMemeText(str) {
-		let xloc = canvas.width / 2;
+		const xloc = canvas.width / 2;
 
 		str = altText(str);
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(img, 0, 0);
 
-		let format = formatText(str);
-		let lines = format.lines;
-		let size = format.size;
+		const format = formatText(str);
+		const lines = format.lines;
+		const size = format.fontSize;
 
-		const lineWidthShrinkFactor = 9;
-		ctx.lineWidth = size / lineWidthShrinkFactor;
+		const LINE_WIDTH_SHRINK_FACTOR = 9;
+		ctx.lineWidth = size / LINE_WIDTH_SHRINK_FACTOR;
 
-		const bottomMargin = 4;
+		const BOTTOM_MARGIN = 4;
 
-		yloc =
+		const yloc =
 			img.height - // start at bottom of canvas
 			(lines.length - 1) * size - // account for the number of lines to move up
 			ctx.lineWidth / 2 - // account for the outer border thickness
 			ctx.measureText(lines[lines.length - 1]).actualBoundingBoxDescent - // align bottom of bounding boxes
-			bottomMargin; // create a bottom margin
+			BOTTOM_MARGIN; // create a bottom margin
 
 		for (let i = 0; i < lines.length; i++) {
 			ctx.strokeText(lines[i], xloc, yloc + i * size); // draw border
@@ -358,7 +393,7 @@
 		mirror.title = input.value;
 
 		var modes = document.getElementsByName("mode");
-		for (i = 0; i < modes.length; i++) {
+		for (let i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
 				if (modes[i].id == "captionRadio") {
 					document.getElementById("cpy-text-btn").disabled = false;
@@ -393,13 +428,14 @@
 
 	function updateMode() {
 		let modes = document.getElementsByName("mode");
-		for (i = 0; i < modes.length; i++) {
+		for (let i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
 				document.getElementById(modes[i].value).style.display = "inline-block";
 				if (document.getElementById(modes[i].value).id === "captionControls") {
 					document.getElementById("caption").focus();
 				} else {
 					document.getElementById(modes[i].value).focus();
+					let microphoneOn;
 					if ((microphoneOn = document.getElementById("microphone--on"))) {
 						microphoneOn.click();
 					}
