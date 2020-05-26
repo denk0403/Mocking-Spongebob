@@ -169,14 +169,10 @@
 		);
 	});
 
-	/**
-	 *
-	 * @param {String} str
-	 */
-	function formatText(str) {
+	function formatText(str = "") {
 		const INITIAL_FONT_SIZE = 100; // in pixels
 		const MIN_FONT_SIZE = 8;
-		const MAX_LINE_WIDTH = 480; // in pixels
+		const MAX_LINE_BOX_WIDTH = 480; // in pixels
 
 		if (str.trim() === "") {
 			return {
@@ -185,10 +181,23 @@
 			};
 		}
 
-		const words = str.split(" ");
-		const result = [[]];
-
+		// Flags
+		// let TOO_SMALL_FLAG = false;
+		// Set-up font
 		let fontSize = INITIAL_FONT_SIZE;
+
+		// Line box width helper
+		function maxBoxWidthFor(curLine) {
+			const PADDING_SCALE = 2 / 3;
+			const MAX_POSSIBLE_WIDTH_CHANGE = -Math.max(
+				fontSize * PADDING_SCALE,
+				MIN_FONT_SIZE
+			);
+			return MAX_LINE_BOX_WIDTH + MAX_POSSIBLE_WIDTH_CHANGE * (curLine % 2);
+		}
+
+		const words = str.split(" ");
+		const result = [];
 
 		let formattedAllWords = false;
 		while (!formattedAllWords && fontSize >= MIN_FONT_SIZE) {
@@ -202,18 +211,25 @@
 
 			formattedAllWords = !words.some((word) => {
 				// returns true if a word cannot fit (font-size or line count need to change)
+				const lineBoxWidth = maxBoxWidthFor(curLine);
 				if (
-					ctx.measureText([...result[curLine], word].join(" ")).width >=
-					MAX_LINE_WIDTH
-					// checks if adding new word exceeds max line length
+					ctx.measureText(result[curLine].concat([word]).join(" ")).width >=
+					lineBoxWidth
+					// checks if adding new word exceeds the line's box width
 				) {
-					if (ctx.measureText(word).width >= MAX_LINE_WIDTH) {
+					if (ctx.measureText(word).width >= lineBoxWidth) {
 						// check if a single word is too big
 						fontSize -= 1;
 						return true;
 					} else {
-						if (fontSize * (curLine + 2) < INITIAL_FONT_SIZE) {
+						if (
+							// is there enough veretical room for a new line
+							fontSize * (curLine + 2) <
+							INITIAL_FONT_SIZE //&&
+							// (TOO_SMALL_FLAG ||
+							// 	ctx.measureText(words.slice(index).join(" ")).width > 110)
 							// check whether to add new line instead of shrinking font
+						) {
 							curLine += 1;
 							result.push([word]);
 						} else {
@@ -226,16 +242,20 @@
 					result[curLine].push(word);
 				}
 			});
+			// if (!TOO_SMALL_FLAG && fontSize < MIN_FONT_SIZE) {
+			// 	TOO_SMALL_FLAG = true;
+			// 	fontSize += 1;
+			// }
 		}
 
 		// check for unreadable text
 		if (fontSize < MIN_FONT_SIZE) {
-			const errorSize = 59;
-			ctx.font = `bold ${errorSize}px Arial`;
+			const ERROR_SIZE = 59;
+			ctx.font = `bold ${ERROR_SIZE}px Arial`;
 			ctx.fillStyle = "red";
 			return {
 				lines: ["Input is too large"],
-				size: errorSize,
+				size: ERROR_SIZE,
 			};
 		} else {
 			ctx.fillStyle = "white";
@@ -380,6 +400,9 @@
 					document.getElementById("caption").focus();
 				} else {
 					document.getElementById(modes[i].value).focus();
+					if ((microphoneOn = document.getElementById("microphone--on"))) {
+						microphoneOn.click();
+					}
 				}
 			} else {
 				document.getElementById(modes[i].value).style.display = "none";
@@ -387,9 +410,6 @@
 		}
 		if (!imageinRadio.checked) {
 			cameraStop();
-		}
-		if ((microphoneOn = document.getElementById("microphone--on"))) {
-			microphoneOn.click();
 		}
 	}
 
