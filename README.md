@@ -33,6 +33,7 @@
 - [x] Offers a toggleable dark mode 🌓 style of the website based on your device preferences and preferences between sessions.
 - [x] On Google Chrome for desktops, use your voice to write the caption in a variety of languages using the Web Speech API.
 - [x] Implements Open Graph protocol for generating shareable cards on various social media sites.
+- [x] Audited for performance, accessibility, and best practices using Google Lighthouse.
 - [x] Pairs well with ["Mocking Spongebob Selection Shortcut" Chrome extension](https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno) to generate memes faster from other online content.
   - View on GitHub: [Click Here](https://github.com/denk0403/Mocking-Spongebob-Chrome-Extension)
 - [x] Available as a Progressive Web App (PWA) that can be installed from most modern browsers onto most devices and **accessed offline** _(after loading the page at least once)_.

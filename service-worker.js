@@ -54,14 +54,21 @@ self.addEventListener("activate", async (e) => {
 // Intercepts when the browser fetches a URL to check cache
 self.addEventListener("fetch", async (e) => {
 	const req = e.request;
-	e.respondWith(networkAndCache(req));
+	e.respondWith(cacheFirst(req));
 });
 
 // Returns a match from the cache first, only making a network request if necessary
 async function cacheFirst(req) {
 	const cache = await caches.open(cacheName);
 	const cached = await cache.match(req);
-	return cached || fetch(req);
+	let resourceUpdate = Promise.resolve({
+		then: async () => {
+			const fresh = await fetch(req);
+			await cache.put(req, fresh.clone());
+			return fresh;
+		},
+	});
+	return cached || (await resourceUpdate);
 }
 
 // Makes the network request immediately if possible,

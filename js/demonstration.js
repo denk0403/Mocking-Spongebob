@@ -6,11 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	let timer;
 	const caption = document.getElementById("caption");
 
-	const TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ut eleifend libero, vel placerat tortor. Sed eget odio a lectus dapibus ornare vel sed felis. Aliquam lobortis, nibh tristique fermentum egestas, elit anteiaculis nibh, quis condimentum lorem lacus non lorem. Maecenas ut libero quis lorem facilisis dignissim. Aenean vitae massa varius, aliquam tellus vel,imperdiet dolor. Morbi cursus lectus id tempor egestas. Aliquamauctor hendrerit nibh, nec congue massa viverra eget. Vestibulum risus nulla,ullamcorper nec ultriciessit amet, rhoncus vellibero. Duis posuere auctor egestas. Aliquam eleifend nunc id mi dictum fringilla.Aenean quis magna nec nulla aliquet pharetra. Aenean at felis a antecondimentum maximus. Pellentesque egestas est vitae rutrum ultricies. Ut vehicula nisi a ipsum viverra viverra. Phasellus orci velit, ultrices ut magnain, cursus dapibus nulla. Phasellus at commodo lorem. Suspendisse porta nisl porttitor interdum tincidunt. Aliquam odio diam, malesuada eget porta vel,facilisis vel neque. Nam congue, arcuat pellentesque sollicitudin, eroslectus rutrum est, vel auctor erat leo sed justo. Mauris ac purus mi. Vestibulum vitae nunc velit. Nullam auctor velit a lacus elementum pharetra. Integerfinibus et est ut varius. Proin a orci vitae nisl lacinia luctus. Aenean at molestie enim. Suspendisse`;
+	const TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ut eleifend libero, vel placerat tortor. Sed eget odio a lectus dapibus ornare vel sed felis. Aliquam lobortis, nibh tristique fermentum egestas, elit anteiaculis nibh, quis condimentum lorem lacus non lorem. Maecenas ut libero quis lorem facilisis dignissim. Aenean vitae massa varius, aliquam tellus vel,imperdiet dolor. Morbi cursus lectus id tempor egestas. Aliquamauctor hendrerit nibh, nec congue massa viverra eget. Vestibulum risus nulla,ullamcorper nec ultriciessit amet, rhoncus vellibero. Duis posuere auctor egestas. Aliquam eleifend nunc id mi dictum fringilla.Aenean quis magna nec nulla aliquet pharetra. Aenean at felis a antecondimentum maximus. Pellentesque egestas est vitae rutrum ultricies. Ut vehicula nisi a ipsum viverra viverra. Phasellus orci velit, ultrices ut magnain, cursus dapibus nulla. Phasellus at commodo lorem. Suspendisse porta nisl porttitor interdum tincidunt. Aliquam odio diam, malesuada eget porta vel,facilisis vel neque. Nam congue, arcuat pellentesque sollicitudin, eroslectus rutrum est, vel auctor erat leo sed justo. Mauris ac purus mi. Vestibulum vitae nunc velit. Nullam auctor velit a lacus elementum pharetra. Integerfinibus et est ut varius. Proin a orci vitae nisl lacinia luctus. Aenean at molestie enim.`;
 
-	const typeEach = (str = "", time = 250) => {
+	const typeEach = (str = "", time = 250, ignoreWarning = false) => {
 		clearInterval(timer);
-		if (time < 200) {
+		if (!ignoreWarning && time < 200) {
 			throw new Error("This may be too fast for your computer");
 		}
 		caption.value = "";
@@ -22,12 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
 				caption.dispatchEvent(new Event("input"));
 			} else {
 				clearInterval(timer);
+				timer = 0;
 			}
 		}, time));
 	};
 
 	window.typeEach = typeEach;
-	window.typeIn = (str = "", time) => typeEach(str, time && time / str.length);
+	window.typeIn = (str = "", time, ignoreWarning = false) =>
+		typeEach(str, time && time / str.length, ignoreWarning);
 
 	window.typeLoremIpsum = () => {
 		typeEach(TEXT, 250);
@@ -47,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				caption.dispatchEvent(new Event("input"));
 			} else {
 				clearInterval(timer);
+				timer = 0;
 			}
 		}, 200));
 	};
@@ -58,8 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		caption.dispatchEvent(new Event("input"));
 	};
 
-	window.stopLoremIpsum = () => {
+	window.stopTimer = () => {
 		clearInterval(timer);
+		timer = 0;
+	};
+
+	window.stopLoremIpsum = window.stopTimer;
+
+	window.isRunningTypeTimer = () => {
+		return !!timer;
 	};
 
 	window.mockError = () => {

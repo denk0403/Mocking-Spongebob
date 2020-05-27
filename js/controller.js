@@ -22,7 +22,6 @@
 
 	//set-up canvas context
 	ctx.lineJoin = "round";
-	// ctx.miterLimit = 2;
 	ctx.textBaseline = "bottom";
 	ctx.imageSmoothingQuality = "high";
 	ctx.textAlign = "center";
@@ -49,7 +48,6 @@
 		//
 		clearFields();
 		drawMemeText("");
-		repaint();
 		//
 	};
 
@@ -78,7 +76,6 @@
 									.join("");
 								captionRadio.click();
 								drawMemeText(input.value);
-								repaint();
 							} catch (err) {
 								title.click();
 							}
@@ -107,7 +104,6 @@
 				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
 			);
 			drawMemeText("");
-			repaint();
 			input.value = "";
 			mathin.value = "";
 			captionRadio.click();
@@ -174,16 +170,6 @@
 
 		// Set-up font
 		let fontSize = INITIAL_FONT_SIZE;
-
-		// Line box width helper
-		// function maxBoxWidthFor(curLine) {
-		// 	const PADDING_SCALE = 2 / 3;
-		// 	const MAX_POSSIBLE_WIDTH_CHANGE = -Math.max(
-		// 		fontSize * PADDING_SCALE,
-		// 		MIN_FONT_SIZE
-		// 	);
-		// 	return MAX_LINE_BOX_WIDTH + MAX_POSSIBLE_WIDTH_CHANGE * (curLine % 2);
-		// }
 
 		const words = str.split(" ");
 		const result = [];
@@ -259,9 +245,10 @@
 			const getLine1Text = () => result[lineIndex].join(" ");
 
 			while (
-				ctx.measureText(`${result[line2Index].slice(-1)[0]} ${getLine1Text()}`)
-					.width <
-				ctx.measureText(result[line2Index].slice(0, -1).join(" ")).width
+				ctx.measureText(
+					`${result[line2Index].slice(-1)[0]} ${getLine1Text()}`.trim()
+				).width <
+				ctx.measureText(result[line2Index].slice(0, -1).join(" ").trim()).width
 			) {
 				result[lineIndex].unshift(result[line2Index].pop());
 			}
@@ -280,7 +267,8 @@
 			ctx.font = `bold ${newSize}px Arial`;
 			if (
 				result.every(
-					(line) => ctx.measureText(line.join(" ")).width < MAX_LINE_BOX_WIDTH
+					(line) =>
+						ctx.measureText(line.join(" ").trim()).width < MAX_LINE_BOX_WIDTH
 				) &&
 				result.length * newSize < INITIAL_FONT_SIZE
 			) {
@@ -301,11 +289,8 @@
 	}
 
 	function drawMemeText(str) {
-		const xloc = canvas.width / 2;
-
 		str = altText(str);
 
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(img, 0, 0);
 
 		const format = formatText(str);
@@ -317,6 +302,7 @@
 
 		const BOTTOM_MARGIN = 4;
 
+		const xloc = canvas.width / 2;
 		const yloc =
 			img.height - // start at bottom of canvas
 			(lines.length - 1) * size - // account for the number of lines to move up
@@ -328,6 +314,7 @@
 			ctx.strokeText(lines[i], xloc, yloc + i * size); // draw border
 			ctx.fillText(lines[i], xloc, yloc + i * size); // draw filled texts
 		}
+		repaint();
 	}
 
 	function defaultMock(str) {
@@ -353,7 +340,7 @@
 		upload.src = dataURL;
 	};
 
-	upload.onload = (event) => {
+	upload.onload = () => {
 		if (
 			upload.src !== `${location.origin}/img/transparent.png` &&
 			upload.src !==
@@ -363,14 +350,12 @@
 			location.replace(`${location.origin}${location.pathname}#image`);
 		}
 		drawMemeImage();
-		repaint();
 	};
 
 	function drawMemeImage() {
 		const MAX_HEIGHT = 105;
 		const MAX_WIDTH = 450;
 
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(img, 0, 0);
 		let scale = Math.min(MAX_WIDTH / upload.width, MAX_HEIGHT / upload.height);
 		let newWidth = upload.width * scale;
@@ -382,6 +367,7 @@
 			newWidth,
 			newHeight
 		);
+		repaint();
 	}
 
 	let repaint;
@@ -419,7 +405,6 @@
 		if (imagein.files[0]) {
 			reader.readAsDataURL(imagein.files[0]);
 		} else {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(img, 0, 0);
 			repaint();
 		}
