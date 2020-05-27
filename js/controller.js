@@ -29,6 +29,7 @@
 	ctx.fillStyle = "white";
 
 	title.onclick = () => {
+		window.stopTimer();
 		location.replace(
 			`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
 		);
