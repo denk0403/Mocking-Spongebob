@@ -61,7 +61,7 @@ self.addEventListener("fetch", async (e) => {
 async function cacheFirst(req) {
 	const cache = await caches.open(cacheName);
 	const cached = await cache.match(req);
-	let network = networkAndCache(req);
+	const network = networkAndCache(req);
 	return cached || (await network);
 }
 
