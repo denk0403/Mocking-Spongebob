@@ -53,12 +53,6 @@ self.addEventListener("activate", async (e) => {
 
 // Intercepts when the browser fetches a URL to check cache
 self.addEventListener("fetch", async (e) => {
-	if (
-		e.request.cache === "only-if-cached" &&
-		e.request.mode !== "same-origin"
-	) {
-		return;
-	}
 	const req = e.request;
 	const res = cacheFirst(req);
 	if (res) {
