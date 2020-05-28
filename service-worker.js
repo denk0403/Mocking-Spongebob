@@ -60,21 +60,20 @@ self.addEventListener("fetch", async (e) => {
 		return;
 	}
 	const req = e.request;
-	e.respondWith(cacheFirst(req));
+	const res = cacheFirst(req);
+	if (res) {
+		e.respondWith(res);
+		networkAndCache(req);
+	} else {
+		e.respondWith(networkAndCache(req));
+	}
 });
 
 // Returns a match from the cache first, only making a network request if necessary
 async function cacheFirst(req) {
 	const cache = await caches.open(cacheName);
 	const cached = await cache.match(req);
-	let resourceUpdate = Promise.resolve({
-		then: async () => {
-			const fresh = await fetch(req);
-			await cache.put(req, fresh.clone());
-			return fresh;
-		},
-	});
-	return cached || (await resourceUpdate);
+	return cached;
 }
 
 // Makes the network request immediately if possible,
