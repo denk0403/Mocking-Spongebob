@@ -138,7 +138,7 @@
 		});
 		imagein.value = "";
 		mathin.value = "";
-		const newHash = hashify(event.currentTarget.value.trim());
+		const newHash = hashify(event.currentTarget.value);
 		if (location.hash !== newHash) {
 			location.replace(
 				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:${newHash}`
