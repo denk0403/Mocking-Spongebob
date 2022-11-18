@@ -1,4 +1,6 @@
 # Block Googlebot and Adsbot
 User-agent: *
 User-agent: AdsBot-Google
-Disallow: /img/
+Allow: /Mocking-Spongebob/img/icon.png
+Allow: /Mocking-Spongebob/img/apple_app_icon.png
+Disallow: /*.png$

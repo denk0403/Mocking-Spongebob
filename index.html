@@ -7,21 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
     <meta name="keywords" content="SpongeBob, meme generator, meme, mock, mocking, funny">
     <meta name="author" content="Dennis Kats">
-    <meta name="description" content="An excessively multifaceted generator for the Mocking SpongeBob meme." />
-    <meta name="theme-color" content="#28e103">
+    <meta name="description" content="An over the top generator for the Mocking SpongeBob meme." />
+    <meta name="theme-color" content="#b7e9b4">
     <title>Mocking SpongeBob Meme Generator</title>
 
-    <!-- Open Graph protocol support-->
+    <!-- Open Graph protocol support -->
     <meta property="og:title" content="Mocking SpongeBob Meme Generator" />
     <meta property="og:type" content="website" />
-    <meta property="og:description" content="An online generator for the Mocking SpongeBob meme." />
-    <meta property="og:image" content="https://denk0403.github.io/Mocking-Spongebob/img/background.jpg" />
-    <meta property="og:image:alt" content="Mocking SpongeBob" />
+    <meta property="og:description" content="An over the top generator for the Mocking SpongeBob meme." />
+    <meta property="og:image" content="https://denk0403.github.io/Mocking-Spongebob/img/spongebob.jpg" />
+    <meta property="og:image:alt" content="Mocking SpongeBob Meme template" />
 
-    <!-- Twitter Card support-->
+    <!-- Twitter Card support -->
     <meta name="twitter:card" content="summary" />
 
-    <!-- Google Search Console verification-->
+    <!-- Google Search Console verification -->
     <meta name="google-site-verification" content="JIVlpHfkqP_v3ESYiV5e0IQyoSESkANczsnTydV37GY" />
 
     <!-- Stylesheets -->
@@ -29,11 +29,11 @@
     <!-- Manifest file for PWA -->
     <link rel="manifest" href="./manifest.json">
 
-    <!-- Math support-->
+    <!-- Math support -->
     <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <!-- Offline PWA support -->
     <script type="text/javascript" async src="./js/sw-registrator.js"></script>
-    <!-- Darkmode library-->
+    <!-- Darkmode library -->
     <script type="text/javascript" async
         src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
 
@@ -49,9 +49,9 @@
     <script type="text/javascript" defer src="./js/darkmode.js"></script>
     <!-- Camera support -->
     <script type="text/javascript" defer src="./js/camera.js"></script>
-    <!-- Website controller-->
+    <!-- Website controller -->
     <script type="text/javascript" defer src="./js/controller.js"></script>
-    <!-- Error box display controller-->
+    <!-- Error box display controller -->
     <script type="text/javascript" defer src="./js/errorDisplay.js"></script>
     <!-- Math support -->
     <script type="text/javascript" defer src="./js/math.js"></script>
@@ -111,8 +111,8 @@
                     <span>Image:</span>
                     <input id="imagein" type="file" accept="image/*" />
                 </label>
-                <img id="camera--toggle" class="icon exclude" title="Toggle camera" src="./img/camera-icon.png"
-                    alt="camera toggle" onContextMenu="return false;" draggable="false" />
+                <img loading="lazy" id="camera--toggle" class="icon exclude" title="Toggle camera"
+                    src="./img/camera-icon.png" onContextMenu="return false;" draggable="false" />
             </div>
             <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
                 <span>Math:</span>
@@ -122,9 +122,9 @@
         <br />
         <div id="views">
             <canvas id="output" width="500" height="350"></canvas>
-            <img id="meme" src="./img/background.jpg" alt="spongebob meme" style="display: none;" />
-            <img id="upload" src="./img/transparent.png" style="display: none;" crossorigin="anonymous" />
-            <img id="mirror" src="./img/background.jpg" alt="spongebob meme" />
+            <img id="mirror" src="./img/spongebob.jpg" alt="Mocking SpongeBob meme" />
+            <img id="meme" src="./img/spongebob.jpg" alt="Mocking SpongeBob meme template" style="display: none;" />
+            <img id="upload" style="display: none;" crossorigin="anonymous" />
 
             <!-- Camera App -->
             <div id="cameraApp" style="display: none;">
@@ -138,11 +138,11 @@
                         playsinline>
                     </video>
                     <!-- Take picture trigger -->
-                    <img id="camera--trigger" src="img/camera-trigger.png" title="Take picture"
+                    <img loading="lazy" id="camera--trigger" src="img/camera-trigger.png" title="Take picture"
                         onContextMenu="return false;" draggable="false">
                     <!-- Flip camera trigger -->
-                    <img id="camera--flip" src="img/camera-flip.png" title="Flip camera" onContextMenu="return false;"
-                        draggable="false">
+                    <img loading="lazy" id="camera--flip" src="img/camera-flip.png" title="Flip camera"
+                        onContextMenu="return false;" draggable="false">
                 </div>
             </div>
         </div>
@@ -154,20 +154,20 @@
                 title="Copy the link for this meme to your clipboard">Copy Link</button>
             <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your local files">Save
                 Image</button>
-            <a id="sv-link" href="./img/background.jpg" download="img.png" style="display: none;">Save Image</a>
+            <a id="sv-link" href="./img/spongebob.jpg" download="img.png" style="display: none;">Save Image</a>
         </div>
         <div class="darkmode-ignore" id="note">
             <p>
-                You can save the image also by right clicking (holding down on mobile) on the meme.
+                You can save the image also by right clicking (holding down on mobile) the image.
             </p>
-            <p>
+            <!-- <p>
                 Also check out the <i>new</i> <a class="external-link"
                     href="https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno"
                     title="Chrome Web Store">Mocking Spongebob Google Chrome extension</a> <img
-                    src="./img/chrome_store_logo.png" title="Chrome Web Store Logo" alt="Chrome Web Store Logo"
-                    width="18px" onContextMenu="return false;" draggable="false"> for
+                    src="./img/chrome_store_logo.png" title="Chrome Web Store Logo" width="18px"
+                    onContextMenu="return false;" draggable="false"> for
                 desktops!
-            </p>
+            </p> -->
         </div>
         <p>Made by <a class="external-link darkmode-ignore" href="https://github.com/denk0403"
                 title="GitHub Page">Dennis Kats</a> <br /> for his friends</p>

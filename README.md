@@ -19,7 +19,7 @@
   <img src="https://user-images.githubusercontent.com/3473945/82801778-d9152980-9e4b-11ea-84a4-0ffea859e547.png">
 </p>
 <p align="center">
-  This website serves as a generator for the Mocking SpongeBob meme that became popular around 2017.
+  This website provides an over the top generator for the Mocking SpongeBob meme that became popular around 2017.
 </p>
 
 # Features!

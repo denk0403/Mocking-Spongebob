@@ -1,10 +1,10 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v2";
+const cacheName = "mockSpongebob-v3";
 
 // Assets to be used for offline availability
 const staticAssets = [
 	// Image files
-	"./img/background.jpg",
+	"./img/spongebob.jpg",
 	"./img/icon.png",
 	"./img/icon-144.png",
 	"./img/icon-192.png",

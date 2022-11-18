@@ -106,6 +106,7 @@
 
 				setAttributes(microphoneOff, {
 					id: "microphone--off",
+					loading: "lazy",
 					class: "icon microphone",
 					title: "Listen for speech",
 					src: "./img/microphoneOff.png",
@@ -122,6 +123,7 @@
 
 				setAttributes(microphoneOn, {
 					id: "microphone--on",
+					loading: "lazy",
 					class: "icon microphone",
 					title: "Stop recording",
 					src: "./img/microphoneOn.png",
