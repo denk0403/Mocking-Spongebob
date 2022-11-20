@@ -7,6 +7,7 @@
 		input = document.querySelector("#caption"),
 		imagein = document.querySelector("#imagein"),
 		title = document.getElementById("title"),
+		copyLinkBtn = document.getElementById("cpy-link-btn"),
 		cameraStop = mockingSpongebob.cameraStop,
 		hashify = mockingSpongebob.hashify,
 		clearFields = mockingSpongebob.clearFields,
@@ -25,32 +26,30 @@
 			repaint();
 		} catch (err) {
 			console.error("Oops. Something went wrong.", err);
-			location.replace(`${location.origin}${location.pathname}#math:`);
+		}
+	}
+
+	function copyLink() {
+		const newHash = hashify(mathin.value.trim());
+		const url = new URL(location);
+		url.hash = `#math:${newHash}`;
+		const urlStr = url.toString();
+
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(urlStr);
+		} else if (document.execCommand) {
+			let temp = document.createElement("textarea");
+			temp.value = urlStr;
+			document.body.appendChild(temp);
+			temp.select();
+			document.execCommand("copy");
+			document.body.removeChild(temp);
 		}
 	}
 
 	window.addEventListener("load", () => {
 		if (window.MathJax && MathJax.tex2svgPromise) {
-			if (location.hash === "#math") {
-				location.replace(`${location.origin}${location.pathname}#math:`);
-			}
-
-			window.addEventListener("hashchange", () => {
-				if (location.hash === "#math") {
-					location.replace(`${location.origin}${location.pathname}#math:`);
-				}
-			});
-
-			window.addEventListener("hashchange", () => {
-				if (location.hash.startsWith("#math:")) {
-					let currentPosition = mathin.selectionStart;
-					processMathHash(location.hash);
-					mathinRadio.click();
-					mathin.selectionEnd = currentPosition;
-				}
-			});
-
-			mathin.oninput = (event) => {
+			mathin.oninput = () => {
 				cameraStop();
 				mathin.scrollIntoView({
 					behavior: "smooth",
@@ -59,50 +58,44 @@
 
 				input.value = "";
 				imagein.value = "";
-				location.replace(
-					`${location.origin}${location.pathname}#math:${hashify(
-						event.currentTarget.value.trim()
-					)}`
-				);
+
+				drawMathHash(mathin.value);
+				repaint();
+
+				copyLinkBtn.onclick = copyLink;
 			};
 
 			mathinRadioSpan.style.display = "inline";
 			if (location.hash.startsWith("#math:")) {
 				mathinRadio.click();
 				processMathHash(location.hash);
+				copyLinkBtn.onclick = copyLink;
 			}
 		} else {
-			window.addEventListener("hashchange", () => {
-				if (location.hash.startsWith("#math")) {
-					location.replace(
-						`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
-					);
-				}
-			});
 			title.click();
 		}
 	});
+
+	function paintWhite(elt) {
+		if (elt.style) {
+			elt.style.fill = "white";
+			elt.style.stroke = "black";
+			elt.style.strokeWidth = "20";
+		}
+		if (elt.children) {
+			for (let item of elt.children) {
+				paintWhite(item);
+			}
+		}
+	}
 
 	function drawMathHash(str) {
 		MathJax.tex2svgPromise(str, { display: false })
 			.then((container) => container.getElementsByTagName("svg")[0])
 			.then((svg) => {
-				function paintWhite(elt) {
-					if (elt.style) {
-						elt.style.fill = "white";
-						elt.style.stroke = "black";
-						elt.style.strokeWidth = "20";
-					}
-					if (elt.children) {
-						for (let item of elt.children) {
-							paintWhite(item);
-						}
-					}
-				}
 				paintWhite(svg);
 				upload.src =
-					"data:image/svg+xml;base64," +
-					window.btoa(xmlSerializer.serializeToString(svg));
+					"data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));
 			})
 			.catch((err) => {
 				console.error("Oops. Something went wrong.", err);

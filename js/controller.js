@@ -1,11 +1,14 @@
 "use strict";
 (() => {
 	// DOM Constants
+	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById("output"),
+		/** @type {CanvasRenderingContext2D} */
 		ctx = canvas.getContext("2d"),
 		img = document.getElementById("meme"),
 		mirror = document.getElementById("mirror"),
 		input = document.getElementById("caption"),
+		copyLinkBtn = document.getElementById("cpy-link-btn"),
 		captionRadio = document.getElementById("captionRadio"),
 		imagein = document.getElementById("imagein"),
 		imageinRadio = document.getElementById("imageinRadio"),
@@ -30,9 +33,7 @@
 
 	title.onclick = () => {
 		window.stopTimer();
-		location.replace(
-			`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
-		);
+		location.hash = "";
 		captionRadio.click();
 		clear();
 	};
@@ -56,8 +57,6 @@
 		if (hash) {
 			if (hash.startsWith("#math")) {
 				// math.js will handle behavior
-			} else if (hash.startsWith("#image")) {
-				imageinRadio.click();
 			} else {
 				if (hash.startsWith("#mockType:")) {
 					const mockType =
@@ -80,30 +79,11 @@
 							} catch (err) {
 								title.click();
 							}
-						} else {
-							location.replace(
-								`${location.origin}${location.pathname}#mockType:${mockType.id}:`
-							);
 						}
-					} else {
-						location.replace(
-							`${location.origin}${location.pathname}#mockType:asl:${hash.slice(
-								hash.indexOf(":", 10) + 1
-							)}`
-						);
 					}
-				} else {
-					location.replace(
-						`${location.origin}${location.pathname}#mockType:asl:${hash.slice(
-							1
-						)}`
-					);
 				}
 			}
 		} else {
-			location.replace(
-				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:`
-			);
 			drawMemeText("");
 			input.value = "";
 			mathin.value = "";
@@ -120,13 +100,7 @@
 		processHashV2(location.hash);
 	});
 
-	window.addEventListener("hashchange", () => {
-		let currentPosition = input.selectionStart;
-		processHashV2(location.hash);
-		input.selectionEnd = currentPosition;
-	});
-
-	input.addEventListener("input", (event) => {
+	input.addEventListener("input", () => {
 		cameraStop();
 		let microphoneOn;
 		if ((microphoneOn = document.getElementById("microphone--on"))) {
@@ -138,12 +112,9 @@
 		});
 		imagein.value = "";
 		mathin.value = "";
-		const newHash = hashify(event.currentTarget.value);
-		if (location.hash !== newHash) {
-			location.replace(
-				`${location.origin}${location.pathname}#mockType:${mockingSpongebob.currentMock.id}:${newHash}`
-			);
-		}
+
+		drawMemeText(input.value);
+		copyLinkBtn.onclick = copyLink;
 	});
 
 	input.onkeydown = (event) => {
@@ -152,72 +123,112 @@
 		}
 	};
 
-	mockSelector.addEventListener("input", (event) => {
-		const newHash = hashify(input.value.trim());
-		location.replace(
-			`${location.origin}${location.pathname}#mockType:${event.currentTarget.value}:${newHash}`
-		);
+	mockSelector.addEventListener("input", () => {
+		drawMemeText(input.value);
+		copyLinkBtn.onclick = copyLink;
 	});
+
+	/**
+	 * @param {string} str
+	 */
+	function getTextWidth(str) {
+		return ctx.measureText(str).width;
+	}
 
 	function formatText(str = "") {
 		const MIN_FONT_SIZE = 8;
+		const trimmedStr = str.trim();
 
-		if (str.trim() === "") {
-			return {
+		if (trimmedStr === "") {
+			lastFormatResult = {
 				lines: [],
 				size: INITIAL_FONT_SIZE,
 			};
+			return lastFormatResult;
 		}
 
-		// Set-up font
-		let fontSize = INITIAL_FONT_SIZE;
+		// Setup font range
+		let lowerFontSize = MIN_FONT_SIZE - 1; // always safe
+		let upperFontSize = INITIAL_FONT_SIZE; // possibly too large
+		let currentFontSize; // assigned in loop
 
-		const words = str.split(" ");
-		const result = [];
+		const words = trimmedStr.split(" ");
 
-		let formattedAllWords = false;
-		while (!formattedAllWords && fontSize >= MIN_FONT_SIZE) {
-			// Apply new font-size if neccessary
+		/** @type {string[][]} */
+		const lines = [];
+		let currentLineIndex = 0;
+
+		/**
+		 * This helper function tries to fit a word into the results
+		 * array using the current font size of the 2D canvas context.
+		 *
+		 * Returns if it was able to be added.
+		 * @param {string} word The word to try to fit
+		 * @returns
+		 */
+		function fitIntoLines(word) {
+			const modifiedLine = lines[currentLineIndex].concat(word);
+			if (
+				getTextWidth(modifiedLine.join(" ")) >= MAX_LINE_BOX_WIDTH
+				// checks if adding new word exceeds the line's box width
+			) {
+				if (getTextWidth(word) >= MAX_LINE_BOX_WIDTH) {
+					// check if a single word is too big
+					return false;
+				} else {
+					if (
+						// is there enough vertical room for a new line
+						currentFontSize * (currentLineIndex + 2) <
+						INITIAL_FONT_SIZE
+					) {
+						currentLineIndex += 1;
+						lines.push([word]);
+						return true;
+					} else {
+						return false;
+					}
+				}
+			} else {
+				// add the word if it fits on the current line
+				lines[currentLineIndex].push(word);
+				return true;
+			}
+		}
+
+		function tryFormatAllWords(fontSize) {
+			currentFontSize = fontSize;
 			ctx.font = `bold ${fontSize}px Arial`;
 
 			// set up result array of lines
-			result.length = 0;
-			result.push([]);
-			let curLine = 0;
+			lines.length = 0;
+			lines.push([]);
+			currentLineIndex = 0;
 
-			formattedAllWords = !words.some((word) => {
-				// returns true if a word cannot fit (font-size or line count need to change)
-				if (
-					ctx.measureText(result[curLine].concat([word]).join(" ")).width >=
-					MAX_LINE_BOX_WIDTH
-					// checks if adding new word exceeds the line's box width
-				) {
-					if (ctx.measureText(word).width >= MAX_LINE_BOX_WIDTH) {
-						// check if a single word is too big
-						fontSize -= 1;
-						return true;
-					} else {
-						if (
-							// is there enough veretical room for a new line
-							fontSize * (curLine + 2) <
-							INITIAL_FONT_SIZE
-						) {
-							curLine += 1;
-							result.push([word]);
-						} else {
-							fontSize -= 1;
-							return true;
-						}
-					}
-				} else {
-					// add the word if it fits just fine
-					result[curLine].push(word);
-				}
-			});
+			return words.every(fitIntoLines);
 		}
 
+		// Binary search through font range
+		while (lowerFontSize !== upperFontSize) {
+			// Try new middle font-size
+			currentFontSize = upperFontSize - Math.floor((upperFontSize - lowerFontSize) / 2);
+			// console.log("Bounds:", lowerFontSize, upperFontSize, "Current:", currentFontSize);
+
+			const formattedAllWords = tryFormatAllWords(currentFontSize);
+
+			if (formattedAllWords) {
+				lowerFontSize = currentFontSize;
+			} else {
+				upperFontSize = currentFontSize - 1;
+			}
+		}
+
+		let finalFontSize = lowerFontSize;
+
+		// rebuild result array
+		tryFormatAllWords(finalFontSize);
+
 		// check for unreadable text
-		if (fontSize < MIN_FONT_SIZE) {
+		if (finalFontSize < MIN_FONT_SIZE) {
 			const ERROR_SIZE = 59;
 			ctx.font = `bold ${ERROR_SIZE}px Arial`;
 			ctx.fillStyle = "red";
@@ -226,52 +237,47 @@
 				fontSize: ERROR_SIZE,
 			};
 		} else {
-			fontSize = optimizeSize(result, fontSize);
+			finalFontSize = optimizeSize(lines, finalFontSize);
 			ctx.fillStyle = "white";
 			return {
-				lines: result.map((line) => line.join(" ").trim()),
-				fontSize,
+				lines: lines.map((line) => line.join(" ").trim()),
+				fontSize: finalFontSize,
 			};
 		}
 	}
 
 	/**
 	 * Optimizes result array and returns best font-size
-	 * @param {[[""]]} result
+	 * @param {[[""]]} lines
 	 * @param {number} fontSize
 	 */
-	function optimizeSize(result, fontSize) {
-		for (let lineIndex = result.length - 1; lineIndex >= 1; lineIndex--) {
+	function optimizeSize(lines, fontSize) {
+		for (let lineIndex = lines.length - 1; lineIndex >= 1; lineIndex--) {
 			const line2Index = lineIndex - 1;
-			const getLine1Text = () => result[lineIndex].join(" ");
+			const getLine1Text = () => lines[lineIndex].join(" ");
 
 			while (
-				ctx.measureText(
-					`${result[line2Index].slice(-1)[0]} ${getLine1Text()}`.trim()
-				).width <
-				ctx.measureText(result[line2Index].slice(0, -1).join(" ").trim()).width
+				getTextWidth(`${lines[line2Index].slice(-1)[0]} ${getLine1Text()}`.trim()) <
+				getTextWidth(lines[line2Index].slice(0, -1).join(" ").trim())
 			) {
-				result[lineIndex].unshift(result[line2Index].pop());
+				lines[lineIndex].unshift(lines[line2Index].pop());
 			}
 		}
-		return tryToIncreaseFont(result, fontSize);
+		return tryToIncreaseFont(lines, fontSize);
 	}
 
 	/**
 	 * Tries to increase the font-size as much as possible
-	 * @param {[[""]]} result
+	 * @param {[[""]]} lines
 	 * @param {number} fontSize
 	 */
-	function tryToIncreaseFont(result, fontSize) {
+	function tryToIncreaseFont(lines, fontSize) {
 		const tryOneIncrease = () => {
 			const newSize = fontSize + 1;
 			ctx.font = `bold ${newSize}px Arial`;
 			if (
-				result.every(
-					(line) =>
-						ctx.measureText(line.join(" ").trim()).width < MAX_LINE_BOX_WIDTH
-				) &&
-				result.length * newSize < INITIAL_FONT_SIZE
+				lines.every((line) => getTextWidth(line.join(" ").trim()) < MAX_LINE_BOX_WIDTH) &&
+				lines.length * newSize < INITIAL_FONT_SIZE
 			) {
 				fontSize = newSize;
 				return true;
@@ -289,14 +295,33 @@
 		return fontSize;
 	}
 
+	let lastFormatText = "";
+	let lastFormatResult = {
+		lines: [],
+		size: INITIAL_FONT_SIZE,
+	};
 	function drawMemeText(str) {
-		str = altText(str);
+		const trimmedStr = str.trim();
 
-		ctx.drawImage(img, 0, 0);
+		let format;
+		if (trimmedStr === lastFormatText) {
+			format = lastFormatResult;
+		} else {
+			lastFormatText = str;
+			const altered_str = altText(str);
 
-		const format = formatText(str);
+			// const start = performance.now();
+			format = formatText(altered_str);
+			// console.log(performance.now() - start);
+			lastFormatResult = format;
+		}
+
+		// console.log(trimmedStr, format);
+
 		const lines = format.lines;
 		const size = format.fontSize;
+
+		ctx.drawImage(img, 0, 0);
 
 		const LINE_WIDTH_SHRINK_FACTOR = 9;
 		ctx.lineWidth = size / LINE_WIDTH_SHRINK_FACTOR;
@@ -315,6 +340,7 @@
 			ctx.strokeText(lines[i], xloc, yloc + i * size); // draw border
 			ctx.fillText(lines[i], xloc, yloc + i * size); // draw filled texts
 		}
+
 		repaint();
 	}
 
@@ -342,14 +368,6 @@
 	};
 
 	upload.onload = () => {
-		if (
-			upload.src !== `${location.origin}/img/transparent.png` &&
-			upload.src !==
-				`${location.origin}/Mocking-Spongebob/img/transparent.png` &&
-			!location.hash.startsWith("#math:")
-		) {
-			location.replace(`${location.origin}${location.pathname}#image`);
-		}
 		drawMemeImage();
 	};
 
@@ -361,13 +379,7 @@
 		let scale = Math.min(MAX_WIDTH / upload.width, MAX_HEIGHT / upload.height);
 		let newWidth = upload.width * scale;
 		let newHeight = upload.height * scale;
-		ctx.drawImage(
-			upload,
-			250 - newWidth / 2,
-			canvas.height - 5 - newHeight,
-			newWidth,
-			newHeight
-		);
+		ctx.drawImage(upload, 250 - newWidth / 2, canvas.height - 5 - newHeight, newWidth, newHeight);
 		repaint();
 	}
 
@@ -435,28 +447,34 @@
 	}
 
 	function copyLink() {
-		if (document.execCommand) {
+		const newHash = hashify(input.value.trim());
+		const url = new URL(location);
+		url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
+		const urlStr = url.toString();
+
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(urlStr);
+		} else if (document.execCommand) {
 			let temp = document.createElement("textarea");
-			temp.value = location.href;
+			temp.value = urlStr;
 			document.body.appendChild(temp);
 			temp.select();
 			document.execCommand("copy");
 			document.body.removeChild(temp);
-		} else {
-			navigator.clipboard && navigator.clipboard.writeText(`${location.href}`);
 		}
 	}
 
 	function copyMockText() {
-		if (document.execCommand) {
+		const text = altText(input.value);
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(text);
+		} else if (document.execCommand) {
 			let temp = document.createElement("textarea");
-			temp.value = altText(input.value);
+			temp.value = text;
 			document.body.appendChild(temp);
 			temp.select();
 			document.execCommand("copy");
 			document.body.removeChild(temp);
-		} else {
-			navigator.clipboard.writeText(`${location.href}`);
 		}
 	}
 
@@ -468,6 +486,6 @@
 	captionRadio.onclick = updateMode;
 	mathinRadio.onclick = updateMode;
 	document.getElementById("cpy-text-btn").onclick = copyMockText;
-	document.getElementById("cpy-link-btn").onclick = copyLink;
+	copyLinkBtn.onclick = copyLink;
 	document.getElementById("sv-btn").onclick = save;
 })();
