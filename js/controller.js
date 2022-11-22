@@ -150,16 +150,17 @@
 		return ctx.measureText(str).width;
 	}
 
+	const EMPTY_FORMAT = {
+		lines: [],
+		size: INITIAL_FONT_SIZE,
+	};
+
 	function formatText(str = "") {
 		const MIN_FONT_SIZE = 8;
 		const trimmedStr = str.trim();
 
 		if (trimmedStr === "") {
-			lastFormatResult = {
-				lines: [],
-				size: INITIAL_FONT_SIZE,
-			};
-			return lastFormatResult;
+			return EMPTY_FORMAT;
 		}
 
 		// Setup font range
