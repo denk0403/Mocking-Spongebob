@@ -148,7 +148,7 @@ label.inputField {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 15px;
+	gap: 10px;
 
 	max-width: 900px;
 
