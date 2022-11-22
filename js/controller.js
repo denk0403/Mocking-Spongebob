@@ -38,6 +38,8 @@
 	const INITIAL_FONT_SIZE = 100; // in pixels
 	const MAX_LINE_BOX_WIDTH = 480; // in pixels
 
+	const BASE_URL = `${location.origin}${location.pathname}`;
+
 	//set-up canvas context
 	ctx.lineJoin = "round";
 	ctx.textBaseline = "bottom";
@@ -60,14 +62,17 @@
 	});
 
 	const clear = (mockingSpongebob.clear = () => {
-		//
 		clearFields();
 		drawMemeText("");
-		//
 	});
 
+	// should only be called once in the script!
 	let processHashV2 = (hash = "") => {
-		if (hash && hash.startsWith("#mockType:")) {
+		if (!hash) {
+			return window.addEventListener("load", () => captionRadio.click());
+		}
+
+		if (hash.startsWith("#mockType:")) {
 			const mockType =
 				mockingSpongebob.mockTypes[hash.slice(10, hash.indexOf(":", 10))] ||
 				mockingSpongebob.mockTypes[hash.slice(10, hash.length)];
@@ -91,6 +96,7 @@
 							img.onload = () => drawMemeText(input.value);
 						}
 					} catch (err) {
+						console.error(err);
 						title.click();
 					}
 				}
@@ -401,7 +407,7 @@
 
 				shareData = {
 					files: [file],
-					text: `Mocking SpongeBob Meme Generator - ${location.origin}${location.pathname}`,
+					text: `Mocking SpongeBob Meme Generator - ${BASE_URL}`,
 				};
 
 				if (navigator.canShare(shareData)) {
@@ -480,10 +486,15 @@
 	}
 
 	function copyLink() {
-		const newHash = hashify(input.value.trim());
-		const url = new URL(location);
-		url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
-		const urlStr = url.toString();
+		let urlStr = BASE_URL;
+
+		const trimmedStr = input.value.trim();
+		if (trimmedStr !== "") {
+			const newHash = hashify(trimmedStr);
+			const url = new URL(location);
+			url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
+			urlStr = url.toString();
+		}
 
 		if (navigator.clipboard) {
 			navigator.clipboard.writeText(urlStr);
@@ -525,10 +536,6 @@
 	}
 
 	processHashV2(location.hash);
-
-	if (location.hash.slice(1) === "") {
-		captionRadio.click();
-	}
 
 	imageinRadio.onclick = updateMode;
 	captionRadio.onclick = updateMode;

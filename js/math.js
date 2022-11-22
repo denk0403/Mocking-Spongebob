@@ -1,10 +1,14 @@
 "use strict";
 (() => {
+	/** @type {HTMLInputElement} */
 	const mathin = document.querySelector("#mathin"),
+		/** @type {HTMLImageElement} */
 		upload = document.querySelector("#upload"),
 		mathinRadioSpan = document.querySelector("#mathinRadioSpan"),
 		mathinRadio = document.querySelector("#mathinRadio"),
+		/** @type {HTMLInputElement} */
 		input = document.querySelector("#caption"),
+		/** @type {HTMLInputElement} */
 		imagein = document.querySelector("#imagein"),
 		title = document.getElementById("title"),
 		copyLinkBtn = document.getElementById("cpy-link-btn"),
@@ -13,6 +17,8 @@
 		clearFields = mockingSpongebob.clearFields,
 		repaint = mockingSpongebob.repaint,
 		xmlSerializer = new XMLSerializer();
+
+	const BASE_URL = `${location.origin}${location.pathname}`;
 
 	function processMathHash(hash) {
 		try {
@@ -30,10 +36,15 @@
 	}
 
 	function copyLink() {
-		const newHash = hashify(mathin.value.trim());
-		const url = new URL(location);
-		url.hash = `#math:${newHash}`;
-		const urlStr = url.toString();
+		let urlStr = BASE_URL;
+
+		const trimmedStr = mathin.value.trim();
+		if (trimmedStr !== "") {
+			const newHash = hashify(trimmedStr);
+			const url = new URL(location);
+			url.hash = `#math:${newHash}`;
+			urlStr = url.toString();
+		}
 
 		if (navigator.clipboard) {
 			navigator.clipboard.writeText(urlStr);
@@ -68,6 +79,7 @@
 			mathinRadioSpan.style.display = "inline";
 			if (location.hash.startsWith("#math:")) {
 				mathinRadio.click();
+				mathin.blur();
 				processMathHash(location.hash);
 				copyLinkBtn.onclick = copyLink;
 			}
