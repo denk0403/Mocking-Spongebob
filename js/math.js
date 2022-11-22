@@ -89,7 +89,16 @@
 		}
 	}
 
-	function drawMathHash(str) {
+	let lastFormatText = "";
+	function drawMathHash(str = "") {
+		const trimmedStr = str.trim();
+
+		if (trimmedStr === lastFormatText) {
+			return;
+		}
+
+		lastFormatText = str;
+
 		MathJax.tex2svgPromise(str, { display: false })
 			.then((container) => container.getElementsByTagName("svg")[0])
 			.then((svg) => {

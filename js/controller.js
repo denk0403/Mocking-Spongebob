@@ -18,7 +18,7 @@
 		/** @type {HTMLImageElement} */
 		upload = document.getElementById("upload"),
 		captionModes = document.getElementsByName("mode"),
-		mathin = document.querySelector("#mathin"),
+		mathin = document.getElementById("mathin"),
 		mathinRadio = document.getElementById("mathinRadio"),
 		title = document.getElementById("title"),
 		mockSelector = document.getElementById("mockType-selector"),
@@ -53,66 +53,53 @@
 		clear();
 	};
 
-	let clearFields;
-	clearFields = mockingSpongebob.clearFields = () => {
+	const clearFields = (mockingSpongebob.clearFields = () => {
 		input.value = "";
 		imagein.value = "";
 		mathin.value = "";
-	};
+	});
 
-	let clear;
-	clear = mockingSpongebob.clear = () => {
+	const clear = (mockingSpongebob.clear = () => {
 		//
 		clearFields();
 		drawMemeText("");
 		//
-	};
+	});
 
 	let processHashV2 = (hash = "") => {
-		if (hash) {
-			if (hash.startsWith("#math")) {
-				// math.js will handle behavior
-			} else {
-				if (hash.startsWith("#mockType:")) {
-					const mockType =
-						mockingSpongebob.mockTypes[hash.slice(10, hash.indexOf(":", 10))] ||
-						mockingSpongebob.mockTypes[hash.slice(10, hash.length)];
-					if (mockType) {
-						document.getElementById(mockType.id).selected = true;
-						mockingSpongebob.currentMock = mockType;
+		if (hash && hash.startsWith("#mockType:")) {
+			const mockType =
+				mockingSpongebob.mockTypes[hash.slice(10, hash.indexOf(":", 10))] ||
+				mockingSpongebob.mockTypes[hash.slice(10, hash.length)];
 
-						if (hash.indexOf(":", 10) !== -1) {
-							try {
-								clearFields();
-								input.value = hash
-									.slice(hash.indexOf(":", 10) + 1) // hash includes '#' when present
-									.split(":")
-									.map((char) => String.fromCodePoint(parseInt(char, 16)))
-									.join("");
-								captionRadio.click();
-								drawMemeText(input.value);
-							} catch (err) {
-								title.click();
-							}
+			if (mockType) {
+				document.getElementById(mockType.id).selected = true;
+				mockingSpongebob.currentMock = mockType;
+
+				if (hash.indexOf(":", 10) !== -1) {
+					try {
+						clearFields();
+						input.value = hash
+							.slice(hash.indexOf(":", 10) + 1) // hash includes '#' when present
+							.split(":")
+							.map((char) => String.fromCodePoint(parseInt(char, 16)))
+							.join("");
+
+						if (img.complete) {
+							drawMemeText(input.value);
+						} else {
+							img.onload = () => drawMemeText(input.value);
 						}
+					} catch (err) {
+						title.click();
 					}
 				}
 			}
-		} else {
-			drawMemeText("");
-			input.value = "";
-			mathin.value = "";
-			captionRadio.click();
 		}
 	};
 
-	let hashify;
-	hashify = mockingSpongebob.hashify = (str) => {
+	const hashify = (mockingSpongebob.hashify = (str) => {
 		return [...str].map((char) => char.codePointAt(0).toString(16)).join(":");
-	};
-
-	window.addEventListener("load", () => {
-		processHashV2(location.hash);
 	});
 
 	input.addEventListener("input", () => {
@@ -524,10 +511,6 @@
 		}
 	}
 
-	function save() {
-		saveLink.click();
-	}
-
 	if (navigator.canShare && navigator.share) {
 		shareBtn.style.removeProperty("display");
 		updateShareData(mirror.src);
@@ -541,10 +524,15 @@
 		});
 	}
 
+	processHashV2(location.hash);
+
+	if (location.hash.slice(1) === "") {
+		captionRadio.click();
+	}
+
 	imageinRadio.onclick = updateMode;
 	captionRadio.onclick = updateMode;
 	mathinRadio.onclick = updateMode;
-	document.getElementById("cpy-text-btn").onclick = copyMockText;
+	copyTextBtn.onclick = copyMockText;
 	copyLinkBtn.onclick = copyLink;
-	document.getElementById("sv-btn").onclick = save;
 })();

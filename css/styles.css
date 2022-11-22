@@ -304,7 +304,8 @@ label.inputField {
 }
 
 #sv-link {
-	display: none;
+	display: contents;
+	text-decoration: none;
 }
 
 .box {
