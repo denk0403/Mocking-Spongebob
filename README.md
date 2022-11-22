@@ -24,11 +24,11 @@
 
 # Features!
 
-- [x] Automatically and intelligently resizes and formats caption in the lower region of the meme.
-- [x] Select from multiple different mocking algorithms.
+- [x] Automatically resizes captions using an effecient binary search algorithm.
+- [x] Choose from multiple different mocking styles.
 - [x] Also supports uploading other images and <sup>[1]</sup>inputting TeX typesetting for the caption.
   - <sup>[2]</sup>Built-in camera app for taking pictures even faster!
-- [x] Includes options for copying mock text, link sharing, and saving images.
+- [x] Includes options for copying mock text, link sharing, saving images, and sharing images via the Web Share API.
 - [x] Compatible with all mobile devices featuring a modern web browser.
 - [x] Offers a toggleable dark mode 🌓 style of the website based on your device preferences and preferences between sessions.
 - [x] On Google Chrome for desktops, use your voice to write the caption in a variety of languages using the Web Speech API.

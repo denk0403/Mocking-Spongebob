@@ -5,20 +5,35 @@
 	const canvas = document.getElementById("output"),
 		/** @type {CanvasRenderingContext2D} */
 		ctx = canvas.getContext("2d"),
+		/** @type {HTMLImageElement} */
 		img = document.getElementById("meme"),
+		/** @type {HTMLImageElement} */
 		mirror = document.getElementById("mirror"),
+		/** @type {HTMLInputElement} */
 		input = document.getElementById("caption"),
-		copyLinkBtn = document.getElementById("cpy-link-btn"),
+		/** @type {HTMLButtonElement} */
 		captionRadio = document.getElementById("captionRadio"),
 		imagein = document.getElementById("imagein"),
 		imageinRadio = document.getElementById("imageinRadio"),
+		/** @type {HTMLImageElement} */
 		upload = document.getElementById("upload"),
+		captionModes = document.getElementsByName("mode"),
 		mathin = document.querySelector("#mathin"),
 		mathinRadio = document.getElementById("mathinRadio"),
 		title = document.getElementById("title"),
 		mockSelector = document.getElementById("mockType-selector"),
+		/** @type {HTMLButtonElement} */
+		copyTextBtn = document.getElementById("cpy-text-btn"),
+		/** @type {HTMLButtonElement} */
+		copyLinkBtn = document.getElementById("cpy-link-btn"),
+		/** @type {HTMLAnchorElement} */
+		saveLink = document.getElementById("sv-link"),
+		/** @type {HTMLButtonElement} */
+		shareBtn = document.getElementById("share-btn"),
 		cameraStop = mockingSpongebob.cameraStop,
 		reader = new FileReader();
+
+	let shareData = null;
 
 	const INITIAL_FONT_SIZE = 100; // in pixels
 	const MAX_LINE_BOX_WIDTH = 480; // in pixels
@@ -296,27 +311,19 @@
 	}
 
 	let lastFormatText = "";
-	let lastFormatResult = {
-		lines: [],
-		size: INITIAL_FONT_SIZE,
-	};
 	function drawMemeText(str) {
 		const trimmedStr = str.trim();
 
-		let format;
 		if (trimmedStr === lastFormatText) {
-			format = lastFormatResult;
-		} else {
-			lastFormatText = str;
-			const altered_str = altText(str);
-
-			// const start = performance.now();
-			format = formatText(altered_str);
-			// console.log(performance.now() - start);
-			lastFormatResult = format;
+			return;
 		}
 
-		// console.log(trimmedStr, format);
+		lastFormatText = str;
+		const altered_str = altText(str);
+
+		// const start = performance.now();
+		const format = formatText(altered_str);
+		// console.log(performance.now() - start);
 
 		const lines = format.lines;
 		const size = format.fontSize;
@@ -363,7 +370,7 @@
 	}
 
 	reader.onload = function () {
-		var dataURL = reader.result;
+		const dataURL = reader.result;
 		upload.src = dataURL;
 	};
 
@@ -383,34 +390,71 @@
 		repaint();
 	}
 
-	let repaint;
-	repaint = mockingSpongebob.repaint = () => {
-		var dataURL = canvas.toDataURL("image/png");
+	/** @type {AbortController} */
+	let abortController;
+
+	/**
+	 * Update the shareData using the given URL
+	 * @param {string} url
+	 */
+	function updateShareData(url) {
+		// abort any pending requests to fetch the image
+		if (abortController && !abortController.signal.aborted) {
+			// hopefully browsers just cache the requests so it should be done
+			// before getting aborted but maybe not ¯\_(ツ)_/¯
+			abortController.abort();
+		}
+
+		abortController = new AbortController();
+		return fetch(url, { signal: abortController.signal })
+			.then((res) => res.blob())
+			.then((blob) => {
+				const file = new File([blob], "image.png", { type: "image/png" });
+
+				shareData = {
+					files: [file],
+					text: `Mocking SpongeBob Meme Generator - ${location.origin}${location.pathname}`,
+				};
+
+				if (navigator.canShare(shareData)) {
+					shareBtn.disabled = false;
+				} else {
+					console.error("There was an error sharing this meme.");
+					shareBtn.disabled = true;
+				}
+			});
+	}
+
+	const repaint = (mockingSpongebob.repaint = () => {
+		const dataURL = canvas.toDataURL("image/png");
 		mirror.src = dataURL;
 		mirror.alt = input.value;
 		mirror.title = input.value;
 
-		var modes = document.getElementsByName("mode");
-		for (let i = 0; i < modes.length; i++) {
-			if (modes[i].checked) {
-				if (modes[i].id == "captionRadio") {
-					document.getElementById("cpy-text-btn").disabled = false;
-					document.getElementById("cpy-link-btn").disabled = false;
-				} else if (modes[i].id == "mathinRadio") {
-					document.getElementById("cpy-text-btn").disabled = true;
-					document.getElementById("cpy-link-btn").disabled = false;
+		saveLink.href = dataURL;
+		saveLink.download = `${
+			input.value ? altText(input.value.trim()) : mathin.value.trim() || "img"
+		}.png`;
+
+		if (navigator.canShare && navigator.share) {
+			updateShareData(dataURL);
+		}
+
+		for (let i = 0; i < captionModes.length; i++) {
+			if (captionModes[i].checked) {
+				if (captionModes[i].id == "captionRadio") {
+					copyTextBtn.disabled = false;
+					copyLinkBtn.disabled = false;
+				} else if (captionModes[i].id == "mathinRadio") {
+					copyTextBtn.disabled = true;
+					copyLinkBtn.disabled = false;
 				} else {
-					document.getElementById("cpy-text-btn").disabled = true;
-					document.getElementById("cpy-link-btn").disabled = true;
+					copyTextBtn.disabled = true;
+					copyLinkBtn.disabled = true;
 				}
 			}
 		}
-
-		document.getElementById("sv-link").href = mirror.src;
-		document.getElementById("sv-link").download = `${
-			input.value ? altText(input.value) : mathin.value || "img"
-		}.png`;
-	};
+	});
 
 	imagein.onchange = (event) => {
 		input.value = "";
@@ -427,7 +471,8 @@
 		let modes = document.getElementsByName("mode");
 		for (let i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
-				document.getElementById(modes[i].value).style.display = "inline-block";
+				document.getElementById(modes[i].value).style.removeProperty("display");
+
 				if (document.getElementById(modes[i].value).id === "captionControls") {
 					document.getElementById("caption").focus();
 				} else {
@@ -479,7 +524,20 @@
 	}
 
 	function save() {
-		document.getElementById("sv-link").click();
+		saveLink.click();
+	}
+
+	if (navigator.canShare && navigator.share) {
+		shareBtn.style.removeProperty("display");
+		updateShareData(mirror.src);
+
+		shareBtn.addEventListener("click", () => {
+			if (navigator.canShare(shareData)) {
+				navigator.share(shareData);
+			} else {
+				console.error("There was an error sharing this meme.");
+			}
+		});
 	}
 
 	imageinRadio.onclick = updateMode;

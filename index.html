@@ -38,6 +38,8 @@
     <!-- Darkmode library -->
     <script type="text/javascript" async
         src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.5/lib/darkmode-js.min.js"></script>
+    <!-- Darkmode support -->
+    <script type="text/javascript" async src="./js/darkmode.js"></script>
 
     <!-- Shared object across scripts for website -->
     <script type="text/javascript">
@@ -47,8 +49,6 @@
 
     <!-- Mock types -->
     <script type="text/javascript" defer src="./js/mockTypes.js"></script>
-    <!-- Darkmode support -->
-    <script type="text/javascript" defer src="./js/darkmode.js"></script>
     <!-- Camera support -->
     <script type="text/javascript" defer src="./js/camera.js"></script>
     <!-- Website controller -->
@@ -93,7 +93,7 @@
         </span>
         <br />
         <br />
-        <form>
+        <form id="controls">
             <div id="captionControls">
                 <div id="captionLabel" class="inputField">
                     <label for="caption">
@@ -102,7 +102,7 @@
                     </label>
                 </div>
                 <label id="mockTypeLabel" for="mockType-selector">
-                    <span>Mock Type: </span>
+                    <span id="mockTypeLabelText">Mock Type: </span>
                     <select id="mockType-selector" name="mockTypes">
                         <option id="asl" value="">Alternating: starting lower</option>
                     </select>
@@ -121,7 +121,7 @@
                 <input id="mathin" class="darkmode-ignore" type="text" placeholder="aDd SoMe TeX..." />
             </label>
         </form>
-        <br />
+
         <div id="views">
             <canvas id="output" width="500" height="350"></canvas>
             <img id="mirror" src="./img/spongebob.jpg" alt="Mocking SpongeBob meme" />
@@ -151,12 +151,19 @@
 
         <div class="btn-group btn-primary">
             <button class="btn darkmode-ignore" id="cpy-text-btn" title="Copy the mocking form of the text">Copy Mocking
-                Text</button>
-            <button class="btn darkmode-ignore" id="cpy-link-btn"
-                title="Copy the link for this meme to your clipboard">Copy Link</button>
-            <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your local files">Save
-                Image</button>
-            <a id="sv-link" href="./img/spongebob.jpg" download="img.png" style="display: none;">Save Image</a>
+                Text <img class="icon"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAAu0lEQVRIie2WTQ6CQAyFPz0C11H3GvecwI0mXlo4BBvQBRjHSefHDpIY+5KXkNLpN+R1AZj+UUegBe5ALdRi7oCzFtw4gyqhFvMw+aIBu4OkWswnoJ/g1yXBlMBLwWr4HGAYl+yZedbClYC3AXjnQ1YBsP/e/xqN3ljrGQaqZOBcbRgzC3n3LXDqnLS0yQbbakmhjJPZloJD55LZxhot48XArfNcCTWNmpymA69/rFqofeobsC+8uOkH9QCUQIZu2oAw+AAAAABJRU5ErkJggg=="></button>
+            <button class="btn darkmode-ignore" id="cpy-link-btn" title="Copy a shareable link to your clipboard">Copy
+                Shareable Link <img class="icon"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAsElEQVRIie2SzQ3CMAxGH7AEdCVaMQFrkAFQJZYCOkCnIb1wKgcMWJZT/noAKU+yIn1O7C9xIJP5O1ZAA3RAb8Ji8x1wBKpU8Z1z6J0GOmrPeQ+cgQ1QDF/UpQCC1OiBUicbEcMHhS1Bah20GEVcmM1Dz5B6vrloJ4CpSU6+tQ/MlLl7g1bWtdPwldDcarRarHgMOTDOkJd2Q81433SbclFynX50Dj1rEIG95zyT+XEuFRpXEhVovf0AAAAASUVORK5CYII="></button>
+            <button class="btn darkmode-ignore" id="sv-btn" title="Save this image to your device">Save
+                Image <img class="icon"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAA1ElEQVRIie2WSw7CIBRFj5/FONCROLLOdRHWfenGTJ2pibEr0BEOhKRt0EKBRGJvQkLovZw+2uQBvf5VQ+AAPAHZcTyAvdrLWlsPYHPkttARcHQNGbRTe5yAsU0gdw18kHMBhYu5RbrqovlgYDDLAECTaiynPy6kkgQvgaxr2Ocb66yrH0j0qHtwVHAGLICyslYCAlj5vsy3TjNXnmnFr+eiJesFLoGZITMBbjHBJrgNNAhYAnfeRyvU3CZT0091p2sE6MXGtFHGUHeuM7AOWESvRPQCoA2TcvzCpGcAAAAASUVORK5CYII="></button>
+            <a id="sv-link" href="./img/spongebob.jpg" download="image.png" style="display: none;"></a>
+            <button class="btn darkmode-ignore" id="share-btn" title="Share this image with other apps"
+                style="display: none;" disabled>Share
+                Image <img class="icon"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAA1ElEQVRIie2WbQqCQBCGHyK8QUJHyc5X1r0EIf1VP7pAeg37M4uipu0nRr4wjMx+PDujuyv8mGIgAwp5DqIdcAcasSewDw0NAo+Bh4CUb3oxL2UvegAF7i7o5gOcAyVtVgqMxErp411dsLY2DhfiDBwBV6Dm++xUvwpIZQ5tXRhumzHIWEzZ2QRcyeDDh/apKiS0mWtrrrxW7Yv8uFawU20txmZYnFxTsjoS58b/3ztewYsA1+ITg3mP4o0uiZThNadrJxNwJHB1PerYS6BGPwKrnOoNnOBnj128ZTsAAAAASUVORK5CYII="></button>
         </div>
         <div class="darkmode-ignore" id="note">
             <p>
