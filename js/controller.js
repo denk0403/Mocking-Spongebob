@@ -72,13 +72,22 @@
 			return window.addEventListener("load", () => captionRadio.click());
 		}
 
-		if (hash.startsWith("#mockType:")) {
-			const mockType =
-				mockingSpongebob.mockTypes[hash.slice(10, hash.indexOf(":", 10))] ||
-				mockingSpongebob.mockTypes[hash.slice(10, hash.length)];
+		// hash format: #mockType:<type>:<content>
+		// ex: #mockType:asl:74:65:73:74
+
+		const HASH_PREFIX = "#mockType:";
+		if (hash.startsWith(HASH_PREFIX)) {
+			const hashSecondColonIndex = hash.indexOf(":", HASH_PREFIX.length);
+
+			const mockTypeId = hash.slice(HASH_PREFIX.length, hashSecondColonIndex);
+
+			const mockType = mockingSpongebob.mockTypes[mockTypeId];
 
 			if (mockType) {
-				document.getElementById(mockType.id).selected = true;
+				/** @type {HTMLOptionElement} */
+				const mockOption = document.getElementById(mockType.id);
+
+				mockOption.selected = true;
 				mockingSpongebob.currentMock = mockType;
 
 				if (hash.indexOf(":", 10) !== -1) {
@@ -91,9 +100,9 @@
 							.join("");
 
 						if (img.complete) {
-							drawMemeText(input.value);
+							requestAnimationFrame(() => drawMemeText(input.value));
 						} else {
-							img.onload = () => drawMemeText(input.value);
+							img.onload = () => requestAnimationFrame(() => drawMemeText(input.value));
 						}
 					} catch (err) {
 						console.error(err);
@@ -106,6 +115,21 @@
 
 	const hashify = (mockingSpongebob.hashify = (str) => {
 		return [...str].map((char) => char.codePointAt(0).toString(16)).join(":");
+	});
+
+	input.addEventListener("audioinput", () => {
+		cameraStop();
+
+		input.scrollIntoView({
+			behavior: "smooth",
+			block: "start",
+		});
+
+		imagein.value = "";
+		mathin.value = "";
+
+		drawMemeText(input.value);
+		copyLinkBtn.onclick = copyLink;
 	});
 
 	input.addEventListener("input", () => {

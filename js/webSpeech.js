@@ -1,5 +1,7 @@
 "use strict";
-(() => {
+(async () => {
+	const caption = document.getElementById("caption");
+
 	const languages = {
 			"en-US": "english",
 			ru: "russian",
@@ -23,9 +25,13 @@
 	});
 	languageLabel.innerText = "Select Language: ";
 
-	String.prototype.capitalize = function () {
-		return this.charAt(0).toUpperCase() + this.slice(1);
-	};
+	/**
+	 * @param {string} str
+	 * @returns {string}
+	 */
+	function capitalizeStr(str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
 
 	/**
 	 *
@@ -49,7 +55,7 @@
 					id: `lang-${key}`,
 					value: key,
 				});
-				option.innerText = languages[key].capitalize();
+				option.innerText = capitalizeStr(languages[key]);
 				return option;
 			})
 			.forEach((option) => {
@@ -57,108 +63,99 @@
 			});
 	}
 
-	document.addEventListener("DOMContentLoaded", async () => {
-		if (
-			navigator.mediaDevices &&
-			navigator.mediaDevices.enumerateDevices &&
-			(await navigator.mediaDevices.enumerateDevices()).filter(
-				(device) => device.kind === "audioinput"
-			).length
-		) {
-			const SpeechRecognition =
-				window.SpeechRecognition || window.webkitSpeechRecognition;
+	if (
+		navigator.mediaDevices &&
+		navigator.mediaDevices.enumerateDevices &&
+		(await navigator.mediaDevices.enumerateDevices()).filter(
+			(device) => device.kind === "audioinput"
+		).length
+	) {
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-			if (SpeechRecognition) {
-				const microphoneOff = document.createElement("img"),
-					microphoneOn = document.createElement("img"),
-					languageSelector = document.createElement("select"),
-					hashify = mockingSpongebob.hashify;
+		if (SpeechRecognition) {
+			const microphoneOff = document.createElement("img"),
+				microphoneOn = document.createElement("img"),
+				languageSelector = document.createElement("select"),
+				hashify = mockingSpongebob.hashify;
 
-				let initLanguage = "en-US";
+			let initLanguage = "en-US";
 
-				document
-					.getElementById("captionLabel")
-					.insertAdjacentElement("beforeend", microphoneOff);
+			document.getElementById("captionLabel").insertAdjacentElement("beforeend", microphoneOff);
 
-				setAttributes(languageSelector, {
-					id: "language-selector",
-					name: "languages",
-					title: "List of languages",
-				});
-				populateLanguageSelector(languageSelector);
-				languageSelector.addEventListener("input", (event) => {
-					recognition.lang = event.currentTarget.value;
-				});
-				languageLabel.appendChild(languageSelector);
+			setAttributes(languageSelector, {
+				id: "language-selector",
+				name: "languages",
+				title: "List of languages",
+			});
+			populateLanguageSelector(languageSelector);
+			languageSelector.addEventListener("input", (event) => {
+				recognition.lang = event.currentTarget.value;
+			});
+			languageLabel.appendChild(languageSelector);
 
-				document.body.insertAdjacentElement("beforeend", languageLabel);
+			document.body.insertAdjacentElement("beforeend", languageLabel);
 
-				if (languages[navigator.language]) {
-					document.getElementById(`lang-${navigator.language}`).selected = true;
-					initLanguage = navigator.language;
-				}
-
-				let recognition = new SpeechRecognition();
-				recognition.lang = initLanguage;
-				recognition.continuous = true;
-				recognition.interimResults = true;
-				recognition.maxAlternatives = 1;
-
-				setAttributes(microphoneOff, {
-					id: "microphone--off",
-					loading: "lazy",
-					class: "icon microphone",
-					title: "Listen for speech",
-					src: "./img/microphoneOff.png",
-					alt: "microphone toggle: off",
-					onContextMenu: "return false;",
-					draggable: "false",
-				});
-				microphoneOff.onclick = () => {
-					recognition.start();
-					microphoneOff.insertAdjacentElement("afterend", microphoneOn);
-					microphoneOff.remove();
-					languageSelector.disabled = true;
-				};
-
-				setAttributes(microphoneOn, {
-					id: "microphone--on",
-					loading: "lazy",
-					class: "icon microphone",
-					title: "Stop recording",
-					src: "./img/microphoneOn.png",
-					alt: "microphone toggle: recording",
-					onContextMenu: "return false;",
-					draggable: "false",
-				});
-				microphoneOn.onclick = () => {
-					recognition.stop();
-					microphoneOn.insertAdjacentElement("afterend", microphoneOff);
-					microphoneOn.remove();
-					languageSelector.disabled = false;
-				};
-
-				recognition.addEventListener("error", () => {
-					recognition.stop();
-					microphoneOn.click();
-				});
-
-				recognition.addEventListener("speechend", () => {
-					microphoneOn.click();
-				});
-
-				recognition.addEventListener("result", (event) => {
-					location.replace(
-						`${location.origin}${location.pathname}#mockType:${
-							mockingSpongebob.currentMock.id
-						}:${hashify(
-							Array.from(event.results)
-								.map((result) => result[0].transcript.trim().capitalize())
-								.join(". ")
-						)}`
-					);
-				});
+			if (languages[navigator.language]) {
+				document.getElementById(`lang-${navigator.language}`).selected = true;
+				initLanguage = navigator.language;
 			}
+
+			let recognition = new SpeechRecognition();
+			recognition.lang = initLanguage;
+			recognition.continuous = true;
+			recognition.interimResults = true;
+			recognition.maxAlternatives = 1;
+
+			setAttributes(microphoneOff, {
+				id: "microphone--off",
+				loading: "lazy",
+				class: "icon microphone",
+				title: "Listen for speech",
+				src: "./img/microphoneOff.png",
+				alt: "microphone toggle: off",
+				onContextMenu: "return false;",
+				draggable: "false",
+			});
+			microphoneOff.onclick = () => {
+				recognition.start();
+				microphoneOff.insertAdjacentElement("afterend", microphoneOn);
+				microphoneOff.remove();
+				languageSelector.disabled = true;
+			};
+
+			setAttributes(microphoneOn, {
+				id: "microphone--on",
+				loading: "lazy",
+				class: "icon microphone",
+				title: "Stop recording",
+				src: "./img/microphoneOn.png",
+				alt: "microphone toggle: recording",
+				onContextMenu: "return false;",
+				draggable: "false",
+			});
+			microphoneOn.onclick = () => {
+				recognition.stop();
+				microphoneOn.insertAdjacentElement("afterend", microphoneOff);
+				microphoneOn.remove();
+				languageSelector.disabled = false;
+			};
+
+			recognition.addEventListener("error", () => {
+				recognition.stop();
+				microphoneOn.click();
+			});
+
+			recognition.addEventListener("speechend", () => {
+				microphoneOn.click();
+			});
+
+			recognition.addEventListener("result", (event) => {
+				console.log(event, event.results);
+				caption.value = Array.from(event.results)
+					.map((result) => capitalizeStr(result[0].transcript.trim()))
+					.join(". ");
+				caption.dispatchEvent(new CustomEvent("audioinput"));
+			});
 		}
-	});
+	}
 })();

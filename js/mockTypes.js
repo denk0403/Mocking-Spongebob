@@ -125,34 +125,28 @@
 		},
 	};
 
+	const mockSelector = document.getElementById("mockType-selector");
+
+	mockSelector.innerHTML = "";
+
+	Object.keys(mockingSpongebob.mockTypes)
+		.map((key) => {
+			const option = document.createElement("option");
+			option.id = key;
+			option.value = key;
+			option.innerText = mockingSpongebob.mockTypes[key].name;
+			return option;
+		})
+		.sort((opt1, opt2) => {
+			const compare = opt1.innerText.length - opt2.innerText.length;
+			return compare !== 0 ? compare : opt1.innerText.localeCompare(opt2.innerText);
+		})
+		.forEach((option) => mockSelector.appendChild(option));
+
 	mockingSpongebob.currentMock = mockingSpongebob.mockTypes.asl;
+	document.getElementById("asl").selected = true;
 
-	document.addEventListener("DOMContentLoaded", () => {
-		const mockSelector = document.getElementById("mockType-selector");
-
-		mockSelector.innerHTML = "";
-
-		Object.keys(mockingSpongebob.mockTypes)
-			.map((key) => {
-				const option = document.createElement("option");
-				option.id = key;
-				option.value = key;
-				option.innerText = mockingSpongebob.mockTypes[key].name;
-				return option;
-			})
-			.sort((opt1, opt2) => {
-				const compare = opt1.innerText.length - opt2.innerText.length;
-				return compare !== 0
-					? compare
-					: opt1.innerText.localeCompare(opt2.innerText);
-			})
-			.forEach((option) => mockSelector.appendChild(option));
-
-		document.getElementById("asl").selected = true;
-
-		mockSelector.addEventListener("input", (event) => {
-			mockingSpongebob.currentMock =
-				mockingSpongebob.mockTypes[event.currentTarget.value];
-		});
+	mockSelector.addEventListener("input", (event) => {
+		mockingSpongebob.currentMock = mockingSpongebob.mockTypes[event.currentTarget.value];
 	});
 })();

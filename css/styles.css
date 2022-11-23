@@ -16,7 +16,6 @@ body {
 	--top-color: #b7e9b4;
 	--bottom-color: #ebebad;
 	background: linear-gradient(var(--top-color), var(--bottom-color)) no-repeat center center fixed;
-	background: -webkit-linear-gradient(var(--top-color), var(--bottom-color)) no-repeat center center fixed;
 }
 
 .preload * {
@@ -25,7 +24,6 @@ body {
 
 #title {
 	transition: color 0.33s ease;
-	-webkit-transition: color 0.33s ease;
 }
 
 #title:hover {
@@ -54,8 +52,6 @@ body {
 
 img {
 	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
 }
 
 #mirror {
@@ -195,6 +191,10 @@ label.inputField {
 	background-color: #97adb6;
 }
 
+.btn img {
+	pointer-events: none;
+}
+
 #views {
 	display: flex;
 	flex-wrap: wrap;
@@ -270,7 +270,6 @@ label.inputField {
 	height: max(auto, 350px);
 	object-position: center;
 	transform: scaleX(-1);
-	-webkit-transform: scaleX(-1);
 }
 
 #camera--view::-webkit-media-controls {
@@ -328,7 +327,6 @@ div.darkmode-background {
 	--top-color: #ffffff;
 	--bottom-color: rgb(225, 225, 225);
 	background: linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
-	background: -webkit-linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
 
 	opacity: 0;
 	transition: opacity 0.3s linear;

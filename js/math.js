@@ -19,22 +19,6 @@
 		xmlSerializer = new XMLSerializer();
 
 	const BASE_URL = `${location.origin}${location.pathname}`;
-
-	function processMathHash(hash) {
-		try {
-			clearFields();
-			mathin.value = hash
-				.slice(6) // hash includes '#' when present
-				.split(":")
-				.map((char) => char && String.fromCodePoint(parseInt(char, 16)))
-				.join("");
-			drawMathHash(mathin.value);
-			repaint();
-		} catch (err) {
-			console.error("Oops. Something went wrong.", err);
-		}
-	}
-
 	function copyLink() {
 		let urlStr = BASE_URL;
 
@@ -57,36 +41,6 @@
 			document.body.removeChild(temp);
 		}
 	}
-
-	window.addEventListener("load", () => {
-		if (window.MathJax && MathJax.tex2svgPromise) {
-			mathin.oninput = () => {
-				cameraStop();
-				mathin.scrollIntoView({
-					behavior: "smooth",
-					block: "start",
-				});
-
-				input.value = "";
-				imagein.value = "";
-
-				drawMathHash(mathin.value);
-				repaint();
-
-				copyLinkBtn.onclick = copyLink;
-			};
-
-			mathinRadioSpan.style.display = "inline";
-			if (location.hash.startsWith("#math:")) {
-				mathinRadio.click();
-				mathin.blur();
-				processMathHash(location.hash);
-				copyLinkBtn.onclick = copyLink;
-			}
-		} else {
-			title.click();
-		}
-	});
 
 	function paintWhite(elt) {
 		if (elt.style) {
@@ -117,9 +71,66 @@
 				paintWhite(svg);
 				upload.src =
 					"data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));
+
+				// The meme will be repainted by the 'upload' handler
 			})
 			.catch((err) => {
 				console.error("Oops. Something went wrong.", err);
 			});
+
+		// The meme will be repainted by the 'upload' handler
+	}
+
+	function processMathHash(hash) {
+		try {
+			clearFields();
+			mathin.value = hash
+				.slice(6) // hash includes '#' when present
+				.split(":")
+				.map((char) => char && String.fromCodePoint(parseInt(char, 16)))
+				.join("");
+
+			drawMathHash(mathin.value);
+		} catch (err) {
+			console.error("Oops. Something went wrong.", err);
+		}
+	}
+
+	function setup() {
+		if (window.MathJax && MathJax.tex2svgPromise) {
+			mathin.oninput = () => {
+				cameraStop();
+				mathin.scrollIntoView({
+					behavior: "smooth",
+					block: "start",
+				});
+
+				input.value = "";
+				imagein.value = "";
+
+				drawMathHash(mathin.value);
+
+				copyLinkBtn.onclick = copyLink;
+			};
+
+			mathinRadioSpan.style.display = "inline";
+			if (location.hash.startsWith("#math:")) {
+				mathinRadio.click();
+				mathin.blur();
+				processMathHash(location.hash);
+				copyLinkBtn.onclick = copyLink;
+			}
+		} else {
+			title.click();
+		}
+	}
+
+	const mathJaxScript = document.getElementById("mathjax");
+	if (mathJaxScript.loaded) {
+		setup();
+	} else {
+		mathJaxScript.addEventListener("load", () => {
+			setup();
+		});
 	}
 })();
