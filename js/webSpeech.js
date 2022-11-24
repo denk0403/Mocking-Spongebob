@@ -75,8 +75,7 @@
 		if (SpeechRecognition) {
 			const microphoneOff = document.createElement("img"),
 				microphoneOn = document.createElement("img"),
-				languageSelector = document.createElement("select"),
-				hashify = mockingSpongebob.hashify;
+				languageSelector = document.createElement("select");
 
 			let initLanguage = "en-US";
 
@@ -100,6 +99,7 @@
 				initLanguage = navigator.language;
 			}
 
+			/** @type {SpeechRecognition} */
 			let recognition = new SpeechRecognition();
 			recognition.lang = initLanguage;
 			recognition.continuous = true;
@@ -140,9 +140,15 @@
 				languageSelector.disabled = false;
 			};
 
-			recognition.addEventListener("error", () => {
+			recognition.addEventListener("error", (/** @type {SpeechSynthesisErrorEvent} */ event) => {
 				recognition.stop();
-				microphoneOn.click();
+
+				if (event.error === "service-not-allowed") {
+					microphoneOn.remove();
+					languageLabel.remove();
+				} else {
+					microphoneOn.click();
+				}
 			});
 
 			recognition.addEventListener("speechend", () => {
@@ -150,7 +156,6 @@
 			});
 
 			recognition.addEventListener("result", (event) => {
-				console.log(event, event.results);
 				caption.value = Array.from(event.results)
 					.map((result) => capitalizeStr(result[0].transcript.trim()))
 					.join(". ");

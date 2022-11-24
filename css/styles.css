@@ -54,6 +54,10 @@ img {
 	user-select: none;
 }
 
+img:not(#mirror) {
+	-webkit-touch-callout: none;
+}
+
 #mirror {
 	max-width: 100%;
 	height: auto;

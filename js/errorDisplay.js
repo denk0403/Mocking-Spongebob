@@ -1,7 +1,7 @@
 "use strict";
 (() => {
 	const upload = document.getElementById("upload"),
-		errorBoxString = `
+		errorBoxString = /* html */ `
         <div id="errorBox" style="display: flex;">
             <div id="errorBoxMessage">
                 There was an issue loading in the requested image. Make sure you have the correct permissions for that
@@ -31,15 +31,15 @@
 	};
 
 	upload.onerror = (event) => {
+		console.log(event)
+
 		event.type === "error" &&
 			!document.getElementById("errorBox") &&
 			document.body.insertAdjacentHTML("beforeend", errorBoxString);
 		errorBox = document.getElementById("errorBox");
-		errorBox
-			.querySelector("#errorCloseButton")
-			.addEventListener("click", () => {
-				errorBox.remove();
-			});
+		errorBox.querySelector("#errorCloseButton").addEventListener("click", () => {
+			errorBox.remove();
+		});
 		initialTimer = setTimeout(mouseleaveHandler, 7500);
 		errorBox.addEventListener("mouseenter", mouseenterHandler);
 		errorBox.addEventListener("mouseleave", () => {

@@ -15,30 +15,23 @@
 		cameraStop = mockingSpongebob.cameraStop,
 		hashify = mockingSpongebob.hashify,
 		clearFields = mockingSpongebob.clearFields,
-		repaint = mockingSpongebob.repaint,
+		clearImage = mockingSpongebob.clearImage,
 		xmlSerializer = new XMLSerializer();
 
 	const BASE_URL = `${location.origin}${location.pathname}`;
 	function copyLink() {
-		let urlStr = BASE_URL;
-
-		const trimmedStr = mathin.value.trim();
-		if (trimmedStr !== "") {
-			const newHash = hashify(trimmedStr);
-			const url = new URL(location);
-			url.hash = `#math:${newHash}`;
-			urlStr = url.toString();
-		}
-
 		if (navigator.clipboard) {
+			let urlStr = BASE_URL;
+
+			const trimmedStr = mathin.value.trim();
+			if (trimmedStr !== "") {
+				const newHash = hashify(trimmedStr);
+				const url = new URL(location);
+				url.hash = `#math:${newHash}`;
+				urlStr = url.toString();
+			}
+
 			navigator.clipboard.writeText(urlStr);
-		} else if (document.execCommand) {
-			let temp = document.createElement("textarea");
-			temp.value = urlStr;
-			document.body.appendChild(temp);
-			temp.select();
-			document.execCommand("copy");
-			document.body.removeChild(temp);
 		}
 	}
 
@@ -68,6 +61,16 @@
 		MathJax.tex2svgPromise(str, { display: false })
 			.then((container) => container.getElementsByTagName("svg")[0])
 			.then((svg) => {
+				const oldOnError = upload.onerror;
+				const newOnError = () => {
+					// console.error("There was an error rendering MathJax");
+					clearImage();
+					upload.onerror = oldOnError;
+				};
+
+				upload.onerror = newOnError;
+				upload.onload = () => (upload.onerror = oldOnError);
+
 				paintWhite(svg);
 				upload.src =
 					"data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));

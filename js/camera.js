@@ -16,8 +16,7 @@
 
 	let track;
 
-	let cameraStop;
-	cameraStop = mockingSpongebob.cameraStop = () => {
+	const cameraStop = (mockingSpongebob.cameraStop = () => {
 		cameraApp.style.display = "none";
 		if (track) {
 			track.stop();
@@ -28,7 +27,7 @@
 				block: "center",
 			});
 		}
-	};
+	});
 
 	if (
 		navigator.mediaDevices &&

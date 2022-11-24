@@ -61,9 +61,13 @@
 		mathin.value = "";
 	});
 
+	const clearImage = (mockingSpongebob.clearImage = () => {
+		drawMemeText("", true);
+	});
+
 	const clear = (mockingSpongebob.clear = () => {
 		clearFields();
-		drawMemeText("");
+		clearImage();
 	});
 
 	// should only be called once in the script!
@@ -74,7 +78,6 @@
 
 		// hash format: #mockType:<type>:<content>
 		// ex: #mockType:asl:74:65:73:74
-
 		const HASH_PREFIX = "#mockType:";
 		if (hash.startsWith(HASH_PREFIX)) {
 			const hashSecondColonIndex = hash.indexOf(":", HASH_PREFIX.length);
@@ -117,6 +120,7 @@
 		return [...str].map((char) => char.codePointAt(0).toString(16)).join(":");
 	});
 
+	// custom event
 	input.addEventListener("audioinput", () => {
 		cameraStop();
 
@@ -134,10 +138,12 @@
 
 	input.addEventListener("input", () => {
 		cameraStop();
-		let microphoneOn;
-		if ((microphoneOn = document.getElementById("microphone--on"))) {
+
+		let microphoneOn = document.getElementById("microphone--on");
+		if (microphoneOn) {
 			microphoneOn.click();
 		}
+
 		input.scrollIntoView({
 			behavior: "smooth",
 			block: "start",
@@ -150,7 +156,7 @@
 	});
 
 	input.onkeydown = (event) => {
-		if (event.keyCode === 13) {
+		if (event.key === "Enter") {
 			event.preventDefault();
 		}
 	};
@@ -172,79 +178,71 @@
 		size: INITIAL_FONT_SIZE,
 	};
 
-	function formatText(str = "") {
-		const MIN_FONT_SIZE = 8;
-		const trimmedStr = str.trim();
+	function maxNumberOfLines(fontSize) {
+		return Math.ceil(INITIAL_FONT_SIZE / fontSize);
+	}
 
-		if (trimmedStr === "") {
+	function formatText(str) {
+		const MIN_FONT_SIZE = 8;
+
+		if (str === "") {
 			return EMPTY_FORMAT;
 		}
 
 		// Setup font range
 		let lowerFontSize = MIN_FONT_SIZE - 1; // always safe
 		let upperFontSize = INITIAL_FONT_SIZE; // possibly too large
-		let currentFontSize; // assigned in loop
 
-		const words = trimmedStr.split(" ");
+		const words = str.split(" ");
 
 		/** @type {string[][]} */
 		const lines = [];
-		let currentLineIndex = 0;
 
 		/**
 		 * This helper function tries to fit a word into the results
 		 * array using the current font size of the 2D canvas context.
 		 *
 		 * Returns if it was able to be added.
-		 * @param {string} word The word to try to fit
+		 * @param {number} fontSize The font size
 		 * @returns
 		 */
-		function fitIntoLines(word) {
-			const modifiedLine = lines[currentLineIndex].concat(word);
-			if (
-				getTextWidth(modifiedLine.join(" ")) >= MAX_LINE_BOX_WIDTH
-				// checks if adding new word exceeds the line's box width
-			) {
-				if (getTextWidth(word) >= MAX_LINE_BOX_WIDTH) {
-					// check if a single word is too big
-					return false;
-				} else {
-					if (
-						// is there enough vertical room for a new line
-						currentFontSize * (currentLineIndex + 2) <
-						INITIAL_FONT_SIZE
-					) {
-						currentLineIndex += 1;
-						lines.push([word]);
-						return true;
-					} else {
+		function fitIntoLinesAtSize(fontSize) {
+			return (/** @type {string} */ word) => {
+				const modifiedLine = lines.at(-1).concat(word).join(" ");
+
+				// checks if adding new word exceeds the last line's box width
+				if (getTextWidth(modifiedLine) >= MAX_LINE_BOX_WIDTH) {
+					// check if a single word is too big to fit
+					if (getTextWidth(word) >= MAX_LINE_BOX_WIDTH) {
 						return false;
 					}
+
+					// create a new line
+					lines.push([word]);
+					// return if we have exceeded the maximum allowed lines
+					return lines.length < maxNumberOfLines(fontSize);
+				} else {
+					// add the word if it fits on the last line
+					lines.at(-1).push(word);
+					return true;
 				}
-			} else {
-				// add the word if it fits on the current line
-				lines[currentLineIndex].push(word);
-				return true;
-			}
+			};
 		}
 
 		function tryFormatAllWords(fontSize) {
-			currentFontSize = fontSize;
 			ctx.font = `bold ${fontSize}px Arial`;
 
 			// set up result array of lines
 			lines.length = 0;
 			lines.push([]);
-			currentLineIndex = 0;
 
-			return words.every(fitIntoLines);
+			return words.every(fitIntoLinesAtSize(fontSize));
 		}
 
 		// Binary search through font range
 		while (lowerFontSize !== upperFontSize) {
 			// Try new middle font-size
-			currentFontSize = upperFontSize - Math.floor((upperFontSize - lowerFontSize) / 2);
-			// console.log("Bounds:", lowerFontSize, upperFontSize, "Current:", currentFontSize);
+			const currentFontSize = upperFontSize - Math.floor((upperFontSize - lowerFontSize) / 2);
 
 			const formattedAllWords = tryFormatAllWords(currentFontSize);
 
@@ -281,7 +279,7 @@
 
 	/**
 	 * Optimizes result array and returns best font-size
-	 * @param {[[""]]} lines
+	 * @param {string[][]} lines
 	 * @param {number} fontSize
 	 */
 	function optimizeSize(lines, fontSize) {
@@ -301,7 +299,7 @@
 
 	/**
 	 * Tries to increase the font-size as much as possible
-	 * @param {[[""]]} lines
+	 * @param {string[][]} lines
 	 * @param {number} fontSize
 	 */
 	function tryToIncreaseFont(lines, fontSize) {
@@ -329,15 +327,20 @@
 	}
 
 	let lastFormatText = "";
-	function drawMemeText(str) {
+	/**
+	 * @param {string} str
+	 * @param {boolean} force Overrides caching. False by default.
+	 * @returns
+	 */
+	function drawMemeText(str, force = false) {
 		const trimmedStr = str.trim();
 
-		if (trimmedStr === lastFormatText) {
+		if (trimmedStr === lastFormatText && !force) {
 			return;
 		}
 
-		lastFormatText = str;
-		const altered_str = altText(str);
+		lastFormatText = trimmedStr;
+		const altered_str = altText(trimmedStr);
 
 		// const start = performance.now();
 		const format = formatText(altered_str);
@@ -392,9 +395,9 @@
 		upload.src = dataURL;
 	};
 
-	upload.onload = () => {
+	upload.addEventListener("load", () => {
 		drawMemeImage();
-	};
+	});
 
 	function drawMemeImage() {
 		const MAX_HEIGHT = 105;
@@ -443,6 +446,29 @@
 			});
 	}
 
+	function updateShareButtons() {
+		const canCopy = !!navigator.clipboard;
+
+		for (let i = 0; i < captionModes.length; i++) {
+			if (captionModes[i].checked) {
+				if (captionModes[i].id == "captionRadio") {
+					copyTextBtn.disabled = !canCopy;
+					copyLinkBtn.disabled = !canCopy;
+				} else if (captionModes[i].id == "mathinRadio") {
+					copyTextBtn.disabled = true;
+					copyLinkBtn.disabled = !canCopy;
+				} else {
+					copyTextBtn.disabled = true;
+					copyLinkBtn.disabled = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Re-exports the canvas to the mirror image element,
+	 * as well as updates all sharing methods.
+	 */
 	const repaint = (mockingSpongebob.repaint = () => {
 		const dataURL = canvas.toDataURL("image/png");
 		mirror.src = dataURL;
@@ -458,23 +484,10 @@
 			updateShareData(dataURL);
 		}
 
-		for (let i = 0; i < captionModes.length; i++) {
-			if (captionModes[i].checked) {
-				if (captionModes[i].id == "captionRadio") {
-					copyTextBtn.disabled = false;
-					copyLinkBtn.disabled = false;
-				} else if (captionModes[i].id == "mathinRadio") {
-					copyTextBtn.disabled = true;
-					copyLinkBtn.disabled = false;
-				} else {
-					copyTextBtn.disabled = true;
-					copyLinkBtn.disabled = true;
-				}
-			}
-		}
+		updateShareButtons();
 	});
 
-	imagein.onchange = (event) => {
+	imagein.onchange = () => {
 		input.value = "";
 		mathin.value = "";
 		if (imagein.files[0]) {
@@ -510,39 +523,24 @@
 	}
 
 	function copyLink() {
-		let urlStr = BASE_URL;
-
-		const trimmedStr = input.value.trim();
-		if (trimmedStr !== "") {
-			const newHash = hashify(trimmedStr);
-			const url = new URL(location);
-			url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
-			urlStr = url.toString();
-		}
-
 		if (navigator.clipboard) {
+			let urlStr = BASE_URL;
+
+			const trimmedStr = input.value.trim();
+			if (trimmedStr !== "") {
+				const newHash = hashify(trimmedStr);
+				const url = new URL(location);
+				url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
+				urlStr = url.toString();
+			}
 			navigator.clipboard.writeText(urlStr);
-		} else if (document.execCommand) {
-			let temp = document.createElement("textarea");
-			temp.value = urlStr;
-			document.body.appendChild(temp);
-			temp.select();
-			document.execCommand("copy");
-			document.body.removeChild(temp);
 		}
 	}
 
 	function copyMockText() {
-		const text = altText(input.value);
 		if (navigator.clipboard) {
+			const text = altText(input.value);
 			navigator.clipboard.writeText(text);
-		} else if (document.execCommand) {
-			let temp = document.createElement("textarea");
-			temp.value = text;
-			document.body.appendChild(temp);
-			temp.select();
-			document.execCommand("copy");
-			document.body.removeChild(temp);
 		}
 	}
 
@@ -559,6 +557,7 @@
 		});
 	}
 
+	updateShareButtons();
 	processHashV2(location.hash);
 
 	imageinRadio.onclick = updateMode;
