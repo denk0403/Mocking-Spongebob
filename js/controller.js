@@ -30,6 +30,10 @@
 		saveLink = document.getElementById("sv-link"),
 		/** @type {HTMLButtonElement} */
 		shareBtn = document.getElementById("share-btn"),
+		/** @type {HTMLSpanElement} */
+		copyLinkTxt = document.getElementById("cpy-link-txt"),
+		/** @type {HTMLSpanElement} */
+		copyTextTxt = document.getElementById("cpy-text-txt"),
 		cameraStop = mockingSpongebob.cameraStop,
 		reader = new FileReader();
 
@@ -522,6 +526,7 @@
 		}
 	}
 
+	let copyLinkTimer;
 	function copyLink() {
 		if (navigator.clipboard) {
 			let urlStr = BASE_URL;
@@ -533,14 +538,31 @@
 				url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
 				urlStr = url.toString();
 			}
-			navigator.clipboard.writeText(urlStr);
+
+			navigator.clipboard.writeText(urlStr).then(() => {
+				copyLinkTxt.textContent = "Copied!";
+
+				clearTimeout(copyLinkTimer);
+				copyLinkTimer = setTimeout(() => {
+					copyLinkTxt.textContent = "Copy Shareable Link";
+				}, 2000);
+			});
 		}
 	}
 
+	let copyTextTimer;
 	function copyMockText() {
 		if (navigator.clipboard) {
 			const text = altText(input.value);
-			navigator.clipboard.writeText(text);
+
+			navigator.clipboard.writeText(text).then(() => {
+				copyTextTxt.textContent = "Copied!";
+
+				clearTimeout(copyTextTimer);
+				copyTextTimer = setTimeout(() => {
+					copyTextTxt.textContent = "Copy Mocking Text";
+				}, 2000);
+			});
 		}
 	}
 

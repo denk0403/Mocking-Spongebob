@@ -68,7 +68,7 @@ img:not(#mirror) {
 	margin: 7px;
 }
 
-label * {
+#modeRadios * {
 	vertical-align: middle;
 }
 
@@ -166,7 +166,7 @@ label.inputField {
 	gap: 5px;
 
 	min-height: 50px;
-	min-width: 245px;
+	min-width: 250px;
 	width: max-content;
 
 	padding: 0 15px;
@@ -299,7 +299,6 @@ label.inputField {
 
 .icon {
 	max-width: min(10%, 30px);
-	vertical-align: middle;
 }
 
 #camera--sensor {
@@ -431,7 +430,6 @@ div.darkmode-background {
 
 	width: min(100%, 500px);
 	margin-block-start: 10px;
-	vertical-align: middle;
 }
 
 #mockTypeLabelText {

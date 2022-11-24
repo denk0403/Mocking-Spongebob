@@ -12,6 +12,8 @@
 		imagein = document.querySelector("#imagein"),
 		title = document.getElementById("title"),
 		copyLinkBtn = document.getElementById("cpy-link-btn"),
+		/** @type {HTMLSpanElement} */
+		copyLinkTxt = document.getElementById("cpy-link-txt"),
 		cameraStop = mockingSpongebob.cameraStop,
 		hashify = mockingSpongebob.hashify,
 		clearFields = mockingSpongebob.clearFields,
@@ -19,6 +21,8 @@
 		xmlSerializer = new XMLSerializer();
 
 	const BASE_URL = `${location.origin}${location.pathname}`;
+
+	let copyLinkTimer;
 	function copyLink() {
 		if (navigator.clipboard) {
 			let urlStr = BASE_URL;
@@ -31,7 +35,14 @@
 				urlStr = url.toString();
 			}
 
-			navigator.clipboard.writeText(urlStr);
+			navigator.clipboard.writeText(urlStr).then(() => {
+				copyLinkTxt.textContent = "Copied!";
+
+				clearTimeout(copyLinkTimer);
+				copyLinkTimer = setTimeout(() => {
+					copyLinkTxt.textContent = "Copy Shareable Link";
+				}, 2000);
+			});
 		}
 	}
 
