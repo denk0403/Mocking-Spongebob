@@ -1,5 +1,5 @@
 "use strict";
-document.addEventListener("DOMContentLoaded", () => {
+(() => {
 	/**
 	 * Timer
 	 */
@@ -87,4 +87,4 @@ document.addEventListener("DOMContentLoaded", () => {
 		caption.value = "؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁";
 		caption.dispatchEvent(new Event("input"));
 	};
-});
+})();

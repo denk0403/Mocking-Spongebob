@@ -40,7 +40,6 @@
 	let shareData = null;
 
 	const INITIAL_FONT_SIZE = 100; // in pixels
-	const MAX_LINE_BOX_WIDTH = 480; // in pixels
 
 	const BASE_URL = `${location.origin}${location.pathname}`;
 
@@ -186,21 +185,24 @@
 		return Math.ceil(INITIAL_FONT_SIZE / fontSize);
 	}
 
+	/**
+	 * @param {string} str The string to format
+	 * @returns
+	 */
 	function formatText(str) {
-		const MIN_FONT_SIZE = 8;
+		const MIN_FONT_SIZE = 8; // in pixels
+
+		const MAX_LINE_BOX_WIDTH = 480; // in pixels
+		const MIN_LINE_BOX_WIDTH = 25; // in pixels
 
 		if (str === "") {
 			return EMPTY_FORMAT;
 		}
 
-		// Setup font range
-		let lowerFontSize = MIN_FONT_SIZE - 1; // always safe
-		let upperFontSize = INITIAL_FONT_SIZE; // possibly too large
-
 		const words = str.split(" ");
 
 		/** @type {string[][]} */
-		const lines = [];
+		let lines;
 
 		/**
 		 * This helper function tries to fit a word into the results
@@ -208,16 +210,17 @@
 		 *
 		 * Returns if it was able to be added.
 		 * @param {number} fontSize The font size
+		 * @param {number} boxWidth The max width of the region
 		 * @returns
 		 */
-		function fitIntoLinesAtSize(fontSize) {
+		function fitIntoLinesAtSize(fontSize, boxWidth) {
 			return (/** @type {string} */ word) => {
-				const modifiedLine = lines.at(-1).concat(word).join(" ");
+				const modifiedLine = lines.at(-1).concat(word).join(" ").trim();
 
 				// checks if adding new word exceeds the last line's box width
-				if (getTextWidth(modifiedLine) >= MAX_LINE_BOX_WIDTH) {
+				if (getTextWidth(modifiedLine) >= boxWidth) {
 					// check if a single word is too big to fit
-					if (getTextWidth(word) >= MAX_LINE_BOX_WIDTH) {
+					if (getTextWidth(word) >= boxWidth) {
 						return false;
 					}
 
@@ -233,22 +236,26 @@
 			};
 		}
 
-		function tryFormatAllWords(fontSize) {
+		function tryFormatAllWords(fontSize, boxWidth) {
 			ctx.font = `bold ${fontSize}px Arial`;
 
 			// set up result array of lines
-			lines.length = 0;
-			lines.push([]);
+			lines = [[]];
 
-			return words.every(fitIntoLinesAtSize(fontSize));
+			return words.every(fitIntoLinesAtSize(fontSize, boxWidth));
 		}
 
+		// Setup font range
+		let lowerFontSize = MIN_FONT_SIZE - 1; // always safe
+		let upperFontSize = INITIAL_FONT_SIZE; // possibly too large
+
 		// Binary search through font range
+		// This determines the maximum font size that fits all the text into the region
 		while (lowerFontSize !== upperFontSize) {
 			// Try new middle font-size
 			const currentFontSize = upperFontSize - Math.floor((upperFontSize - lowerFontSize) / 2);
 
-			const formattedAllWords = tryFormatAllWords(currentFontSize);
+			const formattedAllWords = tryFormatAllWords(currentFontSize, MAX_LINE_BOX_WIDTH);
 
 			if (formattedAllWords) {
 				lowerFontSize = currentFontSize;
@@ -257,13 +264,31 @@
 			}
 		}
 
-		let finalFontSize = lowerFontSize;
+		const finalFontSize = lowerFontSize;
 
-		// rebuild result array
-		tryFormatAllWords(finalFontSize);
+		// Setup max width range
+		let lowerBoxWidth = MIN_LINE_BOX_WIDTH - 1; // possibly too small
+		let upperBoxWidth = MAX_LINE_BOX_WIDTH; // always safe
+
+		// Binary search through max width range
+		// This determines the minimum width that optimally balances the text within the region
+		while (lowerBoxWidth !== upperBoxWidth) {
+			// Try new middle max width
+			const currentBoxWidth = lowerBoxWidth + Math.floor((upperBoxWidth - lowerBoxWidth) / 2);
+
+			const formattedAllWords = tryFormatAllWords(finalFontSize, currentBoxWidth);
+
+			if (formattedAllWords) {
+				upperBoxWidth = currentBoxWidth;
+			} else {
+				lowerBoxWidth = currentBoxWidth + 1;
+			}
+		}
+
+		const finalBoxWidth = upperBoxWidth;
 
 		// check for unreadable text
-		if (finalFontSize < MIN_FONT_SIZE) {
+		if (finalFontSize < MIN_FONT_SIZE || finalBoxWidth < MIN_LINE_BOX_WIDTH) {
 			const ERROR_SIZE = 59;
 			ctx.font = `bold ${ERROR_SIZE}px Arial`;
 			ctx.fillStyle = "red";
@@ -271,63 +296,16 @@
 				lines: ["Input is too large"],
 				fontSize: ERROR_SIZE,
 			};
-		} else {
-			finalFontSize = optimizeSize(lines, finalFontSize);
-			ctx.fillStyle = "white";
-			return {
-				lines: lines.map((line) => line.join(" ").trim()),
-				fontSize: finalFontSize,
-			};
 		}
-	}
 
-	/**
-	 * Optimizes result array and returns best font-size
-	 * @param {string[][]} lines
-	 * @param {number} fontSize
-	 */
-	function optimizeSize(lines, fontSize) {
-		for (let lineIndex = lines.length - 1; lineIndex >= 1; lineIndex--) {
-			const line2Index = lineIndex - 1;
-			const getLine1Text = () => lines[lineIndex].join(" ");
+		// rebuild result array
+		tryFormatAllWords(finalFontSize, finalBoxWidth);
 
-			while (
-				getTextWidth(`${lines[line2Index].slice(-1)[0]} ${getLine1Text()}`.trim()) <
-				getTextWidth(lines[line2Index].slice(0, -1).join(" ").trim())
-			) {
-				lines[lineIndex].unshift(lines[line2Index].pop());
-			}
-		}
-		return tryToIncreaseFont(lines, fontSize);
-	}
-
-	/**
-	 * Tries to increase the font-size as much as possible
-	 * @param {string[][]} lines
-	 * @param {number} fontSize
-	 */
-	function tryToIncreaseFont(lines, fontSize) {
-		const tryOneIncrease = () => {
-			const newSize = fontSize + 1;
-			ctx.font = `bold ${newSize}px Arial`;
-			if (
-				lines.every((line) => getTextWidth(line.join(" ").trim()) < MAX_LINE_BOX_WIDTH) &&
-				lines.length * newSize < INITIAL_FONT_SIZE
-			) {
-				fontSize = newSize;
-				return true;
-			} else {
-				ctx.font = `bold ${fontSize}px Arial`;
-				return false;
-			}
+		ctx.fillStyle = "white";
+		return {
+			lines: lines.map((line) => line.join(" ").trim()),
+			fontSize: finalFontSize,
 		};
-
-		let increasePossible = true;
-		while (increasePossible) {
-			increasePossible = tryOneIncrease();
-		}
-
-		return fontSize;
 	}
 
 	let lastFormatText = "";
@@ -347,30 +325,27 @@
 		const altered_str = altText(trimmedStr);
 
 		// const start = performance.now();
-		const format = formatText(altered_str);
+		const { lines, fontSize } = formatText(altered_str);
 		// console.log(performance.now() - start);
-
-		const lines = format.lines;
-		const size = format.fontSize;
 
 		ctx.drawImage(img, 0, 0);
 
 		const LINE_WIDTH_SHRINK_FACTOR = 9;
-		ctx.lineWidth = size / LINE_WIDTH_SHRINK_FACTOR;
+		ctx.lineWidth = fontSize / LINE_WIDTH_SHRINK_FACTOR;
 
 		const BOTTOM_MARGIN = 4;
 
 		const xloc = canvas.width / 2;
 		const yloc =
 			img.height - // start at bottom of canvas
-			(lines.length - 1) * size - // account for the number of lines to move up
+			(lines.length - 1) * fontSize - // account for the number of lines to move up
 			ctx.lineWidth / 2 - // account for the outer border thickness
 			ctx.measureText(lines[lines.length - 1]).actualBoundingBoxDescent - // align bottom of bounding boxes
 			BOTTOM_MARGIN; // create a bottom margin
 
 		for (let i = 0; i < lines.length; i++) {
-			ctx.strokeText(lines[i], xloc, yloc + i * size); // draw border
-			ctx.fillText(lines[i], xloc, yloc + i * size); // draw filled texts
+			ctx.strokeText(lines[i], xloc, yloc + i * fontSize); // draw border
+			ctx.fillText(lines[i], xloc, yloc + i * fontSize); // draw filled texts
 		}
 
 		repaint();
