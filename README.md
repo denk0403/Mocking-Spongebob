@@ -24,7 +24,7 @@
 
 # Features!
 
-- [x] Automatically resizes captions using an effecient binary search algorithm.
+- [x] Automatically resizes and balances captions using an efficient binary search algorithm.
 - [x] Choose from multiple different mocking styles.
 - [x] Also supports uploading other images and <sup>[1]</sup>inputting TeX typesetting for the caption.
   - <sup>[2]</sup>Built-in camera app for taking pictures even faster!
