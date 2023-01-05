@@ -253,18 +253,18 @@
 		// This determines the maximum font size that fits all the text into the region
 		while (lowerFontSize !== upperFontSize) {
 			// Try new middle font-size
-			const currentFontSize = upperFontSize - Math.floor((upperFontSize - lowerFontSize) / 2);
+			const currentFontSize = ~~((upperFontSize + lowerFontSize) / 2);
 
 			const formattedAllWords = tryFormatAllWords(currentFontSize, MAX_LINE_BOX_WIDTH);
 
 			if (formattedAllWords) {
-				lowerFontSize = currentFontSize;
+				lowerFontSize = currentFontSize + 1;
 			} else {
-				upperFontSize = currentFontSize - 1;
+				upperFontSize = currentFontSize;
 			}
 		}
 
-		const finalFontSize = lowerFontSize;
+		const finalFontSize = lowerFontSize - 1;
 
 		// Setup max width range
 		let lowerBoxWidth = MIN_LINE_BOX_WIDTH - 1; // possibly too small
@@ -274,7 +274,7 @@
 		// This determines the minimum width that optimally balances the text within the region
 		while (lowerBoxWidth !== upperBoxWidth) {
 			// Try new middle max width
-			const currentBoxWidth = lowerBoxWidth + Math.floor((upperBoxWidth - lowerBoxWidth) / 2);
+			const currentBoxWidth = ~~((upperBoxWidth + lowerBoxWidth) / 2);
 
 			const formattedAllWords = tryFormatAllWords(finalFontSize, currentBoxWidth);
 
