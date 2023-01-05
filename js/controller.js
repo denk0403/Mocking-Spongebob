@@ -4,7 +4,7 @@
 	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById("output"),
 		/** @type {CanvasRenderingContext2D} */
-		ctx = canvas.getContext("2d"),
+		ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }),
 		/** @type {HTMLImageElement} */
 		img = document.getElementById("meme"),
 		/** @type {HTMLImageElement} */
@@ -409,7 +409,7 @@
 		return fetch(url, { signal: abortController.signal })
 			.then((res) => res.blob())
 			.then((blob) => {
-				const file = new File([blob], "image.png", { type: "image/png" });
+				const file = new File([blob], "image.jpg", { type: "image/jpeg" });
 
 				shareData = {
 					files: [file],
@@ -449,7 +449,7 @@
 	 * as well as updates all sharing methods.
 	 */
 	const repaint = (mockingSpongebob.repaint = () => {
-		const dataURL = canvas.toDataURL("image/png");
+		const dataURL = canvas.toDataURL("image/jpeg");
 		mirror.src = dataURL;
 		mirror.alt = input.value;
 		mirror.title = input.value;
@@ -457,7 +457,7 @@
 		saveLink.href = dataURL;
 		saveLink.download = `${
 			input.value ? altText(input.value.trim()) : mathin.value.trim() || "img"
-		}.png`;
+		}.jpg`;
 
 		if (navigator.canShare && navigator.share) {
 			updateShareData(dataURL);
