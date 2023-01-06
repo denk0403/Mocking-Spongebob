@@ -294,7 +294,9 @@
 
 		ctx.drawImage(img, 0, 0);
 
+		// const start = performance.now();
 		const format = formatText(str);
+		// console.log(performance.now() - start);
 		const lines = format.lines;
 		const size = format.fontSize;
 
