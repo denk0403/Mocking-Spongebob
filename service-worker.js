@@ -1,5 +1,5 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v4";
+const cacheName = "mockSpongebob-v5";
 
 // Assets to be used for offline availability
 const staticAssets = [
@@ -13,7 +13,6 @@ const staticAssets = [
 	"./img/camera-icon.png",
 	"./img/camera-trigger.png",
 	"./img/camera-flip.png",
-	"./img/transparent.png",
 	"./img/chrome_store_logo.png",
 	"./img/microphoneOff.png",
 	"./img/microphoneOn.png",
@@ -24,7 +23,6 @@ const staticAssets = [
 
 	// JS files
 	"./js/controller.js",
-	"./js/darkmode.js",
 	"./js/sw-registrator.js",
 	"./js/camera.js",
 	"./js/math.js",

@@ -1,5 +1,5 @@
 "use strict";
-(() => {
+{
 	const cameraApp = document.querySelector("#cameraApp"),
 		cameraView = document.querySelector("#camera--view"),
 		cameraSensor = document.querySelector("#camera--sensor"),
@@ -104,4 +104,4 @@
 			}
 		});
 	}
-})();
+}

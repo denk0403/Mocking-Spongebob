@@ -1,5 +1,5 @@
 "use strict";
-(() => {
+{
 	const upload = document.getElementById("upload"),
 		errorBoxString = /* html */ `
         <div id="errorBox" style="display: flex;">
@@ -31,7 +31,7 @@
 	};
 
 	upload.onerror = (event) => {
-		console.log(event)
+		console.log(event);
 
 		event.type === "error" &&
 			!document.getElementById("errorBox") &&
@@ -46,4 +46,4 @@
 			setTimeout(mouseleaveHandler, 2500);
 		});
 	};
-})();
+}
