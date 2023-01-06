@@ -137,14 +137,6 @@ body {
 	filter: brightness(0.95);
 }
 
-#output,
-#meme,
-#upload {
-	display: none;
-	visibility: hidden;
-	align-self: center;
-}
-
 img:not(#mirror) {
 	user-select: none;
 	-webkit-touch-callout: none;
@@ -302,12 +294,9 @@ select {
 }
 
 #views * {
+	margin-top: 10px;
 	max-height: 350px;
 	box-sizing: content-box;
-}
-
-#views *+* {
-	margin-top: 10px;
 }
 
 #camera--frame {
