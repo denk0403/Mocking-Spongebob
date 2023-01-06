@@ -165,7 +165,7 @@
 	};
 
 	mockSelector.addEventListener("input", () => {
-		drawMemeText(input.value);
+		drawMemeText(input.value, true);
 		copyLinkBtn.onclick = copyLink;
 	});
 
