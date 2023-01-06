@@ -33,13 +33,13 @@
     <!-- Manifest file for PWA -->
     <link rel="manifest" href="./manifest.json">
 
+    <link rel="preload" href="./img/spongebob.jpg" as="image">
+
     <!-- Math support -->
     <script id="mathjax" type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
         onload="this.loaded = true"></script>
     <!-- Offline PWA support -->
     <script type="text/javascript" async src="./js/sw-registrator.js"></script>
-    <!-- Darkmode support -->
-    <script type="text/javascript" async></script>
 
     <!-- Shared object across scripts for website, and darkmode support -->
     <script type="text/javascript">
@@ -111,11 +111,9 @@
                 <input id="imageinRadio" name="mode" type="radio" value="imageinLabel" />
                 <span>Image</span>
             </label>
-            <label for="mathinRadio">
-                <span id="mathinRadioSpan" class="exclude">
-                    <input id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
-                    <span>Math</span>
-                </span>
+            <label for="mathinRadio" id="mathinRadioLabel" style="display: none">
+                <input id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
+                <span>Math</span>
             </label>
         </span>
         <br />
@@ -141,7 +139,8 @@
                     <input id="imagein" type="file" accept="image/*" />
                 </label>
                 <img loading="lazy" id="camera--toggle" class="icon exclude" title="Toggle camera"
-                    src="./img/camera-icon.png" onContextMenu="return false;" draggable="false" />
+                    src="./img/camera-icon.png" onContextMenu="return false;" draggable="false" width="30"
+                    height="30" />
             </div>
             <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
                 <span>Math:</span>
@@ -150,15 +149,15 @@
         </form>
 
         <div id="views">
-            <canvas id="output" width="500" height="350"></canvas>
             <img id="mirror" src="./img/spongebob.jpg" width="500" height="350" alt="Mocking SpongeBob meme" />
-            <img id="meme" src="./img/spongebob.jpg" alt="Mocking SpongeBob meme template" style="display: none;" />
-            <img id="upload" style="display: none;" crossorigin="anonymous" />
+            <img id="meme" src="./img/spongebob.jpg" hidden />
+            <canvas id="output" width="500" height="350" hidden></canvas>
+            <img id="upload" crossorigin="anonymous" hidden />
 
             <!-- Camera App -->
             <div id="cameraApp" style="display: none;">
                 <!-- Camera sensor -->
-                <canvas id="camera--sensor" class="exclude"></canvas>
+                <canvas id="camera--sensor" hidden></canvas>
 
                 <!-- Frame for containing camera functionality-->
                 <div id="camera--frame">

@@ -4,7 +4,7 @@
 	const mathin = document.querySelector("#mathin"),
 		/** @type {HTMLImageElement} */
 		upload = document.querySelector("#upload"),
-		mathinRadioSpan = document.querySelector("#mathinRadioSpan"),
+		mathinRadioLabel = document.querySelector("#mathinRadioLabel"),
 		mathinRadio = document.querySelector("#mathinRadio"),
 		/** @type {HTMLInputElement} */
 		input = document.querySelector("#caption"),
@@ -124,7 +124,7 @@
 				copyLinkBtn.onclick = copyLink;
 			};
 
-			mathinRadioSpan.style.display = "inline";
+			mathinRadioLabel.style.display = "inline";
 			if (location.hash.startsWith("#math:")) {
 				mathinRadio.click();
 				mathin.blur();
