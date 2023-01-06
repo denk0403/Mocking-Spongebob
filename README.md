@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/3473945/82801778-d9152980-9e4b-11ea-84a4-0ffea859e547.png">
+  <img src="https://user-images.githubusercontent.com/3473945/211006201-5d67afe1-9ba1-46a3-9c44-e8f349d81617.png">
 </p>
 <p align="center">
   This website provides an over the top generator for the Mocking SpongeBob meme that became popular around 2017.
@@ -24,7 +24,7 @@
 
 # Features!
 
-- [x] Automatically resizes and balances captions using an efficient binary search algorithm.
+- [x] Automatically sizes and balances captions using an efficient binary search algorithm.
 - [x] Choose from multiple different mocking styles.
 - [x] Also supports uploading other images and <sup>[1]</sup>inputting TeX typesetting for the caption.
   - <sup>[2]</sup>Built-in camera app for taking pictures even faster!
