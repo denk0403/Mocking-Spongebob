@@ -15,7 +15,6 @@
 		/** @type {HTMLSpanElement} */
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
 		cameraStop = mockingSpongebob.cameraStop,
-		hashify = mockingSpongebob.hashify,
 		clearFields = mockingSpongebob.clearFields,
 		clearImage = mockingSpongebob.clearImage,
 		xmlSerializer = new XMLSerializer();
@@ -29,7 +28,7 @@
 
 			const trimmedStr = mathin.value.trim();
 			if (trimmedStr !== "") {
-				const newHash = hashify(trimmedStr);
+				const newHash = encodeURIComponent(trimmedStr);
 				const url = new URL(location);
 				url.hash = `#math:${newHash}`;
 				urlStr = url.toString();
@@ -98,11 +97,9 @@
 	function processMathHash(hash) {
 		try {
 			clearFields();
-			mathin.value = hash
-				.slice(6) // hash includes '#' when present
-				.split(":")
-				.map((char) => char && String.fromCodePoint(parseInt(char, 16)))
-				.join("");
+			const contentPrefixIndex = 5;
+			const content = decodeURIComponent(hash.slice(contentPrefixIndex + 1));
+			mathin.value = content;
 
 			drawMathHash(mathin.value);
 		} catch (err) {

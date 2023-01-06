@@ -96,14 +96,12 @@
 				mockOption.selected = true;
 				mockingSpongebob.currentMock = mockType;
 
-				if (hash.indexOf(":", 10) !== -1) {
+				const contentPrefixIndex = hash.indexOf(":", 10);
+				if (~contentPrefixIndex) {
 					try {
 						clearFields();
-						input.value = hash
-							.slice(hash.indexOf(":", 10) + 1) // hash includes '#' when present
-							.split(":")
-							.map((char) => String.fromCodePoint(parseInt(char, 16)))
-							.join("");
+						const content = decodeURIComponent(hash.slice(contentPrefixIndex + 1));
+						input.value = content;
 
 						if (img.complete) {
 							requestAnimationFrame(() => drawMemeText(input.value));
@@ -118,10 +116,6 @@
 			}
 		}
 	};
-
-	const hashify = (mockingSpongebob.hashify = (str) => {
-		return [...str].map((char) => char.codePointAt(0).toString(16)).join(":");
-	});
 
 	// custom event
 	input.addEventListener("audioinput", () => {
@@ -508,7 +502,7 @@
 
 			const trimmedStr = input.value.trim();
 			if (trimmedStr !== "") {
-				const newHash = hashify(trimmedStr);
+				const newHash = encodeURIComponent(trimmedStr);
 				const url = new URL(location);
 				url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
 				urlStr = url.toString();
