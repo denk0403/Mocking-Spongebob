@@ -1,5 +1,5 @@
 "use strict";
-(() => {
+{
 	// DOM Constants
 	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById("output"),
@@ -562,4 +562,4 @@
 	mathinRadio.onclick = updateMode;
 	copyTextBtn.onclick = copyMockText;
 	copyLinkBtn.onclick = copyLink;
-})();
+}

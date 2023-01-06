@@ -1,5 +1,5 @@
 "use strict";
-(() => {
+{
 	/** @type {HTMLInputElement} */
 	const mathin = document.querySelector("#mathin"),
 		/** @type {HTMLImageElement} */
@@ -147,4 +147,4 @@
 			setup();
 		});
 	}
-})();
+}

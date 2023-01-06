@@ -1,5 +1,5 @@
 "use strict";
-(() => {
+{
 	mockingSpongebob.mockTypes = {
 		cu: {
 			id: "cu",
@@ -149,4 +149,4 @@
 	mockSelector.addEventListener("input", (event) => {
 		mockingSpongebob.currentMock = mockingSpongebob.mockTypes[event.currentTarget.value];
 	});
-})();
+}

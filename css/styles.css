@@ -1,8 +1,119 @@
-html {
+:root {
 	min-height: 100%;
 	min-width: 100%;
 	text-size-adjust: 100%;
 	-webkit-text-size-adjust: 100%;
+
+	--white: white;
+	--yellow: yellow;
+	--green: #26ce42;
+
+	--bg-color-top: #b7e9b4;
+	--bg-color-bottom: #ebebad;
+	background: linear-gradient(var(--bg-color-top), var(--bg-color-bottom)) no-repeat center center fixed;
+
+	--box-color: rgba(255, 233, 210, 0.85);
+	--title-hover-color: rgb(0, 94, 255);
+	--form-bg-color: var(--white);
+	--form-color: black;
+	--input-placeholder-color: gray;
+	--external-link-color: blue;
+	--btn-bg-color: #00a6e3;
+	--btn-color: var(--white);
+	--toggle-checked: var(--green);
+
+	--color-transitions: color .25s linear, background-color .25s linear, background .25s linear;
+}
+
+.darkmode:root {
+	--white: #e6e6e6;
+	--yellow: #def200;
+	--green: #2C903D;
+
+	--box-color: rgba(0, 25, 60, 0.67);
+	--title-hover-color: var(--yellow);
+	--form-bg-color: var(--white);
+	--external-link-color: var(--yellow);
+	--btn-bg-color: #0096ce;
+
+	color: var(--white);
+	background: black;
+}
+
+.darkmode-toggle-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+
+	margin: 10px;
+	font-size: large;
+}
+
+input.toggle {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+
+	width: 62px;
+	height: 32px;
+	border-radius: 50px;
+
+	cursor: pointer;
+
+	border: none;
+	background-color: #707070;
+
+	transition: var(--color-transitions);
+}
+
+input.toggle:before {
+	content: "on off";
+
+	display: flex;
+	align-items: center;
+
+	position: absolute;
+	left: 2px;
+	top: 2px;
+	z-index: 2;
+
+	width: 28px;
+	height: 28px;
+
+	border-radius: 50%;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+
+	background: var(--white, inherit);
+	color: var(--white, inherit);
+
+	font: 10px/28px Helvetica;
+	font-weight: bold;
+	text-indent: -22px;
+	word-spacing: 37px;
+
+	text-transform: uppercase;
+	text-shadow: -1px -1px rgba(0, 0, 0, 0.15);
+	white-space: nowrap;
+
+	transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.25s;
+}
+
+input.toggle:checked {
+	background-color: var(--toggle-checked);
+}
+
+input.toggle:checked:before {
+	left: 32px;
+}
+
+.darkmode-toggle:hover {
+	scale: 1.1;
+	opacity: 1;
 }
 
 body {
@@ -12,34 +123,18 @@ body {
 	margin-top: 7px;
 
 	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-
-	--top-color: #b7e9b4;
-	--bottom-color: #ebebad;
-	background: linear-gradient(var(--top-color), var(--bottom-color)) no-repeat center center fixed;
-}
-
-.preload * {
-	transition: none !important;
 }
 
 #title {
-	transition: color 0.33s ease;
+	transition: var(--color-transitions);
 }
 
 #title:hover {
-	color: rgb(0, 94, 255);
+	color: var(--title-hover-color);
 }
 
 #title:active {
-	color: rgb(0, 66, 181);
-}
-
-.darkmode--activated #title:hover {
-	color: blue;
-}
-
-.darkmode--activated #title:active {
-	color: rgb(80, 80, 255);
+	filter: brightness(0.95);
 }
 
 #output,
@@ -50,11 +145,8 @@ body {
 	align-self: center;
 }
 
-img {
-	user-select: none;
-}
-
 img:not(#mirror) {
+	user-select: none;
 	-webkit-touch-callout: none;
 }
 
@@ -62,10 +154,6 @@ img:not(#mirror) {
 	max-width: 100%;
 	height: auto;
 	max-height: 350px;
-}
-
-#note p {
-	margin: 7px;
 }
 
 #modeRadios * {
@@ -117,6 +205,12 @@ label.inputField {
 	width: 100%;
 }
 
+input,
+select {
+	background-color: var(--form-bg-color);
+	color: var(--form-color)
+}
+
 #caption,
 #imagein,
 #mathin {
@@ -127,21 +221,21 @@ label.inputField {
 	width: 100%;
 }
 
+:is(#caption,
+	#imagein,
+	#mathin)::placeholder {
+	color: var(--input-placeholder-color);
+}
+
 #imagein {
 	display: inline-flex;
 	font-size: medium;
-	background-color: white;
-	transition: all 0.3s ease;
+	transition: var(--color-transitions);
 }
 
-.darkmode--activated #imagein {
-	background-color: rgba(0, 0, 0, 0);
-	color: black;
-}
-
-#note {
+#note p {
 	color: red;
-	margin-top: 7px;
+	margin: 10px 0;
 }
 
 .btn-group {
@@ -158,8 +252,7 @@ label.inputField {
 	padding: 0 20px;
 }
 
-.btn,
-.btn.darkmode-ignore {
+.btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -173,9 +266,11 @@ label.inputField {
 	margin: 0;
 
 	border-radius: 5px;
-	background-color: #00a6e3;
+	background-color: var(--btn-bg-color);
 	box-shadow: inset 0 -3px 8px 2px #414b72;
-	color: white;
+	color: var(--white);
+
+	transition: var(--color-transitions), background-color .05s ease;
 
 	font-size: medium;
 	font-weight: bold;
@@ -184,11 +279,11 @@ label.inputField {
 }
 
 .btn:hover {
-	background-color: #21c201;
+	background-color: var(--green);
 }
 
 .btn:active {
-	background-color: #28e103;
+	filter: brightness(0.9)
 }
 
 .btn:disabled {
@@ -314,40 +409,14 @@ label.inputField {
 	display: block;
 	max-width: 80rem;
 	width: 90vw;
-	background-color: rgba(255, 233, 210, 0.85);
+	background-color: var(--box-color);
 	border-radius: 10px;
 	padding: 5px 10px;
-	transition: background-color 0.4s linear;
+	transition: var(--color-transitions);
 
 	margin: 0 auto;
 }
 
-.darkmode--activated .box {
-	background-color: rgba(255, 215, 170, 0.75);
-}
-
-div.darkmode-background {
-	--top-color: #ffffff;
-	--bottom-color: rgb(225, 225, 225);
-	background: linear-gradient(var(--top-color), var(--bottom-color)) fixed no-repeat;
-
-	opacity: 0;
-	transition: opacity 0.3s linear;
-	min-height: 100%;
-}
-
-.darkmode--activated .darkmode-background {
-	opacity: 1;
-}
-
-.darkmode-toggle {
-	z-index: 5;
-	font-size: larger;
-}
-
-.darkmode-toggle:hover {
-	filter: brightness(0.9);
-}
 
 #errorBox {
 	display: flex;
@@ -382,23 +451,15 @@ div.darkmode-background {
 }
 
 .external-link:any-link {
-	color: blue;
+	color: var(--external-link-color);
 	font-weight: bold;
 	text-decoration: none;
-	transition: color linear 0.2s;
+	transition: var(--color-transitions);
 }
 
 .external-link:hover {
 	color: #21c201;
 	text-decoration: underline;
-}
-
-.darkmode--activated .external-link:any-link {
-	color: yellow;
-}
-
-.darkmode--activated .external-link:hover {
-	color: #21c201;
 }
 
 .microphone:hover {
@@ -411,10 +472,9 @@ div.darkmode-background {
 
 #language-label {
 	display: block;
-	margin-block: 20px;
+	margin-block: 10px;
 	font-size: large;
-	color: black;
-	transition: color linear 0.15s;
+	transition: var(--color-transitions);
 }
 
 #language-selector {

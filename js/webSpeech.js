@@ -115,6 +115,8 @@
 				alt: "microphone toggle: off",
 				onContextMenu: "return false;",
 				draggable: "false",
+				width: "30px",
+				height: "30px",
 			});
 			microphoneOff.onclick = () => {
 				recognition.start();
@@ -132,6 +134,8 @@
 				alt: "microphone toggle: recording",
 				onContextMenu: "return false;",
 				draggable: "false",
+				width: "30px",
+				height: "30px",
 			});
 			microphoneOn.onclick = () => {
 				recognition.stop();
