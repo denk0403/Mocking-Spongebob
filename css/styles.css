@@ -40,14 +40,20 @@
 	background: black;
 }
 
+* {
+	box-sizing: border-box;
+}
+
 .darkmode-toggle-wrapper {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 5px;
 
-	margin: 10px;
 	font-size: large;
+
+	margin: 10px auto;
+	width: max-content;
 }
 
 input.toggle {
@@ -153,7 +159,7 @@ img:not(#mirror) {
 }
 
 #modeRadios {
-	display: inline-block;
+	display: block;
 	width: 100%;
 }
 
@@ -170,31 +176,40 @@ input[type="radio"] {
 
 form#controls {
 	max-width: 500px;
-	margin: 0 auto;
+	margin: 10px auto;
 	font-size: larger;
+}
+
+.color-picker {
+	width: 100%;
+	border-radius: 5px;
+}
+
+.no-margin {
+	margin: 0 !important;
 }
 
 div.inputField,
 label.inputField {
-	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	gap: 10px;
+	gap: 12px;
+
+	width: min(100%, 500px);
 }
 
-.inputField label,
-label.inputField {
+.mode-controls {
+	display: none;
 	width: 100%;
+}
+
+#modeRadios:has(#captionRadio:checked)~#controls #caption-controls,
+#modeRadios:has(#imageinRadio:checked)~#controls #image-controls,
+#modeRadios:has(#mathinRadio:checked)~#controls #math-controls {
 	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 15px;
-}
-
-#captionControls {
-	display: block;
-	width: 100%;
+    flex-direction: column;
+	gap: 8px;
 }
 
 input,
@@ -211,6 +226,13 @@ select {
 	padding: 7px;
 	border-radius: 5px;
 	width: 100%;
+	/* min-height: 45px; */
+
+	display: flex;
+	align-items: center;
+	vertical-align: center;
+
+	transition: var(--color-transitions);
 }
 
 :is(#caption,
@@ -220,9 +242,7 @@ select {
 }
 
 #imagein {
-	display: inline-flex;
 	font-size: medium;
-	transition: var(--color-transitions);
 }
 
 #note p {
@@ -288,15 +308,16 @@ select {
 
 #views {
 	display: flex;
-	flex-wrap: wrap;
 	justify-content: center;
+	flex-wrap: wrap;
+	gap: 10px;
+
 	width: 100%;
+	margin-top: 10px;
 }
 
 #views * {
-	margin-top: 10px;
-	max-height: 350px;
-	box-sizing: content-box;
+	box-sizing: border-box;
 }
 
 #camera--frame {
@@ -310,9 +331,10 @@ select {
 #camera--trigger {
 	position: absolute;
 	min-width: 3.5rem;
-	width: 13%;
-	bottom: 0;
-	left: min(43.5%, 50% - 1.75rem);
+	width: 65px;
+	bottom: 15px;
+	left: 50%;
+	translate: -50%;
 }
 
 #camera--trigger:hover {
@@ -330,9 +352,9 @@ select {
 #camera--flip {
 	position: absolute;
 	min-width: 3.5rem;
-	width: 13%;
-	bottom: -3px;
-	right: 7px;
+	width: 65px;
+	bottom: 15px;
+	right: 10px;
 }
 
 #camera--flip.disabled {
@@ -357,7 +379,7 @@ select {
 	max-width: 100%;
 	height: max(auto, 350px);
 	object-position: center;
-	transform: scaleX(-1);
+	scale: -1 1;
 }
 
 #camera--view::-webkit-media-controls {
@@ -397,7 +419,7 @@ select {
 .box {
 	display: block;
 	max-width: 80rem;
-	width: 90vw;
+	width: 95%;
 	background-color: var(--box-color);
 	border-radius: 10px;
 	padding: 5px 10px;
@@ -471,7 +493,7 @@ select {
 	margin-left: 10px;
 }
 
-#mockTypeLabel {
+.form-label {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -479,11 +501,6 @@ select {
 
 	width: min(100%, 500px);
 	margin-block-start: 10px;
-}
-
-#mockTypeLabelText {
-	min-width: max-content;
-	width: 105px;
 }
 
 #mockType-selector {

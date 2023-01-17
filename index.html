@@ -104,53 +104,64 @@
 
         <span id="modeRadios">
             <label for="captionRadio">
-                <input id="captionRadio" name="mode" type="radio" value="captionControls" checked="checked" />
+                <input id="captionRadio" name="mode" type="radio" value="caption-controls" checked="checked" />
                 <span>Caption</span>
             </label>
             <label for="imageinRadio">
-                <input id="imageinRadio" name="mode" type="radio" value="imageinLabel" />
+                <input id="imageinRadio" name="mode" type="radio" value="image-controls" />
                 <span>Image</span>
             </label>
             <label for="mathinRadio" id="mathinRadioLabel" style="display: none">
-                <input id="mathinRadio" name="mode" type="radio" value="mathinLabel" />
+                <input id="mathinRadio" name="mode" type="radio" value="math-controls" />
                 <span>Math</span>
             </label>
         </span>
-        <br />
-        <br />
         <form id="controls">
-            <div id="captionControls">
+            <div id="caption-controls" class="mode-controls">
                 <div id="captionLabel" class="inputField">
-                    <label for="caption">
+                    <label for="caption" class="inputField no-margin">
                         <span>Caption:</span>
                         <input id="caption" type="text" placeholder="aDd A cApTiOn...">
                     </label>
                 </div>
-                <label id="mockTypeLabel" for="mockType-selector">
-                    <span id="mockTypeLabelText">Mock Type: </span>
+                <label for="caption-color" class="inputField">
+                    <span>Color:</span>
+                    <input id="caption-color" class="color-picker" type="color" value="#ffffff">
+                </label>
+                <label id="mockTypeLabel" for="mockType-selector" class="inputField">
+                    <span id="mockTypeLabelText">Pattern: </span>
                     <select id="mockType-selector" name="mockTypes">
                         <option id="asl" value="">Alternating: starting lower</option>
                     </select>
                 </label>
             </div>
-            <div id="imageinLabel" class="inputField" style="display: none;">
-                <label for="imagein">
-                    <span>Image:</span>
-                    <input id="imagein" type="file" accept="image/*" />
-                </label>
-                <img loading="lazy" id="camera--toggle" class="icon exclude" title="Toggle camera"
-                    src="./img/camera-icon.png" onContextMenu="return false;" draggable="false" width="30"
-                    height="30" />
+            <div id="image-controls" class="mode-controls">
+                <div id="imageinLabel" class="inputField">
+                    <label for="imagein" class="inputField no-margin">
+                        <span>Image:</span>
+                        <input id="imagein" type="file" accept="image/*" />
+                    </label>
+                    <img loading="lazy" id="camera--toggle" class="icon exclude" title="Toggle camera"
+                        src="./img/camera-icon.png" onContextMenu="return false;" draggable="false" width="30"
+                        height="30" />
+                </div>
             </div>
-            <label id="mathinLabel" class="inputField" for="mathin" style="display: none;">
-                <span>Math:</span>
-                <input id="mathin" type="text" placeholder="aDd SoMe TeX..." />
-            </label>
+            <div id="math-controls" class="mode-controls">
+                <label id="mathinLabel" class="inputField" for="mathin">
+                    <span>Math:</span>
+                    <input id="mathin" type="text" placeholder="aDd SoMe TeX..." />
+                </label>
+                <label for="math-color" class="inputField">
+                    <span>Color:</span>
+                    <input id="math-color" class="color-picker" type="color" value="#ffffff">
+                </label>
+            </div>
         </form>
 
         <div id="views">
-            <img id="mirror" src="./img/spongebob.jpg" width="500" height="350" alt="Mocking SpongeBob meme" />
-            <img id="meme" src="./img/spongebob.jpg" hidden />
+            <img id="mirror" src="./img/spongebob.jpg" width="500" height="350" alt="Mocking SpongeBob meme"
+                decoding="sync" />
+            <img id="meme" src="./img/spongebob.jpg" decoding="sync" hidden />
             <canvas id="output" width="500" height="350" hidden></canvas>
             <img id="upload" crossorigin="anonymous" hidden />
 
