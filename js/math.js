@@ -4,12 +4,16 @@
 	const mathin = document.querySelector("#mathin"),
 		/** @type {HTMLImageElement} */
 		upload = document.querySelector("#upload"),
+		/** @type {HTMLImageElement} */
+		mirror = document.getElementById("mirror"),
 		mathinRadioLabel = document.querySelector("#mathinRadioLabel"),
 		mathinRadio = document.querySelector("#mathinRadio"),
 		/** @type {HTMLInputElement} */
 		input = document.querySelector("#caption"),
 		/** @type {HTMLInputElement} */
 		imagein = document.querySelector("#imagein"),
+		/** @type {HTMLInputElement} */
+		mathColorInput = document.getElementById("math-color"),
 		title = document.getElementById("title"),
 		copyLinkBtn = document.getElementById("cpy-link-btn"),
 		/** @type {HTMLSpanElement} */
@@ -46,31 +50,66 @@
 		}
 	}
 
-	function paintWhite(elt) {
-		if (elt.style) {
-			elt.style.fill = "white";
-			elt.style.stroke = "black";
-			elt.style.strokeWidth = "20";
+	/**
+	 * @param {SVGElement} elt
+	 * @param {string} color
+	 */
+	function paintColor(elt, color) {
+		const errorElt = elt.querySelector("[data-mjx-error]");
+		if (errorElt) {
+			errorElt.setAttribute("fill", "none");
+			errorElt.setAttribute("stroke", "none");
+			return _paintColor(errorElt.lastChild, color);
 		}
-		if (elt.children) {
-			for (let item of elt.children) {
-				paintWhite(item);
-			}
+
+		_paintColor(elt, color);
+	}
+
+	/**
+	 * @param {SVGElement} elt
+	 * @param {string} color
+	 */
+	function _paintColor(elt, color) {
+		elt.setAttribute("fill", color);
+		elt.setAttribute("stroke", "black");
+		elt.setAttribute("stroke-width", "20");
+
+		for (const item of elt.children) {
+			_paintColor(item);
 		}
 	}
 
 	let lastFormatText = "";
-	function drawMathHash(str = "") {
+	let lastColor = "#ffffff";
+
+	const isomorphicIdleCallback = window.requestIdleCallback ?? requestAnimationFrame;
+	const isomorphicCancelIdleCallback = window.cancelIdleCallback ?? cancelAnimationFrame;
+
+	let color = mathColorInput.value;
+	let updateColorRequest = null;
+	mathColorInput.addEventListener("input", (event) => {
+		isomorphicCancelIdleCallback(updateColorRequest);
+		color = event.currentTarget.value;
+		updateColorRequest = isomorphicIdleCallback(() => drawMathText(lastFormatText));
+	});
+
+	function drawMathText(str = "") {
 		const trimmedStr = str.trim();
 
-		if (trimmedStr === lastFormatText) {
+		if (trimmedStr === lastFormatText && color === lastColor) {
 			return;
 		}
 
 		lastFormatText = str;
+		lastColor = color;
+
+		if (trimmedStr === "") {
+			mirror.src = "./img/spongebob.jpg";
+			return;
+		}
 
 		MathJax.tex2svgPromise(str, { display: false })
-			.then((container) => container.getElementsByTagName("svg")[0])
+			.then((container) => container.firstChild)
 			.then((svg) => {
 				const oldOnError = upload.onerror;
 				const newOnError = () => {
@@ -82,7 +121,7 @@
 				upload.onerror = newOnError;
 				upload.onload = () => (upload.onerror = oldOnError);
 
-				paintWhite(svg);
+				paintColor(svg, color);
 				upload.src =
 					"data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));
 
@@ -104,7 +143,7 @@
 				.map((char) => char && String.fromCodePoint(parseInt(char, 16)))
 				.join("");
 
-			drawMathHash(mathin.value);
+			drawMathText(mathin.value);
 		} catch (err) {
 			console.error("Oops. Something went wrong.", err);
 		}
@@ -122,7 +161,8 @@
 				input.value = "";
 				imagein.value = "";
 
-				drawMathHash(mathin.value);
+				console.log(mathin.value);
+				drawMathText(mathin.value);
 
 				copyLinkBtn.onclick = copyLink;
 			};

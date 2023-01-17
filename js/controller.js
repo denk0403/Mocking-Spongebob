@@ -10,9 +10,11 @@
 		/** @type {HTMLImageElement} */
 		mirror = document.getElementById("mirror"),
 		/** @type {HTMLInputElement} */
-		input = document.getElementById("caption"),
+		captionin = document.getElementById("caption"),
 		/** @type {HTMLButtonElement} */
 		captionRadio = document.getElementById("captionRadio"),
+		/** @type {HTMLInputElement} */
+		captionColorInput = document.getElementById("caption-color"),
 		imagein = document.getElementById("imagein"),
 		imageinRadio = document.getElementById("imageinRadio"),
 		/** @type {HTMLImageElement} */
@@ -59,13 +61,13 @@
 	};
 
 	const clearFields = (mockingSpongebob.clearFields = () => {
-		input.value = "";
+		captionin.value = "";
 		imagein.value = "";
 		mathin.value = "";
 	});
 
 	const clearImage = (mockingSpongebob.clearImage = () => {
-		drawMemeText("", true);
+		formatAndDrawText("");
 	});
 
 	const clear = (mockingSpongebob.clear = () => {
@@ -99,16 +101,16 @@
 				if (hash.indexOf(":", 10) !== -1) {
 					try {
 						clearFields();
-						input.value = hash
+						captionin.value = hash
 							.slice(hash.indexOf(":", 10) + 1) // hash includes '#' when present
 							.split(":")
 							.map((char) => String.fromCodePoint(parseInt(char, 16)))
 							.join("");
 
 						if (img.complete) {
-							requestAnimationFrame(() => drawMemeText(input.value));
+							formatAndDrawText(captionin.value);
 						} else {
-							img.onload = () => requestAnimationFrame(() => drawMemeText(input.value));
+							img.onload = () => formatAndDrawText(captionin.value);
 						}
 					} catch (err) {
 						console.error(err);
@@ -124,10 +126,10 @@
 	});
 
 	// custom event
-	input.addEventListener("audioinput", () => {
+	captionin.addEventListener("audioinput", () => {
 		cameraStop();
 
-		input.scrollIntoView({
+		captionin.scrollIntoView({
 			behavior: "smooth",
 			block: "start",
 		});
@@ -135,11 +137,11 @@
 		imagein.value = "";
 		mathin.value = "";
 
-		drawMemeText(input.value);
+		formatAndDrawText(captionin.value);
 		copyLinkBtn.onclick = copyLink;
 	});
 
-	input.addEventListener("input", () => {
+	captionin.addEventListener("input", () => {
 		cameraStop();
 
 		let microphoneOn = document.getElementById("microphone--on");
@@ -147,25 +149,25 @@
 			microphoneOn.click();
 		}
 
-		input.scrollIntoView({
+		captionin.scrollIntoView({
 			behavior: "smooth",
 			block: "start",
 		});
 		imagein.value = "";
 		mathin.value = "";
 
-		drawMemeText(input.value);
+		formatAndDrawText(captionin.value);
 		copyLinkBtn.onclick = copyLink;
 	});
 
-	input.onkeydown = (event) => {
+	captionin.onkeydown = (event) => {
 		if (event.key === "Enter") {
 			event.preventDefault();
 		}
 	};
 
 	mockSelector.addEventListener("input", () => {
-		drawMemeText(input.value, true);
+		formatAndDrawText(captionin.value, null, true);
 		copyLinkBtn.onclick = copyLink;
 	});
 
@@ -176,9 +178,22 @@
 		return ctx.measureText(str).width;
 	}
 
+	/**
+	 * @typedef CaptionFormat
+	 * @property {string[] | null} lines
+	 * @property {number} fontSize
+	 */
+
+	/** @type {CaptionFormat} */
 	const EMPTY_FORMAT = {
 		lines: [],
-		size: INITIAL_FONT_SIZE,
+		fontSize: INITIAL_FONT_SIZE,
+	};
+
+	/** @type {CaptionFormat} */
+	const ERROR_FORMAT = {
+		lines: null,
+		fontSize: 59,
 	};
 
 	function maxNumberOfLines(fontSize) {
@@ -187,7 +202,7 @@
 
 	/**
 	 * @param {string} str The string to format
-	 * @returns
+	 * @returns {CaptionFormat}
 	 */
 	function formatText(str) {
 		const MIN_FONT_SIZE = 8; // in pixels
@@ -201,21 +216,32 @@
 
 		const words = str.split(" ");
 
-		/** @type {string[][]} */
-		let lines;
+		/**
+		 * A list representing how the caption should be broken up into
+		 * separate lines using some formatting strategy.
+		 * @type {string[][]}
+		 */
+		let linesByWord;
 
 		/**
-		 * This helper function tries to fit a word into the results
-		 * array using the current font size of the 2D canvas context.
+		 * This higher-order function returns a procedure (a.k.a. a callback)
+		 * for determining whether a word is able to fit into the {@link linesByWord}
+		 * list using the given font size and box width.
 		 *
-		 * Returns if it was able to be added.
+		 * The resulting procedure HAS SIDE EFFECTS: the procedure also appends the
+		 * given word to a line of the {@link linesByWord} list if, but not only if,
+		 * it fits.
+		 *
+		 * The resulting procedure should likely be used within another function
+		 * that accepts a callback function such as {@link Array.prototype.every}.
+		 *
 		 * @param {number} fontSize The font size
 		 * @param {number} boxWidth The max width of the region
-		 * @returns
+		 * @returns {(word: string) => boolean} A procedure to determine if a word will fit.
 		 */
 		function fitIntoLinesAtSize(fontSize, boxWidth) {
 			return (/** @type {string} */ word) => {
-				const modifiedLine = lines.at(-1).concat(word).join(" ").trim();
+				const modifiedLine = linesByWord.at(-1).concat(word).join(" ").trim();
 
 				// checks if adding new word exceeds the last line's box width
 				if (getTextWidth(modifiedLine) >= boxWidth) {
@@ -225,12 +251,12 @@
 					}
 
 					// create a new line
-					lines.push([word]);
+					linesByWord.push([word]);
 					// return if we have exceeded the maximum allowed lines
-					return lines.length < maxNumberOfLines(fontSize);
+					return linesByWord.length < maxNumberOfLines(fontSize);
 				} else {
 					// add the word if it fits on the last line
-					lines.at(-1).push(word);
+					linesByWord.at(-1).push(word);
 					return true;
 				}
 			};
@@ -240,8 +266,9 @@
 			ctx.font = `bold ${fontSize}px Arial`;
 
 			// set up result array of lines
-			lines = [[]];
+			linesByWord = [[]];
 
+			// tries to fits every word into `linesByWord`, returning whether it was successful
 			return words.every(fitIntoLinesAtSize(fontSize, boxWidth));
 		}
 
@@ -287,46 +314,91 @@
 
 		const finalBoxWidth = upperBoxWidth;
 
-		// check for unreadable text
+		// check that text is readable, return error format otherwise
 		if (finalFontSize < MIN_FONT_SIZE || finalBoxWidth < MIN_LINE_BOX_WIDTH) {
-			const ERROR_SIZE = 59;
-			ctx.font = `bold ${ERROR_SIZE}px Arial`;
-			ctx.fillStyle = "red";
-			return {
-				lines: ["Input is too large"],
-				fontSize: ERROR_SIZE,
-			};
+			return ERROR_FORMAT;
 		}
 
 		// rebuild result array
 		tryFormatAllWords(finalFontSize, finalBoxWidth);
 
-		ctx.fillStyle = "white";
 		return {
-			lines: lines.map((line) => line.join(" ").trim()),
+			lines: linesByWord.map((line) => line.join(" ").trim()),
 			fontSize: finalFontSize,
 		};
 	}
 
-	let lastFormatText = "";
+	const DRAW_STATE = {
+		baseText: "",
+		textFormat: { lines: [], fontSize: INITIAL_FONT_SIZE },
+		options: { color: "#ffffff" },
+	};
+
+	const isomorphicIdleCallback = window.requestIdleCallback ?? requestAnimationFrame;
+	const isomorphicCancelIdleCallback = window.cancelIdleCallback ?? cancelAnimationFrame;
+
+	let updateColorRequest = null;
+	captionColorInput.addEventListener("input", () => {
+		isomorphicCancelIdleCallback(updateColorRequest);
+		DRAW_STATE.options.color = captionColorInput.value;
+		updateColorRequest = isomorphicIdleCallback(() =>
+			drawText(DRAW_STATE.textFormat, DRAW_STATE.options)
+		);
+	});
+
+	/**
+	 * @typedef DrawOptions
+	 * @property {string} color
+	 */
+
 	/**
 	 * @param {string} str
+	 * @param {DrawOptions?} options
+	 * Customizable options for drawing. Use `null` to reuse previous options.
 	 * @param {boolean} force Overrides caching. False by default.
 	 * @returns
 	 */
-	function drawMemeText(str, force = false) {
-		const trimmedStr = str.trim();
+	function formatAndDrawText(str, options, force = false) {
+		options ??= DRAW_STATE.options;
 
-		if (trimmedStr === lastFormatText && !force) {
-			return;
+		const trimmedStr = str.trim();
+		// check if the text has already been formatted
+		if (trimmedStr === DRAW_STATE.baseText && !force) {
+			// check if the color is the same too, making this a no-op
+			if (options.color === DRAW_STATE.options.color) return;
+
+			return drawText(DRAW_STATE.textFormat, options);
 		}
 
-		lastFormatText = trimmedStr;
 		const altered_str = altText(trimmedStr);
 
 		// const start = performance.now();
-		const { lines, fontSize } = formatText(altered_str);
+		const format = formatText(altered_str);
 		// console.log(performance.now() - start);
+
+		DRAW_STATE.baseText = trimmedStr;
+		DRAW_STATE.textFormat = format;
+		DRAW_STATE.options = options;
+
+		drawText(format, options);
+	}
+
+	/**
+	 *
+	 * @param {CaptionFormat} format
+	 * @param {DrawOptions} options
+	 */
+	function drawText(format, options) {
+		let { lines, fontSize } = format;
+		let { color } = options;
+
+		if (lines === null) {
+			lines = ["Input is too large"];
+			color = "#ff0000";
+		}
+
+		ctx.fillStyle = color;
+		ctx.font = `bold ${fontSize}px Arial`;
 
 		ctx.drawImage(img, 0, 0);
 
@@ -451,12 +523,12 @@
 	const repaint = (mockingSpongebob.repaint = () => {
 		const dataURL = canvas.toDataURL("image/jpeg");
 		mirror.src = dataURL;
-		mirror.alt = input.value;
-		mirror.title = input.value;
+		mirror.alt = captionin.value;
+		mirror.title = captionin.value;
 
 		saveLink.href = dataURL;
 		saveLink.download = `${
-			input.value ? altText(input.value.trim()) : mathin.value.trim() || "img"
+			captionin.value ? altText(captionin.value.trim()) : mathin.value.trim() || "img"
 		}.jpg`;
 
 		if (navigator.canShare && navigator.share) {
@@ -467,7 +539,7 @@
 	});
 
 	imagein.onchange = () => {
-		input.value = "";
+		captionin.value = "";
 		mathin.value = "";
 		if (imagein.files[0]) {
 			reader.readAsDataURL(imagein.files[0]);
@@ -481,9 +553,9 @@
 		let modes = document.getElementsByName("mode");
 		for (let i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
-				document.getElementById(modes[i].value).style.removeProperty("display");
+				document.getElementById(modes[i].value).style.display = "block";
 
-				if (document.getElementById(modes[i].value).id === "captionControls") {
+				if (document.getElementById(modes[i].value).id === "caption-controls") {
 					document.getElementById("caption").focus();
 				} else {
 					document.getElementById(modes[i].value).focus();
@@ -506,7 +578,7 @@
 		if (navigator.clipboard) {
 			let urlStr = BASE_URL;
 
-			const trimmedStr = input.value.trim();
+			const trimmedStr = captionin.value.trim();
 			if (trimmedStr !== "") {
 				const newHash = hashify(trimmedStr);
 				const url = new URL(location);
@@ -528,7 +600,7 @@
 	let copyTextTimer;
 	function copyMockText() {
 		if (navigator.clipboard) {
-			const text = altText(input.value);
+			const text = altText(captionin.value);
 
 			navigator.clipboard.writeText(text).then(() => {
 				copyTextTxt.textContent = "Copied!";
@@ -557,9 +629,16 @@
 	updateShareButtons();
 	processHashV2(location.hash);
 
-	imageinRadio.onclick = updateMode;
-	captionRadio.onclick = updateMode;
-	mathinRadio.onclick = updateMode;
+	if (!CSS.supports("selector(:has(_))")) {
+		imageinRadio.onclick = updateMode;
+		captionRadio.onclick = updateMode;
+		mathinRadio.onclick = updateMode;
+	} else {
+		imageinRadio.onclick = () => imagein.focus();
+		captionRadio.onclick = () => captionin.focus();
+		mathinRadio.onclick = () => mathin.focus();
+	}
+
 	copyTextBtn.onclick = copyMockText;
 	copyLinkBtn.onclick = copyLink;
 }

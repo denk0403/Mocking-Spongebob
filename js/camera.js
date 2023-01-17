@@ -1,7 +1,9 @@
 "use strict";
 {
 	const cameraApp = document.querySelector("#cameraApp"),
+		/** @type {HTMLVideoElement} */
 		cameraView = document.querySelector("#camera--view"),
+		/** @type {HTMLCanvasElement} */
 		cameraSensor = document.querySelector("#camera--sensor"),
 		cameraTrigger = document.querySelector("#camera--trigger"),
 		cameraToggle = document.querySelector("#camera--toggle"),
@@ -45,6 +47,7 @@
 							.then(function (stream) {
 								track = stream.getTracks()[0];
 								cameraView.srcObject = stream;
+								console.log(stream, track.getConstraints())
 							})
 							.then(callback)
 							.catch(function (error) {
@@ -57,10 +60,10 @@
 					let callback;
 					if (constraints.video.facingMode === "front") {
 						constraints.video.facingMode = "environment";
-						callback = () => (cameraView.style.transform = "scaleX(1)");
+						callback = () => (cameraView.style.scale = "1 1");
 					} else {
 						constraints.video.facingMode = "front";
-						callback = () => (cameraView.style.transform = "scaleX(-1)");
+						callback = () => (cameraView.style.scale = "-1 1");
 					}
 					cameraFlip.classList.add("disabled");
 					cameraTrigger.classList.add("disabled");
@@ -92,10 +95,23 @@
 
 				cameraTrigger.onclick = function () {
 					const scrollParams = [window.scrollX, window.scrollY];
-					cameraSensor.width = cameraView.videoWidth;
-					cameraSensor.height = cameraView.videoHeight;
-					cameraSensor.getContext("2d").drawImage(cameraView, 0, 0);
-					upload.src = cameraSensor.toDataURL("image/webp");
+					const width = cameraView.videoWidth;
+					const height = cameraView.videoHeight;
+					cameraSensor.width = width;
+					cameraSensor.height = height;
+
+					const ctx = cameraSensor.getContext("2d");
+
+					if (constraints.video.facingMode === "front") {
+						ctx.save();
+						ctx.scale(-1, 1);
+						ctx.drawImage(cameraView, 0, 0, -width, height);
+						ctx.restore();
+					} else {
+						ctx.drawImage(cameraView, 0, 0);
+					}
+
+					upload.src = cameraSensor.toDataURL("image/jpeg");
 					input.value = "";
 					imagein.value = "";
 					mathin.value = "";
