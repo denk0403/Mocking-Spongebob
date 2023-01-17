@@ -611,9 +611,9 @@
 			const trimmedStr = captionin.value.trim();
 			if (trimmedStr !== "") {
 				const url = new URL(location);
-				url.searchParams.set("mode", mockingSpongebob.currentMock);
+				url.searchParams.set("mode", mockingSpongebob.currentMock.id);
 				url.searchParams.set("text", mockingSpongebob.encodeText(trimmedStr));
-				url.searchParams.set("color", color);
+				url.searchParams.set("color", DRAW_STATE.options.color);
 				urlStr = url.toString();
 			}
 
