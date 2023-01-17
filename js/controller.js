@@ -98,11 +98,12 @@
 				mockOption.selected = true;
 				mockingSpongebob.currentMock = mockType;
 
-				if (hash.indexOf(":", 10) !== -1) {
+				const contentPrefixIndex = hash.indexOf(":", 10);
+				if (~contentPrefixIndex) {
 					try {
 						clearFields();
 						captionin.value = hash
-							.slice(hash.indexOf(":", 10) + 1) // hash includes '#' when present
+							.slice(contentPrefixIndex + 1) // hash includes '#' when present
 							.split(":")
 							.map((char) => String.fromCodePoint(parseInt(char, 16)))
 							.join("");
