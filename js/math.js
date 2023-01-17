@@ -19,36 +19,9 @@
 		/** @type {HTMLSpanElement} */
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
 		cameraStop = mockingSpongebob.cameraStop,
-		hashify = mockingSpongebob.hashify,
 		clearFields = mockingSpongebob.clearFields,
 		clearImage = mockingSpongebob.clearImage,
 		xmlSerializer = new XMLSerializer();
-
-	const BASE_URL = `${location.origin}${location.pathname}`;
-
-	let copyLinkTimer;
-	function copyLink() {
-		if (navigator.clipboard) {
-			let urlStr = BASE_URL;
-
-			const trimmedStr = mathin.value.trim();
-			if (trimmedStr !== "") {
-				const newHash = hashify(trimmedStr);
-				const url = new URL(location);
-				url.hash = `#math:${newHash}`;
-				urlStr = url.toString();
-			}
-
-			navigator.clipboard.writeText(urlStr).then(() => {
-				copyLinkTxt.textContent = "Copied!";
-
-				clearTimeout(copyLinkTimer);
-				copyLinkTimer = setTimeout(() => {
-					copyLinkTxt.textContent = "Copy Shareable Link";
-				}, 2000);
-			});
-		}
-	}
 
 	/**
 	 * @param {SVGElement} elt
@@ -134,7 +107,11 @@
 		// The meme will be repainted by the 'upload' handler
 	}
 
-	function processMathHash(hash) {
+	/**
+	 * @deprecated
+	 * @param {string} hash
+	 */
+	function processMathHash_DEPRECATED(hash) {
 		try {
 			clearFields();
 			mathin.value = hash
@@ -149,6 +126,28 @@
 		}
 	}
 
+	const processMathSearch = (search) => {
+		const searchParams = new URLSearchParams(search);
+		let encodedText = searchParams.get("text") ?? "",
+			mode = searchParams.get("mode") ?? "asl",
+			color = searchParams.get("color") ?? "#ffffff";
+
+		if (mode === "math") {
+			mathinRadio.click();
+
+			mathColorInput.value = color;
+			mathColorInput.dispatchEvent(new InputEvent("input"));
+
+			if (!encodedText) {
+				mathin.focus();
+			} else {
+				mathin.blur();
+				mathin.value = mockingSpongebob.decodeText(encodedText);
+				mathin.dispatchEvent(new InputEvent("input"));
+			}
+		}
+	};
+
 	function setup() {
 		if (window.MathJax && MathJax.tex2svgPromise) {
 			mathin.oninput = () => {
@@ -161,7 +160,6 @@
 				input.value = "";
 				imagein.value = "";
 
-				console.log(mathin.value);
 				drawMathText(mathin.value);
 
 				copyLinkBtn.onclick = copyLink;
@@ -171,11 +169,40 @@
 			if (location.hash.startsWith("#math:")) {
 				mathinRadio.click();
 				mathin.blur();
-				processMathHash(location.hash);
+				processMathHash_DEPRECATED(location.hash);
 				copyLinkBtn.onclick = copyLink;
+			} else if (location.search) {
+				processMathSearch(location.search);
 			}
 		} else {
 			title.click();
+		}
+	}
+
+	const BASE_URL = `${location.origin}${location.pathname}`;
+
+	let copyLinkTimer;
+	function copyLink() {
+		if (navigator.clipboard) {
+			let urlStr = BASE_URL;
+
+			const trimmedStr = mathin.value.trim();
+			if (trimmedStr !== "") {
+				const url = new URL(location);
+				url.searchParams.set("mode", "math");
+				url.searchParams.set("text", mockingSpongebob.encodeText(trimmedStr));
+				url.searchParams.set("color", color);
+				urlStr = url.toString();
+			}
+
+			navigator.clipboard.writeText(urlStr).then(() => {
+				copyLinkTxt.textContent = "Copied!";
+
+				clearTimeout(copyLinkTimer);
+				copyLinkTimer = setTimeout(() => {
+					copyLinkTxt.textContent = "Copy Shareable Link";
+				}, 2000);
+			});
 		}
 	}
 

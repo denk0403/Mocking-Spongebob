@@ -55,9 +55,9 @@
 
 	title.onclick = () => {
 		window.stopTimer();
-		location.hash = "";
-		captionRadio.click();
+		history.replaceState(null, null, "./");
 		clear();
+		captionRadio.click();
 	};
 
 	const clearFields = (mockingSpongebob.clearFields = () => {
@@ -75,10 +75,16 @@
 		clearImage();
 	});
 
-	// should only be called once in the script!
-	let processHashV2 = (hash = "") => {
+	/**
+	 * Parses the given hash and renders the encoded meme.
+	 * This should only be called once!
+	 * @deprecated
+	 * @param {string} hash
+	 * @returns
+	 */
+	const processHash_DEPRECATED = (hash = "") => {
 		if (!hash) {
-			return window.addEventListener("load", () => captionRadio.click());
+			return window.addEventListener("load", () => captionRadio.click(), { once: true });
 		}
 
 		// hash format: #mockType:<type>:<content>
@@ -122,9 +128,32 @@
 		}
 	};
 
-	const hashify = (mockingSpongebob.hashify = (str) => {
-		return [...str].map((char) => char.codePointAt(0).toString(16)).join(":");
-	});
+	const processSearch = (search) => {
+		const searchParams = new URLSearchParams(search);
+		let encodedText = searchParams.get("text") ?? "",
+			mode = searchParams.get("mode") ?? "asl",
+			color = searchParams.get("color") ?? "#ffffff";
+
+		if (mode in mockingSpongebob.mockTypes) {
+			const mockType = mockingSpongebob.mockTypes[mode];
+
+			if (mockType) {
+				mockType.htmlOption.selected = true;
+				mockingSpongebob.currentMock = mockType;
+			}
+
+			captionColorInput.value = color;
+			captionColorInput.dispatchEvent(new InputEvent("input"));
+
+			if (!encodedText) {
+				captionin.focus();
+			} else {
+				captionin.blur();
+				captionin.value = mockingSpongebob.decodeText(encodedText);
+				captionin.dispatchEvent(new InputEvent("input"));
+			}
+		}
+	};
 
 	// custom event
 	captionin.addEventListener("audioinput", () => {
@@ -581,9 +610,10 @@
 
 			const trimmedStr = captionin.value.trim();
 			if (trimmedStr !== "") {
-				const newHash = hashify(trimmedStr);
 				const url = new URL(location);
-				url.hash = `#mockType:${mockingSpongebob.currentMock.id}:${newHash}`;
+				url.searchParams.set("mode", mockingSpongebob.currentMock);
+				url.searchParams.set("text", mockingSpongebob.encodeText(trimmedStr));
+				url.searchParams.set("color", color);
 				urlStr = url.toString();
 			}
 
@@ -628,7 +658,13 @@
 	}
 
 	updateShareButtons();
-	processHashV2(location.hash);
+	if (location.hash) {
+		processHash_DEPRECATED(location.hash);
+	} else if (location.search) {
+		processSearch(location.search);
+	} else {
+		captionin.focus();
+	}
 
 	if (!CSS.supports("selector(:has(_))")) {
 		imageinRadio.onclick = updateMode;

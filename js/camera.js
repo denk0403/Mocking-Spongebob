@@ -47,7 +47,6 @@
 							.then(function (stream) {
 								track = stream.getTracks()[0];
 								cameraView.srcObject = stream;
-								console.log(stream, track.getConstraints())
 							})
 							.then(callback)
 							.catch(function (error) {

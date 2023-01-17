@@ -169,6 +169,10 @@ img:not(#mirror) {
 	font-size: min(22px, 5vw);
 }
 
+label {
+	cursor: pointer;
+}
+
 input[type="radio"] {
 	height: 20px;
 	width: 20px;
@@ -183,6 +187,7 @@ form#controls {
 .color-picker {
 	width: 100%;
 	border-radius: 5px;
+	cursor: pointer;
 }
 
 .no-margin {
@@ -208,7 +213,7 @@ label.inputField {
 #modeRadios:has(#imageinRadio:checked)~#controls #image-controls,
 #modeRadios:has(#mathinRadio:checked)~#controls #math-controls {
 	display: flex;
-    flex-direction: column;
+	flex-direction: column;
 	gap: 8px;
 }
 
@@ -290,11 +295,15 @@ select {
 		"Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
+.btn:not(:disabled) {
+	cursor: pointer;
+}
+
 .btn:hover {
 	background-color: var(--green);
 }
 
-.btn:active {
+.btn:active:not(:disabled) {
 	filter: brightness(0.9)
 }
 
@@ -491,6 +500,7 @@ select {
 #language-selector {
 	transform: scale(1.2, 1.2);
 	margin-left: 10px;
+	cursor: pointer;
 }
 
 .form-label {

@@ -64,7 +64,23 @@
                     darkmodeToggle.checked = newValue;
                 }
             },
-            toggleDarkmode: () => { mockingSpongebob.isDarkmode = !mockingSpongebob.isDarkmode; }
+            toggleDarkmode: () => { mockingSpongebob.isDarkmode = !mockingSpongebob.isDarkmode; },
+            encodeText: (str) => {
+                let i = 0;
+                const result = [];
+                for (const ch of str) {
+                    result[i++] = ch.codePointAt(0).toString(16);
+                }
+                return result.join(":");
+            },
+            decodeText: (str) => {
+                let index = 0;
+                const result = [];
+                for (const cp16 of str.split(":")) {
+                    result[index++] = String.fromCodePoint(parseInt(cp16, 16));
+                }
+                return result.join("");
+            }
         };
 
         if (mockingSpongebob.isDarkmode) {

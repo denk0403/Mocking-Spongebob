@@ -1,10 +1,11 @@
 "use strict";
 {
-	mockingSpongebob.mockTypes = {
+	const mockTypes = {
 		cu: {
 			id: "cu",
 			name: "Custom Text",
 			apply: (str = "") => str,
+			htmlOption: document.createElement("option"),
 		},
 		asl: {
 			id: "asl",
@@ -18,6 +19,7 @@
 				}
 				return result;
 			},
+			htmlOption: document.createElement("option"),
 		},
 		asu: {
 			id: "asu",
@@ -31,16 +33,19 @@
 				}
 				return result;
 			},
+			htmlOption: document.createElement("option"),
 		},
 		au: {
 			id: "au",
 			name: "All Upper",
 			apply: (str = "") => str.toUpperCase(),
+			htmlOption: document.createElement("option"),
 		},
 		al: {
 			id: "al",
 			name: "All Lower",
 			apply: (str = "") => str.toLowerCase(),
+			htmlOption: document.createElement("option"),
 		},
 		awsu: {
 			id: "awsu",
@@ -48,9 +53,10 @@
 			apply: (str = "") => {
 				return str
 					.split(" ")
-					.map((str) => mockingSpongebob.mockTypes.asu.apply(str))
+					.map((str) => mockTypes.asu.apply(str))
 					.join(" ");
 			},
+			htmlOption: document.createElement("option"),
 		},
 		awsl: {
 			id: "awsl",
@@ -58,9 +64,10 @@
 			apply: (str = "") => {
 				return str
 					.split(" ")
-					.map((str) => mockingSpongebob.mockTypes.asl.apply(str))
+					.map((str) => mockTypes.asl.apply(str))
 					.join(" ");
 			},
+			htmlOption: document.createElement("option"),
 		},
 		ar: {
 			id: "ar",
@@ -74,6 +81,7 @@
 				}
 				return result;
 			},
+			htmlOption: document.createElement("option"),
 		},
 		rsu: {
 			id: "rsu",
@@ -87,6 +95,7 @@
 				}
 				return result;
 			},
+			htmlOption: document.createElement("option"),
 		},
 		rsl: {
 			id: "rsl",
@@ -100,6 +109,7 @@
 				}
 				return result;
 			},
+			htmlOption: document.createElement("option"),
 		},
 		rwsu: {
 			id: "rwsu",
@@ -108,10 +118,11 @@
 				return str
 					.split(" ")
 					.map((str) => {
-						return mockingSpongebob.mockTypes.rsu.apply(str);
+						return mockTypes.rsu.apply(str);
 					})
 					.join(" ");
 			},
+			htmlOption: document.createElement("option"),
 		},
 		rwsl: {
 			id: "rwsl",
@@ -119,34 +130,32 @@
 			apply: (str = "") => {
 				return str
 					.split(" ")
-					.map((str) => mockingSpongebob.mockTypes.rsl.apply(str))
+					.map((str) => mockTypes.rsl.apply(str))
 					.join(" ");
 			},
+			htmlOption: document.createElement("option"),
 		},
 	};
+	mockingSpongebob.mockTypes = mockTypes;
 
 	const mockSelector = document.getElementById("mockType-selector");
-
 	mockSelector.innerHTML = "";
 
-	Object.keys(mockingSpongebob.mockTypes)
-		.map((key) => {
-			const option = document.createElement("option");
-			option.id = key;
-			option.value = key;
-			option.innerText = mockingSpongebob.mockTypes[key].name;
-			return option;
-		})
-		.sort((opt1, opt2) => {
-			const compare = opt1.innerText.length - opt2.innerText.length;
-			return compare !== 0 ? compare : opt1.innerText.localeCompare(opt2.innerText);
-		})
-		.forEach((option) => mockSelector.appendChild(option));
+	Object.entries(mockTypes).forEach(([key, mockType]) => {
+		const option = mockType.htmlOption;
+		option.id = key;
+		option.value = key;
+		option.innerText = mockType.name;
+	});
 
-	mockingSpongebob.currentMock = mockingSpongebob.mockTypes.asl;
-	document.getElementById("asl").selected = true;
+	Object.values(mockTypes)
+		.sort((mock1, mock2) => mock1.name.localeCompare(mock2.name))
+		.forEach((mock) => mockSelector.appendChild(mock.htmlOption));
+
+	mockingSpongebob.currentMock = mockTypes.asl;
+	mockTypes.asl.htmlOption.selected = true;
 
 	mockSelector.addEventListener("input", (event) => {
-		mockingSpongebob.currentMock = mockingSpongebob.mockTypes[event.currentTarget.value];
+		mockingSpongebob.currentMock = mockTypes[event.currentTarget.value];
 	});
 }
