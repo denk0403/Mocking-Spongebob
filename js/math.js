@@ -5,6 +5,8 @@
 		/** @type {HTMLImageElement} */
 		upload = document.querySelector("#upload"),
 		/** @type {HTMLImageElement} */
+		img = document.getElementById("meme"),
+		/** @type {HTMLImageElement} */
 		mirror = document.getElementById("mirror"),
 		mathinRadioLabel = document.querySelector("#mathinRadioLabel"),
 		mathinRadio = document.querySelector("#mathinRadio"),
@@ -135,16 +137,18 @@
 		if (mode === "math") {
 			mathinRadio.click();
 
-			mathColorInput.value = color;
-			mathColorInput.dispatchEvent(new InputEvent("input"));
+			img.decode().then(() => {
+				mathColorInput.value = color;
+				mathColorInput.dispatchEvent(new InputEvent("input"));
 
-			if (!encodedText) {
-				mathin.focus();
-			} else {
-				mathin.blur();
-				mathin.value = mockingSpongebob.decodeText(encodedText);
-				mathin.dispatchEvent(new InputEvent("input"));
-			}
+				if (!encodedText) {
+					mathin.focus();
+				} else {
+					mathin.blur();
+					mathin.value = mockingSpongebob.decodeText(encodedText);
+					mathin.dispatchEvent(new InputEvent("input"));
+				}
+			});
 		}
 	};
 

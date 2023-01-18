@@ -106,6 +106,18 @@
 			recognition.interimResults = true;
 			recognition.maxAlternatives = 1;
 
+			recognition.addEventListener("audiostart", () => {
+				microphoneOff.insertAdjacentElement("afterend", microphoneOn);
+				microphoneOff.remove();
+				languageSelector.disabled = true;
+			});
+
+			recognition.addEventListener("audioend", () => {
+				microphoneOn.insertAdjacentElement("afterend", microphoneOff);
+				microphoneOn.remove();
+				languageSelector.disabled = false;
+			});
+
 			setAttributes(microphoneOff, {
 				id: "microphone--off",
 				loading: "lazy",
@@ -118,12 +130,8 @@
 				width: "30px",
 				height: "30px",
 			});
-			microphoneOff.onclick = () => {
-				recognition.start();
-				microphoneOff.insertAdjacentElement("afterend", microphoneOn);
-				microphoneOff.remove();
-				languageSelector.disabled = true;
-			};
+
+			microphoneOff.onclick = () => recognition.start();
 
 			setAttributes(microphoneOn, {
 				id: "microphone--on",
@@ -137,12 +145,8 @@
 				width: "30px",
 				height: "30px",
 			});
-			microphoneOn.onclick = () => {
-				recognition.stop();
-				microphoneOn.insertAdjacentElement("afterend", microphoneOff);
-				microphoneOn.remove();
-				languageSelector.disabled = false;
-			};
+
+			microphoneOn.onclick = () => recognition.stop();
 
 			recognition.addEventListener("error", (/** @type {SpeechSynthesisErrorEvent} */ event) => {
 				recognition.stop();
@@ -155,9 +159,7 @@
 				}
 			});
 
-			recognition.addEventListener("speechend", () => {
-				microphoneOn.click();
-			});
+			recognition.addEventListener("speechend", () => recognition.stop());
 
 			recognition.addEventListener("result", (event) => {
 				caption.value = Array.from(event.results)

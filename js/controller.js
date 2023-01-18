@@ -142,16 +142,19 @@
 				mockingSpongebob.currentMock = mockType;
 			}
 
-			captionColorInput.value = color;
-			captionColorInput.dispatchEvent(new InputEvent("input"));
+			// ensure image has finished decoding
+			img.decode().then(() => {
+				captionColorInput.value = color;
+				captionColorInput.dispatchEvent(new InputEvent("input"));
 
-			if (!encodedText) {
-				captionin.focus();
-			} else {
-				captionin.blur();
-				captionin.value = mockingSpongebob.decodeText(encodedText);
-				captionin.dispatchEvent(new InputEvent("input"));
-			}
+				if (!encodedText) {
+					captionin.focus();
+				} else {
+					captionin.blur();
+					captionin.value = mockingSpongebob.decodeText(encodedText);
+					captionin.dispatchEvent(new InputEvent("input"));
+				}
+			});
 		}
 	};
 
@@ -422,15 +425,17 @@
 		let { lines, fontSize } = format;
 		let { color } = options;
 
+		ctx.drawImage(img, 0, 0);
+
 		if (lines === null) {
 			lines = ["Input is too large"];
 			color = "#ff0000";
+		} else if (lines.length === 0) {
+			return repaint();
 		}
 
 		ctx.fillStyle = color;
 		ctx.font = `bold ${fontSize}px Arial`;
-
-		ctx.drawImage(img, 0, 0);
 
 		const LINE_WIDTH_SHRINK_FACTOR = 9;
 		ctx.lineWidth = fontSize / LINE_WIDTH_SHRINK_FACTOR;
@@ -583,7 +588,7 @@
 		let modes = document.getElementsByName("mode");
 		for (let i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
-				document.getElementById(modes[i].value).style.display = "block";
+				document.getElementById(modes[i].value).style.display = "flex";
 
 				if (document.getElementById(modes[i].value).id === "caption-controls") {
 					document.getElementById("caption").focus();
@@ -667,9 +672,12 @@
 	}
 
 	if (!CSS.supports("selector(:has(_))")) {
+		// support Firefox
 		imageinRadio.onclick = updateMode;
 		captionRadio.onclick = updateMode;
 		mathinRadio.onclick = updateMode;
+
+		captionRadio.click();
 	} else {
 		imageinRadio.onclick = () => imagein.focus();
 		captionRadio.onclick = () => captionin.focus();

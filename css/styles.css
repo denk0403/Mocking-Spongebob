@@ -207,14 +207,15 @@ label.inputField {
 .mode-controls {
 	display: none;
 	width: 100%;
+	
+	flex-direction: column;
+	gap: 8px;
 }
 
 #modeRadios:has(#captionRadio:checked)~#controls #caption-controls,
 #modeRadios:has(#imageinRadio:checked)~#controls #image-controls,
 #modeRadios:has(#mathinRadio:checked)~#controls #math-controls {
 	display: flex;
-	flex-direction: column;
-	gap: 8px;
 }
 
 input,
