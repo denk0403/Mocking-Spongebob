@@ -374,8 +374,9 @@
 	captionColorInput.addEventListener("input", () => {
 		isomorphicCancelIdleCallback(updateColorRequest);
 		DRAW_STATE.options.color = captionColorInput.value;
-		updateColorRequest = isomorphicIdleCallback(() =>
-			drawText(DRAW_STATE.textFormat, DRAW_STATE.options)
+		updateColorRequest = isomorphicIdleCallback(
+			() => drawText(DRAW_STATE.textFormat, DRAW_STATE.options),
+			{ timeout: 16 }
 		);
 	});
 

@@ -65,7 +65,9 @@
 	mathColorInput.addEventListener("input", (event) => {
 		isomorphicCancelIdleCallback(updateColorRequest);
 		color = event.currentTarget.value;
-		updateColorRequest = isomorphicIdleCallback(() => drawMathText(lastFormatText));
+		updateColorRequest = isomorphicIdleCallback(() => drawMathText(lastFormatText), {
+			timeout: 16,
+		});
 	});
 
 	function drawMathText(str = "") {
