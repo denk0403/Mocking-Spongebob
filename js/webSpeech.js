@@ -95,13 +95,13 @@
 		});
 
 		recognition.addEventListener("error", (/** @type {SpeechSynthesisErrorEvent} */ event) => {
+			console.error(event);
 			recognition.stop();
 
 			if (event.error === "service-not-allowed") {
+				microphoneOffBtn.remove();
 				microphoneOnBtn.remove();
 				languageLabel.remove();
-			} else {
-				microphoneOnBtn.click();
 			}
 		});
 

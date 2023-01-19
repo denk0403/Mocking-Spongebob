@@ -471,7 +471,8 @@
 	upload.addEventListener("load", () => {
 		drawMemeImage();
 	});
-	upload.addEventListener("error", () => {
+	upload.addEventListener("error", (event) => {
+		console.error(event);
 		clearImage();
 	});
 
