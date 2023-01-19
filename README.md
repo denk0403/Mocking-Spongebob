@@ -3,8 +3,8 @@
 <p align="center">
   <img src="http://hits.dwyl.com/denk0403/Mocking-Spongebob.svg">
   <img src="https://img.shields.io/github/last-commit/denk0403/Mocking-Spongebob">
-  <a href="https://denk0403.github.io/Mocking-Spongebob/#">
-    <img src="https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fdenk0403.github.io%2FMocking-Spongebob%2F%23">
+  <a href="https://denniskats.dev/Mocking-Spongebob/">
+    <img src="https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fdenniskats.dev%2FMocking-Spongebob%2F">
   </a>
   <img src="https://img.shields.io/github/languages/code-size/denk0403/Mocking-Spongebob">
   <img src="https://img.shields.io/github/languages/count/denk0403/Mocking-Spongebob">
@@ -31,7 +31,7 @@
 - [x] Includes options for copying mock text, link sharing, saving images, and sharing images via the Web Share API.
 - [x] Compatible with all mobile devices featuring a modern web browser.
 - [x] Offers a toggleable dark mode 🌓 style of the website based on your device preferences and preferences between sessions.
-- [x] On Google Chrome for desktops, use your voice to write the caption in a variety of languages using the Web Speech API.
+- [x] In compatible browsers, use your voice to write the caption in a variety of languages using the Web Speech API.
 - [x] Implements Open Graph protocol for generating shareable cards on various social media sites.
 - [x] Audited for performance, accessibility, and best practices using Google Lighthouse.
 - [x] Pairs well with ["Mocking Spongebob Selection Shortcut" Chrome extension](https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno) to generate memes faster from other online content.
@@ -40,14 +40,14 @@
   - From Safari on iOS: Go to the [website](https://denk0403.github.io/Mocking-Spongebob/) and open the Share options ![share](https://user-images.githubusercontent.com/3473945/81280920-2e1d0700-9027-11ea-8cf9-0d01023137d7.png), and then select "Add to Home Screen" ![square-plus](https://user-images.githubusercontent.com/3473945/81280919-2e1d0700-9027-11ea-993c-b1e2f7192ad6.png).
   - From Google Chrome on Desktops: Go to the [website](https://denk0403.github.io/Mocking-Spongebob/) and watch for a plus icon ![circle-plus](https://user-images.githubusercontent.com/3473945/81280918-2e1d0700-9027-11ea-8221-5679a3382109.png) on the address bar. Click on it and then simply select "Install".
 
-### [**Try It Out!**](https://denk0403.github.io/Mocking-Spongebob/)
+### [**Try It Out!**](https://denniskats.dev/Mocking-Spongebob/)
 
 ###### _<sup><sup>[1][2]</sup> Features may be disabled under compatibility issues.</sup>_
 
 # Built With
 
 - **Technologies**: HTML, CSS, JavaScript, and various Web APIs
-- **Libraries**: [Darkmode.js](https://darkmodejs.learn.uno/), [MathJax](https://www.mathjax.org/)
+- **Libraries**: [MathJax](https://www.mathjax.org/)
 
 # License
 
