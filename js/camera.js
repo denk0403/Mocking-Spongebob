@@ -4,7 +4,7 @@
 		/** @type {HTMLVideoElement} */
 		cameraView = document.querySelector("#camera--view"),
 		/** @type {HTMLCanvasElement} */
-		cameraSensor = document.querySelector("#camera--sensor"),
+		cameraSensor = document.createElement("canvas"),
 		cameraTrigger = document.querySelector("#camera--trigger"),
 		cameraToggle = document.querySelector("#camera--toggle"),
 		cameraFlip = document.querySelector("#camera--flip"),
@@ -14,12 +14,14 @@
 		input = document.querySelector("#caption"),
 		mirror = document.querySelector("#mirror");
 
+	cameraView.controls = false;
 	const constraints = { video: { facingMode: "front" }, audio: false };
 
 	let track;
 
 	const cameraStop = (mockingSpongebob.cameraStop = () => {
 		cameraApp.style.display = "none";
+		cameraView.pause();
 		if (track) {
 			track.stop();
 			track = undefined;
@@ -44,12 +46,13 @@
 					if (navigator.mediaDevices.getUserMedia) {
 						navigator.mediaDevices
 							.getUserMedia(constraints)
-							.then(function (stream) {
+							.then((stream) => {
 								track = stream.getTracks()[0];
 								cameraView.srcObject = stream;
+								return cameraView.play();
 							})
 							.then(callback)
-							.catch(function (error) {
+							.catch((error) => {
 								console.error("Oops. Something went wrong.", error);
 							});
 					}
@@ -80,10 +83,10 @@
 				});
 
 				cameraToggle.onclick = function () {
-					if (cameraApp.style.display != "none") {
-						cameraStop();
-					} else {
+					if (cameraApp.style.display === "none") {
 						cameraStart();
+					} else {
+						cameraStop();
 					}
 				};
 

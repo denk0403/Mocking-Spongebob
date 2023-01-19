@@ -98,8 +98,6 @@
     <script type="text/javascript" defer src="./js/camera.js"></script>
     <!-- Website controller -->
     <script type="text/javascript" defer src="./js/controller.js"></script>
-    <!-- Error box display controller -->
-    <script type="text/javascript" defer src="./js/errorDisplay.js"></script>
     <!-- Math support -->
     <script type="text/javascript" defer src="./js/math.js"></script>
     <!-- Web speech support -->
@@ -158,9 +156,12 @@
                         <span>Image:</span>
                         <input id="imagein" type="file" accept="image/*" />
                     </label>
-                    <img loading="lazy" id="camera--toggle" class="icon exclude" title="Toggle camera"
-                        src="./img/camera-icon.png" onContextMenu="return false;" draggable="false" width="30"
-                        height="30" />
+                    <button type="button" id="camera--toggle" class="icon-btn" style="display: none;"
+                        title="Toggle camera">
+                        <img loading="lazy" class="icon" src="./img/camera-icon.png" onContextMenu="return false;"
+                            draggable="false" width="30" height="30" />
+                    </button>
+
                 </div>
             </div>
             <div id="math-controls" class="mode-controls">
@@ -179,18 +180,14 @@
             <img id="mirror" src="./img/spongebob.jpg" width="500" height="350" alt="Mocking SpongeBob meme"
                 decoding="sync" />
             <img id="meme" src="./img/spongebob.jpg" decoding="sync" hidden />
-            <canvas id="output" width="500" height="350" hidden></canvas>
             <img id="upload" crossorigin="anonymous" hidden />
 
             <!-- Camera App -->
             <div id="cameraApp" style="display: none;">
-                <!-- Camera sensor -->
-                <canvas id="camera--sensor" hidden></canvas>
-
                 <!-- Frame for containing camera functionality-->
                 <div id="camera--frame">
                     <!-- Camera view -->
-                    <video id="camera--view" width="500" height="350" autoplay muted playsinline>
+                    <video id="camera--view" width="500" height="350" muted playsinline>
                     </video>
                     <!-- Take picture trigger -->
                     <img loading="lazy" id="camera--trigger" src="img/camera-trigger.png" title="Take picture"
@@ -247,7 +244,8 @@
     </div>
     <label class="darkmode-toggle-wrapper">
         Dark Mode 🌓:
-        <input id="darkmode-toggle" class="toggle" type="checkbox" onclick="mockingSpongebob.toggleDarkmode()" />
+        <input id="darkmode-toggle" class="toggle" type="checkbox" role="switch"
+            onclick="mockingSpongebob.toggleDarkmode()" />
         <script>
             document.getElementById("darkmode-toggle").checked = mockingSpongebob.isDarkmode;
         </script>

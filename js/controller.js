@@ -2,7 +2,7 @@
 {
 	// DOM Constants
 	/** @type {HTMLCanvasElement} */
-	const canvas = document.getElementById("output"),
+	const canvas = document.createElement("canvas"),
 		/** @type {CanvasRenderingContext2D} */
 		ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }),
 		/** @type {HTMLImageElement} */
@@ -36,7 +36,6 @@
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
 		/** @type {HTMLSpanElement} */
 		copyTextTxt = document.getElementById("cpy-text-txt"),
-		cameraStop = mockingSpongebob.cameraStop,
 		reader = new FileReader();
 
 	let shareData = null;
@@ -46,9 +45,12 @@
 	const BASE_URL = `${location.origin}${location.pathname}`;
 
 	//set-up canvas context
+	canvas.width = img.width;
+	canvas.height = img.height;
 	ctx.lineJoin = "round";
 	ctx.textBaseline = "bottom";
 	ctx.imageSmoothingQuality = "high";
+	ctx.textRendering = "optimizeLegibility";
 	ctx.textAlign = "center";
 	ctx.strokeStyle = "black";
 	ctx.fillStyle = "white";
@@ -114,11 +116,7 @@
 							.map((char) => String.fromCodePoint(parseInt(char, 16)))
 							.join("");
 
-						if (img.complete) {
-							formatAndDrawText(captionin.value);
-						} else {
-							img.onload = () => formatAndDrawText(captionin.value);
-						}
+						img.decode().then(() => formatAndDrawText(captionin.value));
 					} catch (err) {
 						console.error(err);
 						title.click();
@@ -158,9 +156,9 @@
 		}
 	};
 
-	// custom event
-	captionin.addEventListener("audioinput", () => {
-		cameraStop();
+	let formatCaptionRequest = null;
+	const captionInputHandler = () => {
+		cancelAnimationFrame(formatCaptionRequest);
 
 		captionin.scrollIntoView({
 			behavior: "smooth",
@@ -170,34 +168,21 @@
 		imagein.value = "";
 		mathin.value = "";
 
-		formatAndDrawText(captionin.value);
+		formatCaptionRequest = requestAnimationFrame(() => formatAndDrawText(captionin.value));
 		copyLinkBtn.onclick = copyLink;
+	};
+
+	// custom event for microphone input
+	captionin.addEventListener("audioinput", () => {
+		mockingSpongebob.cameraStop();
+		captionInputHandler();
 	});
 
 	captionin.addEventListener("input", () => {
-		cameraStop();
-
-		let microphoneOn = document.getElementById("microphone--on");
-		if (microphoneOn) {
-			microphoneOn.click();
-		}
-
-		captionin.scrollIntoView({
-			behavior: "smooth",
-			block: "start",
-		});
-		imagein.value = "";
-		mathin.value = "";
-
-		formatAndDrawText(captionin.value);
-		copyLinkBtn.onclick = copyLink;
+		mockingSpongebob.cameraStop();
+		mockingSpongebob.recognition?.stop();
+		captionInputHandler();
 	});
-
-	captionin.onkeydown = (event) => {
-		if (event.key === "Enter") {
-			event.preventDefault();
-		}
-	};
 
 	mockSelector.addEventListener("input", () => {
 		formatAndDrawText(captionin.value, null, true);
@@ -213,7 +198,7 @@
 
 	/**
 	 * @typedef CaptionFormat
-	 * @property {string[] | null} lines
+	 * @property {string[]} lines
 	 * @property {number} fontSize
 	 */
 
@@ -225,7 +210,7 @@
 
 	/** @type {CaptionFormat} */
 	const ERROR_FORMAT = {
-		lines: null,
+		lines: ["Input is too large"],
 		fontSize: 59,
 	};
 
@@ -235,13 +220,13 @@
 
 	/**
 	 * @param {string} str The string to format
-	 * @returns {CaptionFormat}
+	 * @returns {CaptionFormat?} A null value indicates a formatting constraint
 	 */
 	function formatText(str) {
 		const MIN_FONT_SIZE = 8; // in pixels
 
 		const MAX_LINE_BOX_WIDTH = 480; // in pixels
-		const MIN_LINE_BOX_WIDTH = 25; // in pixels
+		const MIN_LINE_BOX_WIDTH = 1; // in pixels
 
 		if (str === "") {
 			return EMPTY_FORMAT;
@@ -326,6 +311,11 @@
 
 		const finalFontSize = lowerFontSize - 1;
 
+		// check that text is a readable size, otherwise return null
+		if (finalFontSize < MIN_FONT_SIZE) {
+			return null;
+		}
+
 		// Setup max width range
 		let lowerBoxWidth = MIN_LINE_BOX_WIDTH - 1; // possibly too small
 		let upperBoxWidth = MAX_LINE_BOX_WIDTH; // always safe
@@ -346,11 +336,6 @@
 		}
 
 		const finalBoxWidth = upperBoxWidth;
-
-		// check that text is readable, return error format otherwise
-		if (finalFontSize < MIN_FONT_SIZE || finalBoxWidth < MIN_LINE_BOX_WIDTH) {
-			return ERROR_FORMAT;
-		}
 
 		// rebuild result array
 		tryFormatAllWords(finalFontSize, finalBoxWidth);
@@ -394,27 +379,31 @@
 	 */
 	function formatAndDrawText(str, options, force = false) {
 		options ??= DRAW_STATE.options;
-
 		const trimmedStr = str.trim();
+
 		// check if the text has already been formatted
 		if (trimmedStr === DRAW_STATE.baseText && !force) {
 			// check if the color is the same too, making this a no-op
 			if (options.color === DRAW_STATE.options.color) return;
 
-			return drawText(DRAW_STATE.textFormat, options);
+			DRAW_STATE.options = options;
+			return drawText(DRAW_STATE.textFormat, DRAW_STATE.options);
 		}
 
 		const altered_str = altText(trimmedStr);
 
-		// const start = performance.now();
 		const format = formatText(altered_str);
-		// console.log(performance.now() - start);
 
 		DRAW_STATE.baseText = trimmedStr;
-		DRAW_STATE.textFormat = format;
-		DRAW_STATE.options = options;
+		if (format === null) {
+			DRAW_STATE.textFormat = ERROR_FORMAT;
+			DRAW_STATE.options = { color: "#ff0000" };
+		} else {
+			DRAW_STATE.textFormat = format;
+			DRAW_STATE.options = options;
+		}
 
-		drawText(format, options);
+		drawText(DRAW_STATE.textFormat, DRAW_STATE.options);
 	}
 
 	/**
@@ -428,10 +417,7 @@
 
 		ctx.drawImage(img, 0, 0);
 
-		if (lines === null) {
-			lines = ["Input is too large"];
-			color = "#ff0000";
-		} else if (lines.length === 0) {
+		if (lines.length === 0) {
 			return repaint();
 		}
 
@@ -484,6 +470,9 @@
 
 	upload.addEventListener("load", () => {
 		drawMemeImage();
+	});
+	upload.addEventListener("error", () => {
+		clearImage();
 	});
 
 	function drawMemeImage() {
@@ -605,7 +594,7 @@
 			}
 		}
 		if (!imageinRadio.checked) {
-			cameraStop();
+			mockingSpongebob.cameraStop();
 		}
 	}
 

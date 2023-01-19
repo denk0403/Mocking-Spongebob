@@ -22,7 +22,6 @@
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
 		cameraStop = mockingSpongebob.cameraStop,
 		clearFields = mockingSpongebob.clearFields,
-		clearImage = mockingSpongebob.clearImage,
 		xmlSerializer = new XMLSerializer();
 
 	/**
@@ -88,16 +87,6 @@
 		MathJax.tex2svgPromise(str, { display: false })
 			.then((container) => container.firstChild)
 			.then((svg) => {
-				const oldOnError = upload.onerror;
-				const newOnError = () => {
-					// console.error("There was an error rendering MathJax");
-					clearImage();
-					upload.onerror = oldOnError;
-				};
-
-				upload.onerror = newOnError;
-				upload.onload = () => (upload.onerror = oldOnError);
-
 				paintColor(svg, color);
 				upload.src =
 					"data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));

@@ -20,5 +20,6 @@ declare global {
 		clear: () => void;
 		repaint: () => void;
 		cameraStop: () => void;
+		recognition: SpeechRecognition?;
 	};
 }

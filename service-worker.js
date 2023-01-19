@@ -1,5 +1,5 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v5";
+const cacheName = "mockSpongebob-v6";
 
 // Assets to be used for offline availability
 const staticAssets = [
@@ -26,7 +26,6 @@ const staticAssets = [
 	"./js/sw-registrator.js",
 	"./js/camera.js",
 	"./js/math.js",
-	"./js/errorDisplay.js",
 	"./js/webSpeech.js",
 	"./js/mockTypes.js",
 	"./js/demonstration.js",
