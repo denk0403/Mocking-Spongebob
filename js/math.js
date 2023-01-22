@@ -1,27 +1,28 @@
 "use strict";
 {
 	/** @type {HTMLInputElement} */
-	const mathin = document.querySelector("#mathin"),
+	const mathin = document.getElementById("mathin"),
 		/** @type {HTMLImageElement} */
-		upload = document.querySelector("#upload"),
+		upload = document.getElementById("upload"),
 		/** @type {HTMLImageElement} */
 		img = document.getElementById("meme"),
 		/** @type {HTMLImageElement} */
 		mirror = document.getElementById("mirror"),
-		mathinRadioLabel = document.querySelector("#mathinRadioLabel"),
-		mathinRadio = document.querySelector("#mathinRadio"),
 		/** @type {HTMLInputElement} */
-		input = document.querySelector("#caption"),
+		captionRadio = document.getElementById("captionRadio"),
+		mathinRadioLabel = document.getElementById("mathinRadioLabel"),
+		mathinRadio = document.getElementById("mathinRadio"),
 		/** @type {HTMLInputElement} */
-		imagein = document.querySelector("#imagein"),
+		input = document.getElementById("caption"),
+		/** @type {HTMLInputElement} */
+		imagein = document.getElementById("imagein"),
 		/** @type {HTMLInputElement} */
 		mathColorInput = document.getElementById("math-color"),
-		title = document.getElementById("title"),
 		copyLinkBtn = document.getElementById("cpy-link-btn"),
 		/** @type {HTMLSpanElement} */
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
-		cameraStop = mockingSpongebob.cameraStop,
-		clearFields = mockingSpongebob.clearFields,
+		cameraStop = mockingSpongeBob.cameraStop,
+		clearFields = mockingSpongeBob.clearFields,
 		xmlSerializer = new XMLSerializer();
 
 	/**
@@ -53,50 +54,68 @@
 		}
 	}
 
-	let lastFormatText = "";
-	let lastColor = "#ffffff";
+	/** @type {SVGElement} */
+	let SVG_CACHE = null;
 
 	const isomorphicIdleCallback = window.requestIdleCallback ?? requestAnimationFrame;
 	const isomorphicCancelIdleCallback = window.cancelIdleCallback ?? cancelAnimationFrame;
 
-	let color = mathColorInput.value;
 	let updateColorRequest = null;
-	mathColorInput.addEventListener("input", (event) => {
+	mathColorInput.addEventListener("input", () => {
 		isomorphicCancelIdleCallback(updateColorRequest);
-		color = event.currentTarget.value;
-		updateColorRequest = isomorphicIdleCallback(() => drawMathText(lastFormatText), {
-			timeout: 16,
-		});
+		updateColorRequest = isomorphicIdleCallback(
+			() => {
+				drawMathText(mathin.value, mathColorInput.value);
+			},
+			{ timeout: 16 }
+		);
 	});
 
-	function drawMathText(str = "") {
+	/**
+	 * @param {string} str
+	 * @param {string} color
+	 */
+	function drawMathText(str, color) {
 		const trimmedStr = str.trim();
-
-		if (trimmedStr === lastFormatText && color === lastColor) {
-			return;
-		}
-
-		lastFormatText = str;
-		lastColor = color;
 
 		if (trimmedStr === "") {
 			mirror.src = "./img/spongebob.jpg";
 			return;
 		}
 
+		const { text, color: lastColor, mode } = mockingSpongeBob.drawn;
+		if (trimmedStr === text && mode === "math") {
+			if (color === lastColor) return;
+
+			mockingSpongeBob.drawn.color = color;
+			return paintAndDrawSVG(SVG_CACHE, mathColorInput.value);
+		}
+
+		mockingSpongeBob.drawn = {
+			text: trimmedStr,
+			color,
+			mode: "math",
+			isErrored: false,
+		};
+
 		MathJax.tex2svgPromise(str, { display: false })
 			.then((container) => container.firstChild)
-			.then((svg) => {
-				paintColor(svg, color);
-				upload.src =
-					"data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));
-
-				// The meme will be repainted by the 'upload' handler
-			})
+			.then((svg) => paintAndDrawSVG(svg, color))
 			.catch((err) => {
 				console.error("Oops. Something went wrong.", err);
 			});
 
+		// The meme will be repainted by the 'upload' handler
+	}
+
+	/**
+	 * @param {SVGElement} svg
+	 * @param {string} color
+	 */
+	function paintAndDrawSVG(svg, color) {
+		SVG_CACHE = svg;
+		paintColor(svg, color);
+		upload.src = "data:image/svg+xml;base64," + window.btoa(xmlSerializer.serializeToString(svg));
 		// The meme will be repainted by the 'upload' handler
 	}
 
@@ -113,7 +132,7 @@
 				.map((char) => char && String.fromCodePoint(parseInt(char, 16)))
 				.join("");
 
-			drawMathText(mathin.value);
+			drawMathText(mathin.value, mathColorInput.value);
 		} catch (err) {
 			console.error("Oops. Something went wrong.", err);
 		}
@@ -136,7 +155,7 @@
 					mathin.focus();
 				} else {
 					mathin.blur();
-					mathin.value = mockingSpongebob.decodeText(encodedText);
+					mathin.value = mockingSpongeBob.decodeText(encodedText);
 					mathin.dispatchEvent(new InputEvent("input"));
 				}
 			});
@@ -144,33 +163,56 @@
 	};
 
 	function setup() {
-		if (window.MathJax && MathJax.tex2svgPromise) {
-			mathin.oninput = () => {
-				cameraStop();
-				mathin.scrollIntoView({
-					behavior: "smooth",
-					block: "start",
+		if (!window.MathJax || !MathJax.tex2svgPromise) return;
+
+		mathin.addEventListener("input", () => {
+			mockingSpongeBob.stopAsyncProcesses();
+
+			mathin.scrollIntoView({
+				behavior: "smooth",
+				block: "start",
+			});
+
+			input.value = "";
+			imagein.value = "";
+
+			drawMathText(mathin.value, mathColorInput.value);
+			copyLinkBtn.onclick = copyLink;
+		});
+
+		mathinRadioLabel.style.display = "inline";
+		if (location.hash.startsWith("#math:")) {
+			mathinRadio.click();
+			mathin.blur();
+			processMathHash_DEPRECATED(location.hash);
+			copyLinkBtn.onclick = copyLink;
+		} else if (location.search) {
+			processMathSearch(location.search);
+		}
+
+		if ("MathMLElement" in window) {
+			const mathBtns = document.getElementById("math-btns");
+			mathBtns.removeAttribute("hidden");
+
+			for (const child of mathBtns.children) {
+				child.addEventListener("click", () => {
+					const selectionStart = mathin.selectionStart;
+					const selectionEnd = mathin.selectionEnd;
+
+					/** @type {string} */
+					const expandedValue = child.dataset.value;
+					mathin.setRangeText(expandedValue, selectionStart, selectionEnd, "end");
+					mathin.focus();
+
+					const argumentIndex = expandedValue.indexOf("{}");
+					if (~argumentIndex) {
+						const newSelectionIndex = selectionStart + argumentIndex + 1;
+						mathin.setSelectionRange(newSelectionIndex, newSelectionIndex);
+					}
+
+					mathin.dispatchEvent(new InputEvent("input"));
 				});
-
-				input.value = "";
-				imagein.value = "";
-
-				drawMathText(mathin.value);
-
-				copyLinkBtn.onclick = copyLink;
-			};
-
-			mathinRadioLabel.style.display = "inline";
-			if (location.hash.startsWith("#math:")) {
-				mathinRadio.click();
-				mathin.blur();
-				processMathHash_DEPRECATED(location.hash);
-				copyLinkBtn.onclick = copyLink;
-			} else if (location.search) {
-				processMathSearch(location.search);
 			}
-		} else {
-			title.click();
 		}
 	}
 
@@ -185,8 +227,8 @@
 			if (trimmedStr !== "") {
 				const url = new URL(location);
 				url.searchParams.set("mode", "math");
-				url.searchParams.set("text", mockingSpongebob.encodeText(trimmedStr));
-				url.searchParams.set("color", color);
+				url.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
+				url.searchParams.set("color", mathColorInput.value);
 				urlStr = url.toString();
 			}
 

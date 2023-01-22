@@ -63,6 +63,7 @@
 			(device) => device.kind === "audioinput"
 		).length > 0;
 
+	/** @type {SpeechRecognition} */
 	const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 	if (supportsMicrophone && SpeechRecognition) {
@@ -80,9 +81,10 @@
 		recognition.continuous = true;
 		recognition.interimResults = true;
 		recognition.maxAlternatives = 1;
-		mockingSpongebob.recognition = recognition;
+		mockingSpongeBob.recognition = recognition;
 
 		recognition.addEventListener("audiostart", () => {
+			mockingSpongeBob.cameraStop();
 			microphoneOffBtn.insertAdjacentElement("afterend", microphoneOnBtn);
 			microphoneOffBtn.remove();
 			languageSelector.disabled = true;
@@ -96,7 +98,7 @@
 
 		recognition.addEventListener("error", (/** @type {SpeechSynthesisErrorEvent} */ event) => {
 			console.error(event);
-			recognition.stop();
+			recognition.abort();
 
 			if (event.error === "service-not-allowed") {
 				microphoneOffBtn.remove();
@@ -107,7 +109,7 @@
 
 		recognition.addEventListener("speechend", () => recognition.stop());
 
-		recognition.addEventListener("result", (event) => {
+		recognition.addEventListener("result", (/** @type {SpeechRecognitionEvent} */ event) => {
 			caption.value = Array.from(event.results)
 				.map((result) => capitalizeStr(result[0].transcript.trim()))
 				.join(". ");

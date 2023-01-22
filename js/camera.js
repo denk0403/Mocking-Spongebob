@@ -1,125 +1,127 @@
 "use strict";
-{
-	const cameraApp = document.querySelector("#cameraApp"),
+(async () => {
+	const cameraApp = document.getElementById("cameraApp"),
 		/** @type {HTMLVideoElement} */
-		cameraView = document.querySelector("#camera--view"),
+		cameraView = document.getElementById("camera--view"),
 		/** @type {HTMLCanvasElement} */
-		cameraSensor = document.createElement("canvas"),
-		cameraTrigger = document.querySelector("#camera--trigger"),
-		cameraToggle = document.querySelector("#camera--toggle"),
-		cameraFlip = document.querySelector("#camera--flip"),
-		upload = document.querySelector("#upload"),
-		imagein = document.querySelector("#imagein"),
-		mathin = document.querySelector("#mathin"),
-		input = document.querySelector("#caption"),
-		mirror = document.querySelector("#mirror");
+		cameraSensor = document.getElementById("camera--sensor"),
+		/** @type {HTMLButtonElement} */
+		cameraTrigger = document.getElementById("camera--trigger"),
+		/** @type {HTMLButtonElement} */
+		cameraToggle = document.getElementById("camera--toggle"),
+		/** @type {HTMLButtonElement} */
+		cameraFlip = document.getElementById("camera--flip"),
+		upload = document.getElementById("upload");
 
-	cameraView.controls = false;
-	const constraints = { video: { facingMode: "front" }, audio: false };
-
+	/** @type {MediaStreamConstraints} */
+	const constraints = { video: { facingMode: "user" }, audio: false };
+	/** @type {MediaStreamTrack?} */
 	let track;
 
-	const cameraStop = (mockingSpongebob.cameraStop = () => {
+	const cameraStop = (mockingSpongeBob.cameraStop = () => {
 		cameraApp.style.display = "none";
 		cameraView.pause();
-		if (track) {
-			track.stop();
-			track = undefined;
-
-			mirror.scrollIntoView({
-				behavior: "smooth",
-				block: "center",
-			});
-		}
+		track?.stop();
+		track = undefined;
 	});
 
-	if (
-		navigator.mediaDevices &&
-		navigator.mediaDevices.enumerateDevices &&
-		navigator.mediaDevices.getUserMedia
-	) {
-		navigator.mediaDevices.enumerateDevices().then((devices) => {
-			if (devices.filter((device) => device.kind === "videoinput").length) {
-				cameraToggle.style.display = "inline";
+	if (!navigator.mediaDevices?.enumerateDevices || !navigator.mediaDevices.getUserMedia) return;
 
-				function cameraStart(callback) {
-					if (navigator.mediaDevices.getUserMedia) {
-						navigator.mediaDevices
-							.getUserMedia(constraints)
-							.then((stream) => {
-								track = stream.getTracks()[0];
-								cameraView.srcObject = stream;
-								return cameraView.play();
-							})
-							.then(callback)
-							.catch((error) => {
-								console.error("Oops. Something went wrong.", error);
-							});
-					}
+	const devices = await navigator.mediaDevices.enumerateDevices();
+	const videoDevices = devices.filter((device) => device.kind === "videoinput");
+
+	if (!videoDevices.length) return;
+
+	cameraToggle.style.display = "inline";
+
+	let currentDeviceIndex = 0;
+	constraints.video.deviceId = videoDevices[0].deviceId;
+
+	function cameraStart() {
+		mockingSpongeBob.stopAsyncProcesses();
+
+		navigator.mediaDevices
+			.getUserMedia?.(constraints)
+			.then((stream) => {
+				track = stream.getTracks()[0];
+				cameraView.srcObject = stream;
+
+				if (constraints.video.facingMode === "user") {
+					cameraView.style.scale = "-1 1";
+				} else {
+					cameraView.style.scale = "1 1";
 				}
 
-				function flipCamera() {
-					let callback;
-					if (constraints.video.facingMode === "front") {
-						constraints.video.facingMode = "environment";
-						callback = () => (cameraView.style.scale = "1 1");
-					} else {
-						constraints.video.facingMode = "front";
-						callback = () => (cameraView.style.scale = "-1 1");
-					}
-					cameraFlip.classList.add("disabled");
-					cameraTrigger.classList.add("disabled");
-					cameraStart(callback);
+				return cameraView.play();
+			})
+			.catch((error) => {
+				console.error("Oops. Something went wrong.", error);
+
+				// try next video device
+				if (++currentDeviceIndex < videoDevices.length) {
+					const newId = videoDevices[currentDeviceIndex].deviceId;
+					constraints.video.deviceId = newId;
+					console.error("Trying again with", newId);
+					cameraStart();
+				} else {
+					currentDeviceIndex = 0;
+					constraints.video.deviceId = videoDevices[0].deviceId;
 				}
-
-				cameraView.addEventListener("loadeddata", () => {
-					cameraApp.style.display = "inline-block";
-					cameraFlip.classList.remove("disabled");
-					cameraTrigger.classList.remove("disabled");
-					cameraView.scrollIntoView({
-						behavior: "smooth",
-						block: "center",
-					});
-				});
-
-				cameraToggle.onclick = function () {
-					if (cameraApp.style.display === "none") {
-						cameraStart();
-					} else {
-						cameraStop();
-					}
-				};
-
-				cameraFlip.onclick = function () {
-					cameraFlip.disabled = true;
-					flipCamera();
-				};
-
-				cameraTrigger.onclick = function () {
-					const scrollParams = [window.scrollX, window.scrollY];
-					const width = cameraView.videoWidth;
-					const height = cameraView.videoHeight;
-					cameraSensor.width = width;
-					cameraSensor.height = height;
-
-					const ctx = cameraSensor.getContext("2d");
-
-					if (constraints.video.facingMode === "front") {
-						ctx.save();
-						ctx.scale(-1, 1);
-						ctx.drawImage(cameraView, 0, 0, -width, height);
-						ctx.restore();
-					} else {
-						ctx.drawImage(cameraView, 0, 0);
-					}
-
-					upload.src = cameraSensor.toDataURL("image/jpeg");
-					input.value = "";
-					imagein.value = "";
-					mathin.value = "";
-					window.scroll(...scrollParams);
-				};
-			}
-		});
+			});
 	}
-}
+
+	function flipCamera() {
+		if (constraints.video.facingMode === "user") {
+			constraints.video.facingMode = "environment";
+		} else {
+			constraints.video.facingMode = "user";
+		}
+		cameraFlip.disabled = true;
+		cameraTrigger.disabled = true;
+		cameraStart();
+		cameraApp.style.display = "inline-block";
+	}
+
+	cameraView.addEventListener("loadeddata", () => {
+		cameraApp.style.display = "inline-block";
+		cameraFlip.disabled = false;
+		cameraTrigger.disabled = false;
+		cameraView.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+		});
+	});
+
+	cameraToggle.onclick = () => {
+		if (!track) {
+			cameraStart();
+		} else {
+			cameraStop();
+		}
+	};
+
+	cameraFlip.onclick = flipCamera;
+
+	cameraTrigger.onclick = () => {
+		mockingSpongeBob.clearFields();
+
+		const width = cameraView.videoWidth;
+		const height = cameraView.videoHeight;
+		cameraSensor.width = width;
+		cameraSensor.height = height;
+
+		const ctx = cameraSensor.getContext("2d");
+
+		if (constraints.video.facingMode === "user") {
+			ctx.save();
+			ctx.scale(-1, 1);
+			ctx.drawImage(cameraView, 0, 0, -width, height);
+			ctx.restore();
+		} else {
+			ctx.drawImage(cameraView, 0, 0);
+		}
+
+		mockingSpongeBob.drawn = { mode: "image", isErrored: false };
+		upload.src = cameraSensor.toDataURL("image/jpeg");
+	};
+})();

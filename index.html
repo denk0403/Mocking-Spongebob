@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-    <meta name="keywords" content="SpongeBob, meme generator, meme, mock, mocking, funny">
+    <meta name="keywords" content="SpongeBob, meme generator, meme, mock, mocking, funny, sarcastic, chicken">
     <meta name="author" content="Dennis Kats">
     <meta name="description" content="An over the top generator for the Mocking SpongeBob meme." />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
@@ -46,7 +46,13 @@
     <script type="text/javascript">
         "use strict";
         const html = document.documentElement;
-        const mockingSpongebob = {
+        var mockingSpongeBob = {
+            drawn: {
+                mode: "",
+                text: "",
+                color: "#ffffff",
+                isErrored: false
+            },
             get isDarkmode() {
                 return localStorage.getItem("darkmode") === "true";
             },
@@ -64,7 +70,7 @@
                     darkmodeToggle.checked = newValue;
                 }
             },
-            toggleDarkmode: () => { mockingSpongebob.isDarkmode = !mockingSpongebob.isDarkmode; },
+            toggleDarkmode: () => { mockingSpongeBob.isDarkmode = !mockingSpongeBob.isDarkmode; },
             encodeText: (str) => {
                 let i = 0;
                 const result = [];
@@ -83,11 +89,11 @@
             }
         };
 
-        if (mockingSpongebob.isDarkmode) {
+        if (mockingSpongeBob.isDarkmode) {
             html.classList.add("darkmode")
         } else {
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-                mockingSpongebob.isDarkmode = event.matches;
+                mockingSpongeBob.isDarkmode = event.matches;
             });
         }
     </script>
@@ -114,7 +120,7 @@
 </head>
 
 <body>
-    <div class="box">
+    <div id="box">
         <h1 id="title">Mocking SpongeBob Meme Generator</h1>
 
         <span id="modeRadios">
@@ -131,7 +137,7 @@
                 <span>Math</span>
             </label>
         </span>
-        <form id="controls">
+        <form id="controls" onsubmit="event.preventDefault()">
             <div id="caption-controls" class="mode-controls">
                 <div id="captionLabel" class="inputField">
                     <label for="caption" class="inputField no-margin">
@@ -173,6 +179,52 @@
                     <span>Color:</span>
                     <input id="math-color" class="color-picker" type="color" value="#ffffff">
                 </label>
+
+                <div id="math-btns" hidden>
+                    <button type="button" class="math-btn" data-value="\sum_{}^{}{}">&Sum;</button>
+                    <button type="button" class="math-btn" data-value="\int_{}^{}{}">&int;</button>
+                    <button type="button" class="math-btn" data-value="\Pi_{}^{}{}">&Pi;</button>
+                    <button type="button" class="math-btn" data-value="\frac{}{}">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mfrac>
+                                <mi>x</mi>
+                                <mi>y</mi>
+                            </mfrac>
+                        </math>
+                    </button>
+                    <button type="button" class="math-btn" data-value="\sqrt[]{}">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mroot>
+                                <mi>y</mi>
+                                <mi>x</mi>
+                            </mroot>
+                        </math>
+                    </button>
+                    <button type="button" class="math-btn" data-value="\infty">&infin;</button>
+
+                    <button type="button" class="math-btn wide-only" data-value="\pi">&pi;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\epsilon">&epsilon;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\forall">&forall;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\exists">&exist;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\neg">&not;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\land">&and;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\lor">&or;</button>
+                    <button type="button" class="math-btn wide-only" data-value="\Rightarrow">⇒</button>
+                    <button type="button" class="math-btn wide-only" data-value="\Leftrightarrow">⇔</button>
+                    <button type="button" class="math-btn wide-only"
+                        data-value="\begin{bmatrix} {} & {} \\ {} & {} \end{bmatrix}">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mrow>
+
+                                <mo>[</mo>
+                                <mn>2</mn>
+                                <mo>x</mo>
+                                <mn>2</mn>
+                                <mo>]</mo>
+                            </mrow>
+                        </math>
+                    </button>
+                </div>
             </div>
         </form>
 
@@ -180,26 +232,35 @@
             <img id="mirror" src="./img/spongebob.jpg" width="500" height="350" alt="Mocking SpongeBob meme"
                 decoding="sync" />
             <img id="meme" src="./img/spongebob.jpg" decoding="sync" hidden />
+            <canvas id="canvas" width="500" height="350" hidden></canvas>
             <img id="upload" crossorigin="anonymous" hidden />
 
             <!-- Camera App -->
             <div id="cameraApp" style="display: none;">
+                <!-- Camera sensor -->
+                <canvas id="camera--sensor" hidden></canvas>
+
                 <!-- Frame for containing camera functionality-->
                 <div id="camera--frame">
                     <!-- Camera view -->
                     <video id="camera--view" width="500" height="350" muted playsinline>
                     </video>
                     <!-- Take picture trigger -->
-                    <img loading="lazy" id="camera--trigger" src="img/camera-trigger.png" title="Take picture"
-                        onContextMenu="return false;" draggable="false">
+                    <button type="button" id="camera--trigger" title="Take picture">
+                        <img loading="lazy" src="./img/camera-trigger.png" onContextMenu="return false;"
+                            draggable="false">
+                    </button>
+
                     <!-- Flip camera trigger -->
-                    <img loading="lazy" id="camera--flip" src="img/camera-flip.png" title="Flip camera"
-                        onContextMenu="return false;" draggable="false">
+                    <button type="button" id="camera--flip" title="Flip camera">
+                        <img loading="lazy" src="./img/camera-flip.png" onContextMenu="return false;" draggable="false">
+                    </button>
+
                 </div>
             </div>
         </div>
 
-        <div class="btn-group btn-primary">
+        <div class="btn-group">
             <button type="button" class="btn" id="cpy-text-btn" title="Copy the mocking form of the text"><span
                     id="cpy-text-txt">
                     Copy Mocking
@@ -212,42 +273,30 @@
                     Shareable Link
                 </span> <img class="icon" alt="Copy link icon" width="22" height="22"
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAsElEQVRIie2SzQ3CMAxGH7AEdCVaMQFrkAFQJZYCOkCnIb1wKgcMWJZT/noAKU+yIn1O7C9xIJP5O1ZAA3RAb8Ji8x1wBKpU8Z1z6J0GOmrPeQ+cgQ1QDF/UpQCC1OiBUicbEcMHhS1Bah20GEVcmM1Dz5B6vrloJ4CpSU6+tQ/MlLl7g1bWtdPwldDcarRarHgMOTDOkJd2Q81433SbclFynX50Dj1rEIG95zyT+XEuFRpXEhVovf0AAAAASUVORK5CYII="></button>
-            <a id="sv-link" href="./img/spongebob.jpg" download="image.png"><button type="button" class="btn"
+            <a id="sv-link" href="./img/spongebob.jpg" download="spongebob.jpg"><button type="button" class="btn"
                     id="sv-btn" title="Save this image to your device">Save
                     Image <img class="icon" alt="Save icon" width="22" height="22"
                         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAA1ElEQVRIie2WSw7CIBRFj5/FONCROLLOdRHWfenGTJ2pibEr0BEOhKRt0EKBRGJvQkLovZw+2uQBvf5VQ+AAPAHZcTyAvdrLWlsPYHPkttARcHQNGbRTe5yAsU0gdw18kHMBhYu5RbrqovlgYDDLAECTaiynPy6kkgQvgaxr2Ocb66yrH0j0qHtwVHAGLICyslYCAlj5vsy3TjNXnmnFr+eiJesFLoGZITMBbjHBJrgNNAhYAnfeRyvU3CZT0091p2sE6MXGtFHGUHeuM7AOWESvRPQCoA2TcvzCpGcAAAAASUVORK5CYII="></button>
             </a>
-            <button type="button" class="btn" id="share-btn" title="Share this image with other apps"
-                style="display: none;" disabled>Share
+            <button type="button" class="btn" id="share-btn" disabled hidden
+                title="Share this image with other apps">Share
                 Image <img class="icon" alt="Share icon" width="22" height="22"
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAA1ElEQVRIie2WbQqCQBCGHyK8QUJHyc5X1r0EIf1VP7pAeg37M4uipu0nRr4wjMx+PDujuyv8mGIgAwp5DqIdcAcasSewDw0NAo+Bh4CUb3oxL2UvegAF7i7o5gOcAyVtVgqMxErp411dsLY2DhfiDBwBV6Dm++xUvwpIZQ5tXRhumzHIWEzZ2QRcyeDDh/apKiS0mWtrrrxW7Yv8uFawU20txmZYnFxTsjoS58b/3ztewYsA1+ITg3mP4o0uiZThNadrJxNwJHB1PerYS6BGPwKrnOoNnOBnj128ZTsAAAAASUVORK5CYII="></button>
         </div>
-        <div id="note">
-            <p>
-                You can save the image also by right clicking (holding down on mobile) the image.
-            </p>
-            <!-- <p>
-                Also check out the <i>new</i> <a class="external-link"
-                    href="https://chrome.google.com/webstore/detail/mocking-spongebob-selecti/dkideaomnilanjacdpgkflcocpepjeno"
-                    title="Chrome Web Store">Mocking Spongebob Google Chrome extension</a> <img
-                    src="./img/chrome_store_logo.png" title="Chrome Web Store Logo" width="18px"
-                    onContextMenu="return false;" draggable="false"> for
-                desktops!
-            </p> -->
-        </div>
-        <p><span>Made by <a class="external-link" href="https://denniskats.dev/" title="Go to personal website">Dennis
-                    Kats</a> for his friends.</span>
-            <span style="display:block; margin-top: 5px">View on <a class="external-link"
-                    href="https://github.com/denk0403/Mocking-Spongebob"
-                    title="Go to project page on GitHub">GitHub</a>.</span>
+        <p>
+            Created by <a class="external-link" href="https://denniskats.dev/" title="Go to personal website">Dennis
+                Kats</a>.
+            View on <a class="external-link" href="https://github.com/denk0403/Mocking-Spongebob"
+                title="Go to project page on GitHub">GitHub</a>.
+
         </p>
     </div>
     <label class="darkmode-toggle-wrapper">
         Dark Mode 🌓:
         <input id="darkmode-toggle" class="toggle" type="checkbox" role="switch"
-            onclick="mockingSpongebob.toggleDarkmode()" />
+            onclick="mockingSpongeBob.toggleDarkmode()" />
         <script>
-            document.getElementById("darkmode-toggle").checked = mockingSpongebob.isDarkmode;
+            document.getElementById("darkmode-toggle").checked = mockingSpongeBob.isDarkmode;
         </script>
     </label>
 </body>

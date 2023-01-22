@@ -136,7 +136,7 @@
 			htmlOption: document.createElement("option"),
 		},
 	};
-	mockingSpongebob.mockTypes = mockTypes;
+	mockingSpongeBob.mockTypes = mockTypes;
 
 	const mockSelector = document.getElementById("mockType-selector");
 	mockSelector.innerHTML = "";
@@ -152,10 +152,10 @@
 		.sort((mock1, mock2) => mock1.name.localeCompare(mock2.name))
 		.forEach((mock) => mockSelector.appendChild(mock.htmlOption));
 
-	mockingSpongebob.currentMock = mockTypes.asl;
+	mockingSpongeBob.currentMock = mockTypes.asl;
 	mockTypes.asl.htmlOption.selected = true;
 
 	mockSelector.addEventListener("input", (event) => {
-		mockingSpongebob.currentMock = mockTypes[event.currentTarget.value];
+		mockingSpongeBob.currentMock = mockTypes[event.currentTarget.value];
 	});
 }

@@ -2,8 +2,7 @@
 {
 	// DOM Constants
 	/** @type {HTMLCanvasElement} */
-	const canvas = document.createElement("canvas"),
-		/** @type {CanvasRenderingContext2D} */
+	const canvas = document.getElementById("canvas"),
 		ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }),
 		/** @type {HTMLImageElement} */
 		img = document.getElementById("meme"),
@@ -11,18 +10,25 @@
 		mirror = document.getElementById("mirror"),
 		/** @type {HTMLInputElement} */
 		captionin = document.getElementById("caption"),
-		/** @type {HTMLButtonElement} */
+		/** @type {HTMLInputElement} */
 		captionRadio = document.getElementById("captionRadio"),
 		/** @type {HTMLInputElement} */
 		captionColorInput = document.getElementById("caption-color"),
+		/** @type {HTMLInputElement} */
 		imagein = document.getElementById("imagein"),
+		/** @type {HTMLInputElement} */
 		imageinRadio = document.getElementById("imageinRadio"),
 		/** @type {HTMLImageElement} */
 		upload = document.getElementById("upload"),
-		captionModes = document.getElementsByName("mode"),
+		/** @type {HTMLInputElement} */
 		mathin = document.getElementById("mathin"),
+		/** @type {HTMLInputElement} */
 		mathinRadio = document.getElementById("mathinRadio"),
+		/** @type {HTMLDivElement} */
+		box = document.getElementById("box"),
+		/** @type {HTMLHeadingElement} */
 		title = document.getElementById("title"),
+		/** @type {HTMLSelectElement} */
 		mockSelector = document.getElementById("mockType-selector"),
 		/** @type {HTMLButtonElement} */
 		copyTextBtn = document.getElementById("cpy-text-btn"),
@@ -55,26 +61,50 @@
 	ctx.strokeStyle = "black";
 	ctx.fillStyle = "white";
 
-	title.onclick = () => {
-		window.stopTimer();
-		history.replaceState(null, null, "./");
-		clear();
-		captionRadio.click();
-	};
-
-	const clearFields = (mockingSpongebob.clearFields = () => {
+	const clearAllFields = (mockingSpongeBob.clearFields = () => {
 		captionin.value = "";
 		imagein.value = "";
 		mathin.value = "";
 	});
 
-	const clearImage = (mockingSpongebob.clearImage = () => {
-		formatAndDrawText("");
+	const clearOtherInputs = () => {
+		imagein.value = "";
+		upload.removeAttribute("src");
+		mathin.value = "";
+	};
+
+	const resetTemplate = (mockingSpongeBob.resetTemplate = () => {
+		formatAndDrawText("", captionColorInput.value, true);
 	});
 
-	const clear = (mockingSpongebob.clear = () => {
-		clearFields();
-		clearImage();
+	const stopAsyncProcesses = (mockingSpongeBob.stopAsyncProcesses = () => {
+		window.stopTimer();
+		mockingSpongeBob.cameraStop();
+		mockingSpongeBob.recognition?.abort();
+	});
+
+	// add drag and drop
+	box.addEventListener("dragover", (event) => {
+		event.preventDefault();
+	});
+	box.addEventListener("drop", (event) => {
+		event.preventDefault();
+
+		const item = event.dataTransfer?.items?.[0];
+		if (item?.kind === "file") {
+			imageinRadio.click();
+			imagein.files = event.dataTransfer.files;
+			imagein.dispatchEvent(new InputEvent("input"));
+		}
+	});
+
+	title.addEventListener("click", () => {
+		stopAsyncProcesses();
+
+		history.pushState(null, null, "./");
+		upload.removeAttribute("src");
+		clearAllFields();
+		resetTemplate();
 	});
 
 	/**
@@ -97,26 +127,26 @@
 
 			const mockTypeId = hash.slice(HASH_PREFIX.length, hashSecondColonIndex);
 
-			const mockType = mockingSpongebob.mockTypes[mockTypeId];
+			const mockType = mockingSpongeBob.mockTypes[mockTypeId];
 
 			if (mockType) {
 				/** @type {HTMLOptionElement} */
 				const mockOption = document.getElementById(mockType.id);
 
 				mockOption.selected = true;
-				mockingSpongebob.currentMock = mockType;
+				mockingSpongeBob.currentMock = mockType;
 
 				const contentPrefixIndex = hash.indexOf(":", 10);
 				if (~contentPrefixIndex) {
 					try {
-						clearFields();
+						clearAllFields();
 						captionin.value = hash
 							.slice(contentPrefixIndex + 1) // hash includes '#' when present
 							.split(":")
 							.map((char) => String.fromCodePoint(parseInt(char, 16)))
 							.join("");
 
-						img.decode().then(() => formatAndDrawText(captionin.value));
+						img.decode().then(() => formatAndDrawText(captionin.value, captionColorInput.value));
 					} catch (err) {
 						console.error(err);
 						title.click();
@@ -132,12 +162,12 @@
 			mode = searchParams.get("mode") ?? "asl",
 			color = searchParams.get("color") ?? "#ffffff";
 
-		if (mode in mockingSpongebob.mockTypes) {
-			const mockType = mockingSpongebob.mockTypes[mode];
+		if (mode in mockingSpongeBob.mockTypes) {
+			const mockType = mockingSpongeBob.mockTypes[mode];
 
 			if (mockType) {
 				mockType.htmlOption.selected = true;
-				mockingSpongebob.currentMock = mockType;
+				mockingSpongeBob.currentMock = mockType;
 			}
 
 			// ensure image has finished decoding
@@ -149,7 +179,7 @@
 					captionin.focus();
 				} else {
 					captionin.blur();
-					captionin.value = mockingSpongebob.decodeText(encodedText);
+					captionin.value = mockingSpongeBob.decodeText(encodedText);
 					captionin.dispatchEvent(new InputEvent("input"));
 				}
 			});
@@ -165,27 +195,25 @@
 			block: "start",
 		});
 
-		imagein.value = "";
-		mathin.value = "";
-
-		formatCaptionRequest = requestAnimationFrame(() => formatAndDrawText(captionin.value));
+		clearOtherInputs();
+		formatCaptionRequest = requestAnimationFrame(() =>
+			formatAndDrawText(captionin.value, captionColorInput.value)
+		);
 		copyLinkBtn.onclick = copyLink;
 	};
 
 	// custom event for microphone input
-	captionin.addEventListener("audioinput", () => {
-		mockingSpongebob.cameraStop();
-		captionInputHandler();
-	});
+	captionin.addEventListener("audioinput", captionInputHandler);
 
 	captionin.addEventListener("input", () => {
-		mockingSpongebob.cameraStop();
-		mockingSpongebob.recognition?.stop();
+		mockingSpongeBob.cameraStop();
+		mockingSpongeBob.recognition?.abort();
 		captionInputHandler();
 	});
 
 	mockSelector.addEventListener("input", () => {
-		formatAndDrawText(captionin.value, null, true);
+		// don't check for error because different text transforms may fit
+		formatAndDrawText(captionin.value, captionColorInput.value);
 		copyLinkBtn.onclick = copyLink;
 	});
 
@@ -196,27 +224,15 @@
 		return ctx.measureText(str).width;
 	}
 
+	function maxNumberOfLines(fontSize) {
+		return Math.ceil(INITIAL_FONT_SIZE / fontSize);
+	}
+
 	/**
 	 * @typedef CaptionFormat
 	 * @property {string[]} lines
 	 * @property {number} fontSize
 	 */
-
-	/** @type {CaptionFormat} */
-	const EMPTY_FORMAT = {
-		lines: [],
-		fontSize: INITIAL_FONT_SIZE,
-	};
-
-	/** @type {CaptionFormat} */
-	const ERROR_FORMAT = {
-		lines: ["Input is too large"],
-		fontSize: 59,
-	};
-
-	function maxNumberOfLines(fontSize) {
-		return Math.ceil(INITIAL_FONT_SIZE / fontSize);
-	}
 
 	/**
 	 * @param {string} str The string to format
@@ -229,7 +245,7 @@
 		const MIN_LINE_BOX_WIDTH = 1; // in pixels
 
 		if (str === "") {
-			return EMPTY_FORMAT;
+			return { lines: [], fontSize: INITIAL_FONT_SIZE };
 		}
 
 		const words = str.split(" ");
@@ -290,11 +306,11 @@
 			return words.every(fitIntoLinesAtSize(fontSize, boxWidth));
 		}
 
-		// Setup font range
+		// Setup font size range
 		let lowerFontSize = MIN_FONT_SIZE - 1; // always safe
 		let upperFontSize = INITIAL_FONT_SIZE; // possibly too large
 
-		// Binary search through font range
+		// Binary search through font size range
 		// This determines the maximum font size that fits all the text into the region
 		while (lowerFontSize !== upperFontSize) {
 			// Try new middle font-size
@@ -346,11 +362,7 @@
 		};
 	}
 
-	const DRAW_STATE = {
-		baseText: "",
-		textFormat: { lines: [], fontSize: INITIAL_FONT_SIZE },
-		options: { color: "#ffffff" },
-	};
+	let FORMAT_CACHE = null;
 
 	const isomorphicIdleCallback = window.requestIdleCallback ?? requestAnimationFrame;
 	const isomorphicCancelIdleCallback = window.cancelIdleCallback ?? cancelAnimationFrame;
@@ -358,62 +370,81 @@
 	let updateColorRequest = null;
 	captionColorInput.addEventListener("input", () => {
 		isomorphicCancelIdleCallback(updateColorRequest);
-		DRAW_STATE.options.color = captionColorInput.value;
+		clearOtherInputs();
 		updateColorRequest = isomorphicIdleCallback(
-			() => drawText(DRAW_STATE.textFormat, DRAW_STATE.options),
+			() => formatAndDrawText(captionin.value, captionColorInput.value),
 			{ timeout: 16 }
 		);
 	});
 
 	/**
-	 * @typedef DrawOptions
-	 * @property {string} color
-	 */
-
-	/**
 	 * @param {string} str
-	 * @param {DrawOptions?} options
-	 * Customizable options for drawing. Use `null` to reuse previous options.
+	 * @param {string} color
 	 * @param {boolean} force Overrides caching. False by default.
 	 * @returns
 	 */
-	function formatAndDrawText(str, options, force = false) {
-		options ??= DRAW_STATE.options;
+	function formatAndDrawText(str, color, force = false) {
 		const trimmedStr = str.trim();
 
-		// check if the text has already been formatted
-		if (trimmedStr === DRAW_STATE.baseText && !force) {
-			// check if the color is the same too, making this a no-op
-			if (options.color === DRAW_STATE.options.color) return;
+		if (trimmedStr === "") {
+			mockingSpongeBob.drawn = {
+				text: "",
+				color,
+				isErrored: false,
+				mode: mockingSpongeBob.currentMock.id,
+			};
 
-			DRAW_STATE.options = options;
-			return drawText(DRAW_STATE.textFormat, DRAW_STATE.options);
+			const url = "./img/spongebob.jpg";
+
+			mirror.src = url;
+			mirror.alt = "Mocking SpongeBob meme";
+			mirror.title = "";
+
+			saveLink.href = url;
+			saveLink.download = "spongebob.jpg";
+
+			if (navigator.canShare && navigator.share) {
+				updateShareData(url);
+			}
+
+			return updateShareButtons();
 		}
 
-		const altered_str = altText(trimmedStr);
+		// handle caching
+		if (!force) {
+			const { text, color: lastColor, mode } = mockingSpongeBob.drawn;
+			if (trimmedStr === text && mockingSpongeBob.currentMock.id === mode) {
+				if (color === lastColor) return;
 
-		const format = formatText(altered_str);
+				mockingSpongeBob.drawn.color = color;
+				return drawText(FORMAT_CACHE, color);
+			}
+		}
 
-		DRAW_STATE.baseText = trimmedStr;
-		if (format === null) {
-			DRAW_STATE.textFormat = ERROR_FORMAT;
-			DRAW_STATE.options = { color: "#ff0000" };
+		const transformedStr = applyCurrentMockTransform(trimmedStr);
+
+		FORMAT_CACHE = formatText(transformedStr);
+		mockingSpongeBob.drawn = {
+			text: trimmedStr,
+			color,
+			mode: mockingSpongeBob.currentMock.id,
+			isErrored: FORMAT_CACHE === null,
+		};
+
+		if (FORMAT_CACHE === null) {
+			drawText({ lines: ["Input is too large"], fontSize: 59 }, "#ff0000");
 		} else {
-			DRAW_STATE.textFormat = format;
-			DRAW_STATE.options = options;
+			drawText(FORMAT_CACHE, color);
 		}
-
-		drawText(DRAW_STATE.textFormat, DRAW_STATE.options);
 	}
 
 	/**
 	 *
 	 * @param {CaptionFormat} format
-	 * @param {DrawOptions} options
+	 * @param {string} color
 	 */
-	function drawText(format, options) {
-		let { lines, fontSize } = format;
-		let { color } = options;
+	function drawText(format, color) {
+		const { lines, fontSize } = format;
 
 		ctx.drawImage(img, 0, 0);
 
@@ -455,28 +486,29 @@
 		return result;
 	}
 
-	function altText(str) {
-		if (mockingSpongebob.currentMock) {
-			return mockingSpongebob.currentMock.apply(str);
+	function applyCurrentMockTransform(str) {
+		if (mockingSpongeBob.currentMock) {
+			return mockingSpongeBob.currentMock.apply(str);
 		} else {
 			return defaultMock(str);
 		}
 	}
 
 	reader.onload = function () {
-		const dataURL = reader.result;
-		upload.src = dataURL;
+		mockingSpongeBob.stopAsyncProcesses();
+		mockingSpongeBob.drawn = { mode: "image", isErrored: false };
+		upload.src = reader.result;
 	};
 
-	upload.addEventListener("load", () => {
-		drawMemeImage();
-	});
+	upload.addEventListener("load", drawUpload);
 	upload.addEventListener("error", (event) => {
 		console.error(event);
-		clearImage();
+		drawUpload;
+		mockingSpongeBob.drawn = { isErrored: false };
+		drawText({ lines: ["There was an error", "uploading the image"], fontSize: 45 }, "#ff0000");
 	});
 
-	function drawMemeImage() {
+	function drawUpload() {
 		const MAX_HEIGHT = 105;
 		const MAX_WIDTH = 450;
 
@@ -514,31 +546,31 @@
 					text: `Mocking SpongeBob Meme Generator - ${BASE_URL}`,
 				};
 
-				if (navigator.canShare(shareData)) {
+				const canShare = navigator.canShare(shareData);
+				if (canShare) {
 					shareBtn.disabled = false;
 				} else {
 					console.error("There was an error sharing this meme.");
 					shareBtn.disabled = true;
 				}
+
+				return canShare;
 			});
 	}
 
 	function updateShareButtons() {
-		const canCopy = !!navigator.clipboard;
+		const haveCopyPermissions = !!navigator.clipboard;
+		const mode = mockingSpongeBob.drawn.mode;
 
-		for (let i = 0; i < captionModes.length; i++) {
-			if (captionModes[i].checked) {
-				if (captionModes[i].id == "captionRadio") {
-					copyTextBtn.disabled = !canCopy;
-					copyLinkBtn.disabled = !canCopy;
-				} else if (captionModes[i].id == "mathinRadio") {
-					copyTextBtn.disabled = true;
-					copyLinkBtn.disabled = !canCopy;
-				} else {
-					copyTextBtn.disabled = true;
-					copyLinkBtn.disabled = true;
-				}
-			}
+		if (mode === "image") {
+			copyTextBtn.disabled = true;
+			copyLinkBtn.disabled = true;
+		} else if (mode === "math") {
+			copyTextBtn.disabled = true;
+			copyLinkBtn.disabled = !haveCopyPermissions;
+		} else {
+			copyTextBtn.disabled = !haveCopyPermissions;
+			copyLinkBtn.disabled = !haveCopyPermissions;
 		}
 	}
 
@@ -546,16 +578,22 @@
 	 * Re-exports the canvas to the mirror image element,
 	 * as well as updates all sharing methods.
 	 */
-	const repaint = (mockingSpongebob.repaint = () => {
+	const repaint = (mockingSpongeBob.repaint = () => {
 		const dataURL = canvas.toDataURL("image/jpeg");
 		mirror.src = dataURL;
 		mirror.alt = captionin.value;
 		mirror.title = captionin.value;
 
 		saveLink.href = dataURL;
-		saveLink.download = `${
-			captionin.value ? altText(captionin.value.trim()) : mathin.value.trim() || "img"
-		}.jpg`;
+
+		const mode = mockingSpongeBob.drawn.mode;
+		if (mode === "image") {
+			saveLink.download = "image.jpg";
+		} else if (mode === "math") {
+			saveLink.download = `${mathin.value.trim()}.jpg`;
+		} else {
+			saveLink.download = `${applyCurrentMockTransform(captionin.value.trim())}.jpg`;
+		}
 
 		if (navigator.canShare && navigator.share) {
 			updateShareData(dataURL);
@@ -564,18 +602,20 @@
 		updateShareButtons();
 	});
 
-	imagein.onchange = () => {
+	imagein.addEventListener("input", () => {
 		captionin.value = "";
 		mathin.value = "";
+
 		if (imagein.files[0]) {
 			reader.readAsDataURL(imagein.files[0]);
 		} else {
 			ctx.drawImage(img, 0, 0);
 			repaint();
 		}
-	};
+	});
 
-	function updateMode() {
+	/** @deprecated */
+	function updateMode_DEPRECATED() {
 		let modes = document.getElementsByName("mode");
 		for (let i = 0; i < modes.length; i++) {
 			if (modes[i].checked) {
@@ -595,7 +635,7 @@
 			}
 		}
 		if (!imageinRadio.checked) {
-			mockingSpongebob.cameraStop();
+			mockingSpongeBob.cameraStop();
 		}
 	}
 
@@ -607,9 +647,9 @@
 			const trimmedStr = captionin.value.trim();
 			if (trimmedStr !== "") {
 				const url = new URL(location);
-				url.searchParams.set("mode", mockingSpongebob.currentMock.id);
-				url.searchParams.set("text", mockingSpongebob.encodeText(trimmedStr));
-				url.searchParams.set("color", DRAW_STATE.options.color);
+				url.searchParams.set("mode", mockingSpongeBob.currentMock.id);
+				url.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
+				url.searchParams.set("color", captionColorInput.value);
 				urlStr = url.toString();
 			}
 
@@ -627,7 +667,7 @@
 	let copyTextTimer;
 	function copyMockText() {
 		if (navigator.clipboard) {
-			const text = altText(captionin.value);
+			const text = applyCurrentMockTransform(captionin.value);
 
 			navigator.clipboard.writeText(text).then(() => {
 				copyTextTxt.textContent = "Copied!";
@@ -641,8 +681,9 @@
 	}
 
 	if (navigator.canShare && navigator.share) {
-		shareBtn.style.removeProperty("display");
-		updateShareData(mirror.src);
+		updateShareData(mirror.src).then((canShare) => {
+			shareBtn.hidden = !canShare;
+		});
 
 		shareBtn.addEventListener("click", () => {
 			if (navigator.canShare(shareData)) {
@@ -664,9 +705,9 @@
 
 	if (!CSS.supports("selector(:has(_))")) {
 		// support Firefox
-		imageinRadio.onclick = updateMode;
-		captionRadio.onclick = updateMode;
-		mathinRadio.onclick = updateMode;
+		imageinRadio.onclick = updateMode_DEPRECATED;
+		captionRadio.onclick = updateMode_DEPRECATED;
+		mathinRadio.onclick = updateMode_DEPRECATED;
 
 		captionRadio.click();
 	} else {
