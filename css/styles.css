@@ -357,7 +357,7 @@ form :is(input, select, button) {
 	left: 50%;
 	translate: -50%;
 	background-color: transparent;
-    border: none;
+	border: none;
 }
 
 #camera--trigger:hover {
@@ -368,7 +368,7 @@ form :is(input, select, button) {
 	filter: brightness(0.6);
 }
 
-#camera--trigger.disabled {
+#camera--trigger:disabled {
 	opacity: 0;
 }
 
@@ -377,10 +377,10 @@ form :is(input, select, button) {
 	bottom: 15px;
 	right: 10px;
 	background-color: transparent;
-    border: none;
+	border: none;
 }
 
-#camera--flip.disabled {
+#camera--flip:disabled {
 	opacity: 0;
 }
 
