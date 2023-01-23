@@ -21,7 +21,6 @@
 		copyLinkBtn = document.getElementById("cpy-link-btn"),
 		/** @type {HTMLSpanElement} */
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
-		cameraStop = mockingSpongeBob.cameraStop,
 		clearFields = mockingSpongeBob.clearFields,
 		xmlSerializer = new XMLSerializer();
 

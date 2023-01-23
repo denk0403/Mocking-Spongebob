@@ -18,12 +18,13 @@
 	/** @type {MediaStreamTrack?} */
 	let track;
 
-	const cameraStop = (mockingSpongeBob.cameraStop = () => {
+	const cameraStop = () => {
 		cameraApp.style.display = "none";
 		cameraView.pause();
 		track?.stop();
 		track = undefined;
-	});
+	};
+	mockingSpongeBob.cameraStop = cameraStop;
 
 	if (!navigator.mediaDevices?.enumerateDevices || !navigator.mediaDevices.getUserMedia) return;
 

@@ -84,7 +84,7 @@
 		mockingSpongeBob.recognition = recognition;
 
 		recognition.addEventListener("audiostart", () => {
-			mockingSpongeBob.cameraStop();
+			mockingSpongeBob.cameraStop?.();
 			microphoneOffBtn.insertAdjacentElement("afterend", microphoneOnBtn);
 			microphoneOffBtn.remove();
 			languageSelector.disabled = true;

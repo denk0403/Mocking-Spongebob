@@ -19,6 +19,17 @@ declare global {
 		isErrored: boolean;
 	}
 
+	interface Demo {
+		LoremIpsumText: string;
+		isRunning(): void;
+		stopTimer(): void;
+		time(str: string): void;
+		timeType(str: string): number;
+		typeEach(str: string, time: number): number;
+		typeIn(str: string, time: number): number;
+		error(): void;
+	}
+
 	interface MockingSpongeBobApp {
 		drawn: DrawState;
 		isDarkmode: boolean;
@@ -30,9 +41,10 @@ declare global {
 		clearFields: () => void;
 		resetTemplate: () => void;
 		repaint: () => void;
-		cameraStop: () => void;
-		stopAsyncProcesses: () => void;
+		cameraStop: (() => void)?;
 		recognition: SpeechRecognition?;
+		stopAsyncProcesses: () => void;
+		demo: Demo;
 	}
 
 	const mockingSpongeBob: MockingSpongeBobApp;

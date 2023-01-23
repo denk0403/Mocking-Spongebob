@@ -78,8 +78,8 @@
 	});
 
 	const stopAsyncProcesses = (mockingSpongeBob.stopAsyncProcesses = () => {
-		window.stopTimer();
-		mockingSpongeBob.cameraStop();
+		mockingSpongeBob.demo.stopTimer();
+		mockingSpongeBob.cameraStop?.();
 		mockingSpongeBob.recognition?.abort();
 	});
 
@@ -160,7 +160,8 @@
 		const searchParams = new URLSearchParams(search);
 		let encodedText = searchParams.get("text") ?? "",
 			mode = searchParams.get("mode") ?? "asl",
-			color = searchParams.get("color") ?? "#ffffff";
+			color = searchParams.get("color") ?? "#ffffff",
+			animateTime = Number.parseFloat(searchParams.get("animate"));
 
 		if (mode in mockingSpongeBob.mockTypes) {
 			const mockType = mockingSpongeBob.mockTypes[mode];
@@ -179,7 +180,12 @@
 					captionin.focus();
 				} else {
 					captionin.blur();
-					captionin.value = mockingSpongeBob.decodeText(encodedText);
+					const decodedText = mockingSpongeBob.decodeText(encodedText);
+
+					if (!Number.isNaN(animateTime))
+						return mockingSpongeBob.demo.typeIn(decodedText, animateTime * 1000);
+
+					captionin.value = decodedText;
 					captionin.dispatchEvent(new InputEvent("input"));
 				}
 			});
@@ -205,9 +211,15 @@
 	// custom event for microphone input
 	captionin.addEventListener("audioinput", captionInputHandler);
 
-	captionin.addEventListener("input", () => {
-		mockingSpongeBob.cameraStop();
+	// custom event for demo input
+	captionin.addEventListener("demoinput", () => {
+		mockingSpongeBob.cameraStop?.();
 		mockingSpongeBob.recognition?.abort();
+		captionInputHandler();
+	});
+
+	captionin.addEventListener("input", () => {
+		stopAsyncProcesses();
 		captionInputHandler();
 	});
 
@@ -503,8 +515,7 @@
 	upload.addEventListener("load", drawUpload);
 	upload.addEventListener("error", (event) => {
 		console.error(event);
-		drawUpload;
-		mockingSpongeBob.drawn = { isErrored: false };
+		mockingSpongeBob.drawn = { isErrored: true };
 		drawText({ lines: ["There was an error", "uploading the image"], fontSize: 45 }, "#ff0000");
 	});
 
@@ -560,7 +571,13 @@
 
 	function updateShareButtons() {
 		const haveCopyPermissions = !!navigator.clipboard;
-		const mode = mockingSpongeBob.drawn.mode;
+		const { mode, isErrored } = mockingSpongeBob.drawn;
+
+		if (isErrored) {
+			copyTextBtn.disabled = true;
+			copyLinkBtn.disabled = true;
+			return;
+		}
 
 		if (mode === "image") {
 			copyTextBtn.disabled = true;
@@ -635,7 +652,7 @@
 			}
 		}
 		if (!imageinRadio.checked) {
-			mockingSpongeBob.cameraStop();
+			mockingSpongeBob.cameraStop?.();
 		}
 	}
 
