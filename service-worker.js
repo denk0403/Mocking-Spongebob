@@ -52,7 +52,7 @@ self.addEventListener("install", (e) => {
 
 // Allow service worker to control current page on next load
 self.addEventListener("activate", (e) => {
-	console.log("Activating new worker");
+	console.log("Activating new service worker");
 	e.waitUntil(clients.claim());
 });
 
