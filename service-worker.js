@@ -1,8 +1,8 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v6";
+const cacheName = "mockSpongebob-v7";
 
 // Assets to be used for offline availability
-const staticAssets = [
+const precachedAssets = [
 	// Image files
 	"./img/spongebob.jpg",
 	"./img/icon.png",
@@ -10,12 +10,12 @@ const staticAssets = [
 	"./img/icon-192.png",
 	"./img/icon-512.png",
 	"./img/apple_app_icon.png",
-	"./img/camera-icon.png",
-	"./img/camera-trigger.png",
-	"./img/camera-flip.png",
-	"./img/chrome_store_logo.png",
-	"./img/microphoneOff.png",
-	"./img/microphoneOn.png",
+	"./img/webp/camera-icon.webp",
+	"./img/webp/camera-icon-active.webp",
+	"./img/webp/camera-trigger.webp",
+	"./img/webp/camera-flip.webp",
+	"./img/webp/microphoneOff.webp",
+	"./img/webp/microphoneOn.webp",
 
 	// Display files
 	"./css/styles.css",
@@ -30,48 +30,51 @@ const staticAssets = [
 	"./js/mockTypes.js",
 	"./js/demonstration.js",
 
+	// MathJax
+	"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js",
+
 	// Other
 	"./",
 	"./manifest.json",
 ];
 
 // During the installation phase, you'll usually want to cache static assets.
-self.addEventListener("install", async (e) => {
-	// Once the service worker is installed, go ahead and fetch the resources to make this work offline.
-	const cache = await caches.open(cacheName);
-	await cache.addAll(staticAssets);
-	return self.skipWaiting();
+self.addEventListener("install", (e) => {
+	self.skipWaiting();
+
+	// Precache assets on install
+	e.waitUntil(
+		caches.open(cacheName).then((cache) => {
+			return cache.addAll(precachedAssets);
+		})
+	);
 });
 
 // Allow service worker to control current page on next load
-self.addEventListener("activate", async (e) => {
-	await self.clients.claim();
+self.addEventListener("activate", (e) => {
+	console.log("Activating new worker");
+	e.waitUntil(clients.claim());
 });
 
 // Intercepts when the browser fetches a URL to check cache
-self.addEventListener("fetch", async (e) => {
-	const req = e.request;
-	e.respondWith(cacheFirst(req));
-});
+self.addEventListener("fetch", (e) => e.respondWith(cacheFirst(e.request)));
 
 // Returns a match from the cache first, only making a network request if necessary
 async function cacheFirst(req) {
 	const cache = await caches.open(cacheName);
 	const cached = await cache.match(req);
-	const network = networkAndCache(req);
-	return cached || (await network);
+	return cached ?? networkAndCache(cache, req);
 }
 
 // Makes the network request immediately if possible,
 // and saves the result in cache for future offline use
-async function networkAndCache(req) {
-	const cache = await caches.open(cacheName);
+async function networkAndCache(cache, req) {
 	try {
 		const fresh = await fetch(req);
-		await cache.put(req, fresh.clone());
+		await cache.put(req, fresh.clone()); // must clone before use
 		return fresh;
 	} catch (e) {
-		const cached = await cache.match(req);
-		return cached;
+		console.error(e);
+		return;
 	}
 }

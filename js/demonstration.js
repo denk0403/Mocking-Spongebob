@@ -1,7 +1,7 @@
 "use strict";
 {
 	/** @type {HTMLInputElement} */
-	const caption = document.getElementById("caption"),
+	const captionin = document.getElementById("caption"),
 		/** @type {HTMLInputElement} */
 		captionRadio = document.getElementById("captionRadio"),
 		/** @type {HTMLCanvasElement} */
@@ -26,10 +26,10 @@
 			str ??= "";
 
 			captionRadio.click();
-			caption.value = str;
+			captionin.value = str;
 
 			let start = performance.now();
-			caption.dispatchEvent(new CustomEvent("demoinput"));
+			captionin.dispatchEvent(new CustomEvent("demoinput"));
 			queueMicrotask(() => console.log(performance.now() - start));
 		};
 
@@ -39,8 +39,8 @@
 			str = str.trim();
 
 			captionRadio.click();
-			caption.value = "";
-			caption.dispatchEvent(new CustomEvent("demoinput"));
+			captionin.value = "";
+			captionin.dispatchEvent(new CustomEvent("demoinput"));
 
 			if (!str) return;
 
@@ -48,8 +48,8 @@
 			const start = performance.now();
 
 			this.#timer = setInterval(() => {
-				caption.value += str.charAt(index++);
-				caption.dispatchEvent(new CustomEvent("demoinput"));
+				captionin.value += str.charAt(index++);
+				captionin.dispatchEvent(new CustomEvent("demoinput"));
 
 				if (index >= str.length) {
 					const end = performance.now();
@@ -68,8 +68,8 @@
 			time ??= 0;
 
 			captionRadio.click();
-			caption.value = "";
-			caption.dispatchEvent(new CustomEvent("demoinput"));
+			captionin.value = "";
+			captionin.dispatchEvent(new CustomEvent("demoinput"));
 
 			if (!str) return;
 
@@ -80,8 +80,8 @@
 					return callback?.();
 				}
 
-				caption.value += str.charAt(index++);
-				caption.dispatchEvent(new CustomEvent("demoinput"));
+				captionin.value += str.charAt(index++);
+				captionin.dispatchEvent(new CustomEvent("demoinput"));
 			}, time);
 
 			return this.#timer;
@@ -93,8 +93,8 @@
 			this.stopTimer();
 
 			captionRadio.click();
-			caption.value = "؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁";
-			caption.dispatchEvent(new CustomEvent("demoinput"));
+			captionin.value = "؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁؁";
+			captionin.dispatchEvent(new CustomEvent("demoinput"));
 		};
 
 		createVideo = (str, time) => {
@@ -122,6 +122,8 @@
 			mediaRecorder.start();
 			this.typeIn(str, time, () => mediaRecorder.stop());
 		};
+
+		timeTypeLoremIpsumText = () => this.timeType(TEXT);
 	}
 
 	mockingSpongeBob.demo = new Demo();

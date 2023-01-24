@@ -9,6 +9,8 @@
 		cameraTrigger = document.getElementById("camera--trigger"),
 		/** @type {HTMLButtonElement} */
 		cameraToggle = document.getElementById("camera--toggle"),
+		/** @type {HTMLImageElement} */
+		cameraToggleImg = document.getElementById("camera--toggle-img"),
 		/** @type {HTMLButtonElement} */
 		cameraFlip = document.getElementById("camera--flip"),
 		upload = document.getElementById("upload");
@@ -19,6 +21,7 @@
 	let track;
 
 	const cameraStop = () => {
+		cameraToggleImg.src = "./img/webp/camera-icon.webp";
 		cameraApp.style.display = "none";
 		cameraView.pause();
 		track?.stop();
@@ -44,6 +47,8 @@
 		navigator.mediaDevices
 			.getUserMedia?.(constraints)
 			.then((stream) => {
+				cameraToggleImg.src = "./img/webp/camera-icon-active.webp";
+
 				track = stream.getTracks()[0];
 				cameraView.srcObject = stream;
 
