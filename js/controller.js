@@ -159,7 +159,7 @@
 	const processSearch = (search) => {
 		const searchParams = new URLSearchParams(search);
 		let encodedText = searchParams.get("text") ?? "",
-			mode = searchParams.get("mode") ?? "asl",
+			mode = searchParams.get("mode") ?? "altsl",
 			color = searchParams.get("color") ?? "#ffffff",
 			animateTime = Number.parseFloat(searchParams.get("animate"));
 

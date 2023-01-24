@@ -85,14 +85,12 @@
 
 		recognition.addEventListener("audiostart", () => {
 			mockingSpongeBob.cameraStop?.();
-			microphoneOffBtn.insertAdjacentElement("afterend", microphoneOnBtn);
-			microphoneOffBtn.remove();
+			microphoneOffBtn.replaceWith(microphoneOnBtn);
 			languageSelector.disabled = true;
 		});
 
 		recognition.addEventListener("audioend", () => {
-			microphoneOnBtn.insertAdjacentElement("afterend", microphoneOffBtn);
-			microphoneOnBtn.remove();
+			microphoneOnBtn.replaceWith(microphoneOffBtn);
 			languageSelector.disabled = false;
 		});
 
@@ -100,6 +98,7 @@
 			console.error(event);
 			recognition.abort();
 
+			// handle iOS PWA error
 			if (event.error === "service-not-allowed") {
 				microphoneOffBtn.remove();
 				microphoneOnBtn.remove();
@@ -169,7 +168,7 @@
 		// update DOM
 		microphoneOffBtn.appendChild(microphoneOffImg);
 		microphoneOnBtn.appendChild(microphoneOnImg);
-		captionLabel.insertAdjacentElement("beforeend", microphoneOffBtn);
+		captionLabel.appendChild(microphoneOffBtn);
 		languageSelector.append(...getLanguageSelectorOptions());
 		languageLabel.appendChild(languageSelector);
 		document.body.insertAdjacentElement("beforeend", languageLabel);

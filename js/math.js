@@ -140,7 +140,7 @@
 	const processMathSearch = (search) => {
 		const searchParams = new URLSearchParams(search);
 		let encodedText = searchParams.get("text") ?? "",
-			mode = searchParams.get("mode") ?? "asl",
+			mode = searchParams.get("mode"),
 			color = searchParams.get("color") ?? "#ffffff";
 
 		if (mode === "math") {

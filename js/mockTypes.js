@@ -1,5 +1,9 @@
 "use strict";
 {
+	// prettier-ignore
+	/** @type {Object.<string, string | undefined>} */
+	const cursedMap = {a:"aãåāàáâäąă",b:"bƄ",c:"cçĉ¢ċč",d:"dďđḍ",e:"eēêĕëėęèé",f:"fƒ",g:"gġĝğ",h:"hĥħ",i:"i!ìïĭįīîí",j:"jĵ",k:"ķk",l:"l",m:"m",n:"nñṅń",o:"oõōøòöôó",p:"p",q:"qǫ",r:"rṛŕŗř",s:"s$śṣšş",t:"tṭţŧ",u:"uūüũùûúůű",v:"v",w:"wŵω",x:"x×",y:"y¥ýÿŷ",z:"zƶžźžż",A:"AÃÅĀÀÁÂÄĂĄ",B:"BẞƁɃ",C:"CĆĈČÇĊÇ",D:"DĎḌÐ",E:"EƎĒÊĔËÈĘĖÉ£Ʃ",F:"ƑF",G:"GĠĜĢĞ",H:"HĤ",I:"IÌÏĪĬÎÍ",J:"JĴ",K:"KĶ",L:"LŁĿĽ",M:"M",N:"NÑŊŃƝ",O:"OÕŌØÒÖÔΘÓ0",P:"PƤ",Q:"QǬǪ",R:"RṚŔŖŘ",S:"S$ŚṢŠŞ",T:"TṬŤŦͲ",U:"UŪŨÜŮŰÙÛÚ",V:"V",W:"WŴƜ",X:"X",Y:"YÝŶŸ",Z:"ZƵŽŻŽŹ"};
+
 	const mockTypes = {
 		cu: {
 			id: "cu",
@@ -7,131 +11,175 @@
 			apply: (str = "") => str,
 			htmlOption: document.createElement("option"),
 		},
-		asl: {
-			id: "asl",
+		altsl: {
+			id: "altsl",
 			name: "Alternating: starting lower",
 			apply: (str = "") => {
 				let result = "";
 				let lower = true;
-				for (let c of str) {
-					result += lower ? c.toLowerCase() : c.toUpperCase();
-					if (c.match(/[a-z]/i)) lower = !lower;
+				for (const ch of str) {
+					result += lower ? ch.toLowerCase() : ch.toUpperCase();
+					if (ch.match(/[a-z]/i)) lower = !lower;
 				}
 				return result;
 			},
 			htmlOption: document.createElement("option"),
 		},
-		asu: {
-			id: "asu",
+		altsu: {
+			id: "altsu",
 			name: "Alternating: starting upper",
 			apply: (str = "") => {
 				let result = "";
 				let lower = false;
-				for (let c of str) {
-					result += lower ? c.toLowerCase() : c.toUpperCase();
-					if (c.match(/[a-z]/i)) lower = !lower;
+				for (const ch of str) {
+					result += lower ? ch.toLowerCase() : ch.toUpperCase();
+					if (ch.match(/[a-z]/i)) lower = !lower;
 				}
 				return result;
 			},
 			htmlOption: document.createElement("option"),
 		},
-		au: {
-			id: "au",
+		upper: {
+			id: "upper",
 			name: "All Upper",
 			apply: (str = "") => str.toUpperCase(),
 			htmlOption: document.createElement("option"),
 		},
-		al: {
-			id: "al",
+		lower: {
+			id: "lower",
 			name: "All Lower",
 			apply: (str = "") => str.toLowerCase(),
 			htmlOption: document.createElement("option"),
 		},
-		awsu: {
-			id: "awsu",
+		altwsu: {
+			id: "altwsu",
 			name: "Alternating: words start upper",
 			apply: (str = "") => {
 				return str
 					.split(" ")
-					.map((str) => mockTypes.asu.apply(str))
+					.map((str) => mockTypes.altsu.apply(str))
 					.join(" ");
 			},
 			htmlOption: document.createElement("option"),
 		},
-		awsl: {
-			id: "awsl",
+		altwsl: {
+			id: "altwsl",
 			name: "Alternating: words start lower",
 			apply: (str = "") => {
 				return str
 					.split(" ")
-					.map((str) => mockTypes.asl.apply(str))
+					.map((str) => mockTypes.altsl.apply(str))
 					.join(" ");
 			},
 			htmlOption: document.createElement("option"),
 		},
-		ar: {
-			id: "ar",
-			name: "All Random",
+		rand: {
+			id: "rand",
+			name: "Random",
 			apply: (str = "") => {
 				let result = "";
-				let lower = Math.random() < 0.5;
-				for (let c of str) {
-					result += lower ? c.toLowerCase() : c.toUpperCase();
-					if (c.match(/[a-z]/i)) lower = Math.random() < 0.5;
+				for (const ch of str) {
+					const lower = Math.random() < 0.5;
+					result += lower ? ch.toLowerCase() : ch.toUpperCase();
 				}
 				return result;
 			},
 			htmlOption: document.createElement("option"),
 		},
-		rsu: {
-			id: "rsu",
-			name: "Random: starting upper",
-			apply: (str = "") => {
-				let result = "";
-				let lower = false;
-				for (let c of str) {
-					result += lower ? c.toLowerCase() : c.toUpperCase();
-					if (c.match(/[a-z]/i)) lower = Math.random() < 0.5;
-				}
-				return result;
-			},
-			htmlOption: document.createElement("option"),
-		},
-		rsl: {
-			id: "rsl",
-			name: "Random: starting lower",
-			apply: (str = "") => {
-				let result = "";
-				let lower = true;
-				for (let c of str) {
-					result += lower ? c.toLowerCase() : c.toUpperCase();
-					if (c.match(/[a-z]/i)) lower = Math.random() < 0.5;
-				}
-				return result;
-			},
-			htmlOption: document.createElement("option"),
-		},
-		rwsu: {
-			id: "rwsu",
+		randwsu: {
+			id: "randwsu",
 			name: "Random: words start upper",
 			apply: (str = "") => {
 				return str
 					.split(" ")
 					.map((str) => {
-						return mockTypes.rsu.apply(str);
+						let result = "";
+						let lower = false;
+						for (const ch of str) {
+							result += lower ? ch.toLowerCase() : ch.toUpperCase();
+							lower = Math.random() < 0.5;
+						}
+						return result;
 					})
 					.join(" ");
 			},
 			htmlOption: document.createElement("option"),
 		},
-		rwsl: {
-			id: "rwsl",
+		randwsl: {
+			id: "randwsl",
 			name: "Random: words start lower",
 			apply: (str = "") => {
 				return str
 					.split(" ")
-					.map((str) => mockTypes.rsl.apply(str))
+					.map((str) => {
+						let result = "";
+						let lower = true;
+						for (const ch of str) {
+							result += lower ? ch.toLowerCase() : ch.toUpperCase();
+							lower = Math.random() < 0.5;
+						}
+						return result;
+					})
 					.join(" ");
+			},
+			htmlOption: document.createElement("option"),
+		},
+		cursed: {
+			id: "cursed",
+			name: "Cursed",
+			apply: (str = "") => {
+				let i = 0;
+				const result = [];
+				for (const ch of str) {
+					const cursedValues = cursedMap[ch];
+					if (cursedValues && cursedValues.length > 1) {
+						result[i++] = cursedValues.charAt(i % cursedValues.length);
+					} else {
+						result[i++] = ch;
+					}
+				}
+				return result.join("");
+			},
+			htmlOption: document.createElement("option"),
+		},
+		altcursed: {
+			id: "altcursed",
+			name: "Alternating: cursed",
+			apply: (str = "") => {
+				let lower = true;
+				let i = 0;
+				const result = [];
+				for (const ch of str) {
+					const altCh = lower ? ch.toLowerCase() : ch.toUpperCase();
+					const cursedValues = cursedMap[altCh];
+					if (cursedValues && cursedValues.length > 1) {
+						result[i++] = cursedValues.charAt(i % cursedValues.length);
+					} else {
+						result[i++] = altCh;
+					}
+
+					if (ch.match(/[a-z]/i)) lower = !lower;
+				}
+				return result.join("");
+			},
+			htmlOption: document.createElement("option"),
+		},
+		randcursed: {
+			id: "randcursed",
+			name: "Random: cursed",
+			apply: (str = "") => {
+				let i = 0;
+				const result = [];
+				for (const ch of str) {
+					const altCh = Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase();
+					const cursedValues = cursedMap[altCh];
+					if (cursedValues && cursedValues.length > 1) {
+						result[i++] = cursedValues.charAt(i % cursedValues.length);
+					} else {
+						result[i++] = altCh;
+					}
+				}
+				return result.join("");
 			},
 			htmlOption: document.createElement("option"),
 		},
@@ -152,8 +200,8 @@
 		.sort((mock1, mock2) => mock1.name.localeCompare(mock2.name))
 		.forEach((mock) => mockSelector.appendChild(mock.htmlOption));
 
-	mockingSpongeBob.currentMock = mockTypes.asl;
-	mockTypes.asl.htmlOption.selected = true;
+	mockingSpongeBob.currentMock = mockTypes.altsl;
+	mockTypes.altsl.htmlOption.selected = true;
 
 	mockSelector.addEventListener("input", (event) => {
 		mockingSpongeBob.currentMock = mockTypes[event.currentTarget.value];
