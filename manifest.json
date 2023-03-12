@@ -7,6 +7,9 @@
 	"background_color": "#b7e9b4",
 	"theme_color": "#b7e9b4",
 	"categories": ["entertainment", "social", "productivity"],
+	"launch_handler": {
+		"client_mode": "navigate-existing"
+	},
 	"icons": [
 		{
 			"src": "./img/icon-144.png",

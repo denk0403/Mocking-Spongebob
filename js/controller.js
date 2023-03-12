@@ -54,7 +54,7 @@
 	canvas.width = img.width;
 	canvas.height = img.height;
 	ctx.lineJoin = "round";
-	ctx.textBaseline = "bottom";
+	ctx.textBaseline = "top";
 	ctx.imageSmoothingQuality = "high";
 	ctx.textRendering = "optimizeLegibility";
 	ctx.textAlign = "center";
@@ -236,10 +236,6 @@
 		return ctx.measureText(str).width;
 	}
 
-	function maxNumberOfLines(fontSize) {
-		return Math.ceil(INITIAL_FONT_SIZE / fontSize);
-	}
-
 	/**
 	 * @typedef CaptionFormat
 	 * @property {string[]} lines
@@ -286,20 +282,22 @@
 		 * @returns {(word: string) => boolean} A procedure to determine if a word will fit.
 		 */
 		function fitIntoLinesAtSize(fontSize, boxWidth) {
+			const maxNumberOfLines = ~~(INITIAL_FONT_SIZE / fontSize);
+
 			return (/** @type {string} */ word) => {
 				const modifiedLine = linesByWord.at(-1).concat(word).join(" ").trim();
 
 				// checks if adding new word exceeds the last line's box width
-				if (getTextWidth(modifiedLine) >= boxWidth) {
+				if (getTextWidth(modifiedLine) > boxWidth) {
 					// check if a single word is too big to fit
-					if (getTextWidth(word) >= boxWidth) {
+					if (getTextWidth(word) > boxWidth) {
 						return false;
 					}
 
 					// create a new line
 					linesByWord.push([word]);
 					// return if we have exceeded the maximum allowed lines
-					return linesByWord.length < maxNumberOfLines(fontSize);
+					return linesByWord.length <= maxNumberOfLines;
 				} else {
 					// add the word if it fits on the last line
 					linesByWord.at(-1).push(word);
@@ -322,6 +320,8 @@
 		let lowerFontSize = MIN_FONT_SIZE - 1; // always safe
 		let upperFontSize = INITIAL_FONT_SIZE; // possibly too large
 
+		let numberOfLines = 0;
+
 		// Binary search through font size range
 		// This determines the maximum font size that fits all the text into the region
 		while (lowerFontSize !== upperFontSize) {
@@ -332,6 +332,7 @@
 
 			if (formattedAllWords) {
 				lowerFontSize = currentFontSize + 1;
+				numberOfLines = linesByWord.length;
 			} else {
 				upperFontSize = currentFontSize;
 			}
@@ -348,18 +349,20 @@
 		let lowerBoxWidth = MIN_LINE_BOX_WIDTH - 1; // possibly too small
 		let upperBoxWidth = MAX_LINE_BOX_WIDTH; // always safe
 
-		// Binary search through max width range
-		// This determines the minimum width that optimally balances the text within the region
-		while (lowerBoxWidth !== upperBoxWidth) {
-			// Try new middle max width
-			const currentBoxWidth = ~~((upperBoxWidth + lowerBoxWidth) / 2);
+		if (numberOfLines > 1) {
+			// Binary search through max width range
+			// This determines the minimum width that optimally balances the text within the region
+			while (lowerBoxWidth !== upperBoxWidth) {
+				// Try new middle max width
+				const currentBoxWidth = ~~((upperBoxWidth + lowerBoxWidth) / 2);
 
-			const formattedAllWords = tryFormatAllWords(finalFontSize, currentBoxWidth);
+				const formattedAllWords = tryFormatAllWords(finalFontSize, currentBoxWidth);
 
-			if (formattedAllWords) {
-				upperBoxWidth = currentBoxWidth;
-			} else {
-				lowerBoxWidth = currentBoxWidth + 1;
+				if (formattedAllWords) {
+					upperBoxWidth = currentBoxWidth;
+				} else {
+					lowerBoxWidth = currentBoxWidth + 1;
+				}
 			}
 		}
 
@@ -464,25 +467,21 @@
 			return repaint();
 		}
 
+		const LINE_WIDTH_SHRINK_FACTOR = 8;
+		const PADDING = 4 / Math.ceil(lines.length / 3); // gap between lines: decrease gap every 3 lines
+
 		ctx.fillStyle = color;
 		ctx.font = `bold ${fontSize}px Arial`;
-
-		const LINE_WIDTH_SHRINK_FACTOR = 9;
 		ctx.lineWidth = fontSize / LINE_WIDTH_SHRINK_FACTOR;
 
-		const BOTTOM_MARGIN = 4;
+		const centerX = canvas.width / 2;
+		const boxBottom = img.height - ctx.lineWidth / 2;
 
-		const xloc = canvas.width / 2;
-		const yloc =
-			img.height - // start at bottom of canvas
-			(lines.length - 1) * fontSize - // account for the number of lines to move up
-			ctx.lineWidth / 2 - // account for the outer border thickness
-			ctx.measureText(lines[lines.length - 1]).actualBoundingBoxDescent - // align bottom of bounding boxes
-			BOTTOM_MARGIN; // create a bottom margin
-
-		for (let i = 0; i < lines.length; i++) {
-			ctx.strokeText(lines[i], xloc, yloc + i * fontSize); // draw border
-			ctx.fillText(lines[i], xloc, yloc + i * fontSize); // draw filled texts
+		let offset = 0;
+		for (let i = lines.length - 1; i >= 0; i--) {
+			offset += ctx.measureText(lines[i]).actualBoundingBoxDescent + PADDING;
+			ctx.strokeText(lines[i], centerX, boxBottom - offset); // draw text border
+			ctx.fillText(lines[i], centerX, boxBottom - offset); // draw text fill
 		}
 
 		repaint();
