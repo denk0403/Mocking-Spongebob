@@ -44,6 +44,8 @@
 		copyTextTxt = document.getElementById("cpy-text-txt"),
 		reader = new FileReader();
 
+	img.decode(); // maybe a fix for mobile safari
+
 	let shareData = null;
 
 	const INITIAL_FONT_SIZE = 100; // in pixels
@@ -467,21 +469,22 @@
 			return repaint();
 		}
 
-		const LINE_WIDTH_SHRINK_FACTOR = 8;
-		const PADDING = 4 / Math.ceil(lines.length / 3); // gap between lines: decrease gap every 3 lines
+		const BOTTOM_MARGIN = 4;
+		const DEFAULT_LINE_WIDTH = 16;
+		const SHRINK_FACTOR = fontSize / INITIAL_FONT_SIZE;
+		const centerX = canvas.width / 2;
+		const boxBottom = img.height - BOTTOM_MARGIN;
 
 		ctx.fillStyle = color;
 		ctx.font = `bold ${fontSize}px Arial`;
-		ctx.lineWidth = fontSize / LINE_WIDTH_SHRINK_FACTOR;
+		ctx.lineWidth = DEFAULT_LINE_WIDTH * SHRINK_FACTOR;
 
-		const centerX = canvas.width / 2;
-		const boxBottom = img.height - ctx.lineWidth / 2;
-
-		let offset = 0;
+		// draw lines from bottom to top
+		let offset = ctx.lineWidth / 2; // from box bottom
 		for (let i = lines.length - 1; i >= 0; i--) {
-			offset += ctx.measureText(lines[i]).actualBoundingBoxDescent + PADDING;
-			ctx.strokeText(lines[i], centerX, boxBottom - offset); // draw text border
-			ctx.fillText(lines[i], centerX, boxBottom - offset); // draw text fill
+			offset -= ctx.measureText(lines[i]).actualBoundingBoxDescent + ctx.lineWidth;
+			ctx.strokeText(lines[i], centerX, boxBottom + offset); // draw text border
+			ctx.fillText(lines[i], centerX, boxBottom + offset); // draw text fill
 		}
 
 		repaint();
