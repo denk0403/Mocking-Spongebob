@@ -43,15 +43,21 @@
 			captionin.dispatchEvent(new CustomEvent("demoinput"));
 
 			if (!str) return;
+			const unicodeCodePoints = [...str];
 
 			let index = 0;
 			const start = performance.now();
 
+			if (index >= unicodeCodePoints.length) {
+				const end = performance.now();
+				console.log("Time:", end - start);
+			}
+
 			this.#timer = setInterval(() => {
-				captionin.value += str.charAt(index++);
+				captionin.value += unicodeCodePoints[index++];
 				captionin.dispatchEvent(new CustomEvent("demoinput"));
 
-				if (index >= str.length) {
+				if (index >= unicodeCodePoints.length) {
 					const end = performance.now();
 					console.log("Time:", end - start);
 					this.stopTimer();
@@ -61,6 +67,13 @@
 			return this.#timer;
 		};
 
+		/**
+		 *
+		 * @param {string} str
+		 * @param {number} time
+		 * @param {() => any} callback A callback to execute once the function is
+		 * @returns
+		 */
 		typeEach = (str, time, callback) => {
 			this.stopTimer();
 			str ??= "";
@@ -72,16 +85,21 @@
 			captionin.dispatchEvent(new CustomEvent("demoinput"));
 
 			if (!str) return;
+			const unicodeCodePoints = [...str];
 
 			let index = 0;
+			if (index >= unicodeCodePoints.length) {
+				return callback?.();
+			}
+
 			this.#timer = setInterval(() => {
-				if (index >= str.length) {
+				captionin.value += unicodeCodePoints[index++];
+				captionin.dispatchEvent(new CustomEvent("demoinput"));
+
+				if (index >= unicodeCodePoints.length) {
 					this.stopTimer();
 					return callback?.();
 				}
-
-				captionin.value += str.charAt(index++);
-				captionin.dispatchEvent(new CustomEvent("demoinput"));
 			}, time);
 
 			return this.#timer;

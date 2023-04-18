@@ -44,24 +44,24 @@
 		copyTextTxt = document.getElementById("cpy-text-txt"),
 		reader = new FileReader();
 
-	img.decode(); // maybe a fix for mobile safari
+	const whenImgLoaded = img.decode();
 
 	let shareData = null;
 
 	const INITIAL_FONT_SIZE = 100; // in pixels
 
-	const BASE_URL = `${location.origin}${location.pathname}`;
-
-	//set-up canvas context
-	canvas.width = img.width;
-	canvas.height = img.height;
-	ctx.lineJoin = "round";
-	ctx.textBaseline = "top";
-	ctx.imageSmoothingQuality = "high";
-	ctx.textRendering = "optimizeLegibility";
-	ctx.textAlign = "center";
-	ctx.strokeStyle = "black";
-	ctx.fillStyle = "white";
+	//set-up canvas context once background image loads
+	whenImgLoaded.then(() => {
+		canvas.width = img.width;
+		canvas.height = img.height;
+		ctx.lineJoin = "round";
+		ctx.textBaseline = "top";
+		ctx.imageSmoothingQuality = "high";
+		ctx.textRendering = "optimizeLegibility";
+		ctx.textAlign = "center";
+		ctx.strokeStyle = "black";
+		ctx.fillStyle = "white";
+	});
 
 	const clearAllFields = (mockingSpongeBob.clearFields = () => {
 		captionin.value = "";
@@ -109,61 +109,13 @@
 		resetTemplate();
 	});
 
-	/**
-	 * Parses the given hash and renders the encoded meme.
-	 * This should only be called once!
-	 * @deprecated
-	 * @param {string} hash
-	 * @returns
-	 */
-	const processHash_DEPRECATED = (hash = "") => {
-		if (!hash) {
-			return window.addEventListener("load", () => captionRadio.click(), { once: true });
-		}
-
-		// hash format: #mockType:<type>:<content>
-		// ex: #mockType:asl:74:65:73:74
-		const HASH_PREFIX = "#mockType:";
-		if (hash.startsWith(HASH_PREFIX)) {
-			const hashSecondColonIndex = hash.indexOf(":", HASH_PREFIX.length);
-
-			const mockTypeId = hash.slice(HASH_PREFIX.length, hashSecondColonIndex);
-
-			const mockType = mockingSpongeBob.mockTypes[mockTypeId];
-
-			if (mockType) {
-				/** @type {HTMLOptionElement} */
-				const mockOption = document.getElementById(mockType.id);
-
-				mockOption.selected = true;
-				mockingSpongeBob.currentMock = mockType;
-
-				const contentPrefixIndex = hash.indexOf(":", 10);
-				if (~contentPrefixIndex) {
-					try {
-						clearAllFields();
-						captionin.value = hash
-							.slice(contentPrefixIndex + 1) // hash includes '#' when present
-							.split(":")
-							.map((char) => String.fromCodePoint(parseInt(char, 16)))
-							.join("");
-
-						img.decode().then(() => formatAndDrawText(captionin.value, captionColorInput.value));
-					} catch (err) {
-						console.error(err);
-						title.click();
-					}
-				}
-			}
-		}
-	};
-
 	const processSearch = (search) => {
 		const searchParams = new URLSearchParams(search);
 		let encodedText = searchParams.get("text") ?? "",
+			quick_query = searchParams.get("q") ?? "",
 			mode = searchParams.get("mode") ?? "altsl",
 			color = searchParams.get("color") ?? "#ffffff",
-			animateTime = Number.parseFloat(searchParams.get("animate"));
+			animateTime = Number.parseFloat(searchParams.get("animate")); // in seconds
 
 		if (mode in mockingSpongeBob.mockTypes) {
 			const mockType = mockingSpongeBob.mockTypes[mode];
@@ -174,15 +126,15 @@
 			}
 
 			// ensure image has finished decoding
-			img.decode().then(() => {
+			whenImgLoaded.then(() => {
 				captionColorInput.value = color;
 				captionColorInput.dispatchEvent(new InputEvent("input"));
 
-				if (!encodedText) {
+				if (!encodedText && !quick_query) {
 					captionin.focus();
 				} else {
 					captionin.blur();
-					const decodedText = mockingSpongeBob.decodeText(encodedText);
+					const decodedText = quick_query || mockingSpongeBob.decodeText(encodedText);
 
 					if (!Number.isNaN(animateTime))
 						return mockingSpongeBob.demo.typeIn(decodedText, animateTime * 1000);
@@ -556,7 +508,7 @@
 
 				shareData = {
 					files: [file],
-					text: `Mocking SpongeBob Meme Generator - ${BASE_URL}`,
+					// text: `Mocking SpongeBob Meme Generator - ${BASE_URL}`,
 				};
 
 				const canShare = navigator.canShare(shareData);
@@ -661,18 +613,17 @@
 	let copyLinkTimer;
 	function copyLink() {
 		if (navigator.clipboard) {
-			let urlStr = BASE_URL;
+			const resultURL = new URL(location.pathname, location.origin);
 
 			const trimmedStr = captionin.value.trim();
 			if (trimmedStr !== "") {
-				const url = new URL(location);
-				url.searchParams.set("mode", mockingSpongeBob.currentMock.id);
-				url.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
-				url.searchParams.set("color", captionColorInput.value);
-				urlStr = url.toString();
+				resultURL.searchParams.set("mode", mockingSpongeBob.currentMock.id);
+				resultURL.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
+				resultURL.searchParams.set("color", captionColorInput.value);
 			}
 
-			navigator.clipboard.writeText(urlStr).then(() => {
+			const resultURLStr = resultURL.toString();
+			navigator.clipboard.writeText(resultURLStr).then(() => {
 				copyLinkTxt.textContent = "Copied!";
 
 				clearTimeout(copyLinkTimer);
@@ -714,9 +665,7 @@
 	}
 
 	updateShareButtons();
-	if (location.hash) {
-		processHash_DEPRECATED(location.hash);
-	} else if (location.search) {
+	if (location.search) {
 		processSearch(location.search);
 	} else {
 		captionin.focus();

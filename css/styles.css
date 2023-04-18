@@ -239,6 +239,7 @@ form :is(input, select, button) {
 #caption,
 #imagein,
 #mathin {
+	scroll-margin-block: 10px;
 	padding: 7px;
 	border-radius: 5px;
 	width: 100%;

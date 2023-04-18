@@ -1,5 +1,5 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v10";
+const cacheName = "mockSpongebob-v1.2";
 
 // Assets to be used for offline availability
 const precachedAssets = [
@@ -40,14 +40,17 @@ const precachedAssets = [
 
 // During the installation phase, you'll usually want to cache static assets.
 self.addEventListener("install", (e) => {
-	self.skipWaiting();
+	self.skipWaiting(); // forces this service worker to become the active service worker.
 
-	// Precache assets on install
-	e.waitUntil(
-		caches.open(cacheName).then((cache) => {
-			return cache.addAll(precachedAssets);
-		})
-	);
+	// delete old cache, then
+	// precache updated assets
+	const refreshCacheTask = caches
+		.keys()
+		.then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+		.then(() => caches.open(cacheName))
+		.then((cache) => cache.addAll(precachedAssets));
+
+	e.waitUntil(refreshCacheTask);
 });
 
 // Allow service worker to control current page on next load

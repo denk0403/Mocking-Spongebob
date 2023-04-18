@@ -118,25 +118,6 @@
 		// The meme will be repainted by the 'upload' handler
 	}
 
-	/**
-	 * @deprecated
-	 * @param {string} hash
-	 */
-	function processMathHash_DEPRECATED(hash) {
-		try {
-			clearFields();
-			mathin.value = hash
-				.slice(6) // hash includes '#' when present
-				.split(":")
-				.map((char) => char && String.fromCodePoint(parseInt(char, 16)))
-				.join("");
-
-			drawMathText(mathin.value, mathColorInput.value);
-		} catch (err) {
-			console.error("Oops. Something went wrong.", err);
-		}
-	}
-
 	const processMathSearch = (search) => {
 		const searchParams = new URLSearchParams(search);
 		let encodedText = searchParams.get("text") ?? "",
@@ -180,12 +161,7 @@
 		});
 
 		mathinRadioLabel.style.display = "inline";
-		if (location.hash.startsWith("#math:")) {
-			mathinRadio.click();
-			mathin.blur();
-			processMathHash_DEPRECATED(location.hash);
-			copyLinkBtn.onclick = copyLink;
-		} else if (location.search) {
+		if (location.search) {
 			processMathSearch(location.search);
 		}
 
@@ -215,23 +191,20 @@
 		}
 	}
 
-	const BASE_URL = `${location.origin}${location.pathname}`;
-
 	let copyLinkTimer;
 	function copyLink() {
 		if (navigator.clipboard) {
-			let urlStr = BASE_URL;
+			const resultURL = new URL(location.pathname, location.origin);
 
 			const trimmedStr = mathin.value.trim();
 			if (trimmedStr !== "") {
-				const url = new URL(location);
-				url.searchParams.set("mode", "math");
-				url.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
-				url.searchParams.set("color", mathColorInput.value);
-				urlStr = url.toString();
+				resultURL.searchParams.set("mode", "math");
+				resultURL.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
+				resultURL.searchParams.set("color", mathColorInput.value);
 			}
 
-			navigator.clipboard.writeText(urlStr).then(() => {
+			const resultURLStr = resultURL.toString();
+			navigator.clipboard.writeText(resultURLStr).then(() => {
 				copyLinkTxt.textContent = "Copied!";
 
 				clearTimeout(copyLinkTimer);
