@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>Mocking SpongeBob</ShortName>
+    <Description>Search Mocking SpongeBob Meme Generator to quickly generate memes from text.</Description>
+    <Contact>denniskats43@gmail.com</Contact>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Url type="text/html" method="get"
+        template="https://denniskats.dev/Mocking-Spongebob/?q={searchTerms}" />
+</OpenSearchDescription>
