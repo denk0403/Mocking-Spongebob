@@ -1,5 +1,5 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v1.2.1";
+const cacheName = "mockSpongebob-v1.2.2";
 
 // Assets to be used for offline availability
 const precachedAssets = [

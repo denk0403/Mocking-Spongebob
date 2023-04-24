@@ -3,7 +3,7 @@
 	// DOM Constants
 	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById("canvas"),
-		ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }),
+		ctx = canvas.getContext("2d", { alpha: false, desynchronized: true, willReadFrequently: true }),
 		/** @type {HTMLImageElement} */
 		img = document.getElementById("meme"),
 		/** @type {HTMLImageElement} */
