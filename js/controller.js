@@ -91,8 +91,8 @@
 
 	mockingSpongeBob.nextRepaint = (signal) =>
 		new Promise((res, rej) => {
-			signal?.onabort = rej;
-			mirror.addEventListener("load", () => setTimeout(res), {
+			if (signal) signal.onabort = rej;
+			mirror.addEventListener("load", () => res(), {
 				once: true,
 				signal,
 			});
