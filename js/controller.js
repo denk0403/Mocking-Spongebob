@@ -3,7 +3,11 @@
 	// DOM Constants
 	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById("canvas"),
-		ctx = canvas.getContext("2d", { alpha: false, desynchronized: true, willReadFrequently: true }),
+		ctx = canvas.getContext("2d", {
+			alpha: false,
+			desynchronized: true,
+			willReadFrequently: true,
+		}),
 		/** @type {HTMLImageElement} */
 		img = document.getElementById("meme"),
 		/** @type {HTMLImageElement} */
@@ -84,6 +88,15 @@
 		mockingSpongeBob.cameraStop?.();
 		mockingSpongeBob.recognition?.abort();
 	});
+
+	mockingSpongeBob.nextRepaint = (signal) =>
+		new Promise((res, rej) => {
+			signal?.onabort = rej;
+			mirror.addEventListener("load", () => setTimeout(res), {
+				once: true,
+				signal,
+			});
+		});
 
 	// add drag and drop
 	box.addEventListener("dragover", (event) => {
@@ -418,7 +431,7 @@
 		ctx.drawImage(img, 0, 0);
 
 		if (lines.length === 0) {
-			return repaint();
+			return requestRepaint();
 		}
 
 		const BOTTOM_MARGIN = 4;
@@ -439,7 +452,7 @@
 			ctx.fillText(lines[i], centerX, boxBottom + offset); // draw text fill
 		}
 
-		repaint();
+		requestRepaint();
 	}
 
 	function defaultMock(str) {
@@ -482,7 +495,7 @@
 		let newWidth = upload.width * scale;
 		let newHeight = upload.height * scale;
 		ctx.drawImage(upload, 250 - newWidth / 2, canvas.height - 5 - newHeight, newWidth, newHeight);
-		repaint();
+		requestRepaint();
 	}
 
 	/** @type {AbortController} */
@@ -549,7 +562,7 @@
 	 * Re-exports the canvas to the mirror image element,
 	 * as well as updates all sharing methods.
 	 */
-	const repaint = (mockingSpongeBob.repaint = () => {
+	const requestRepaint = (mockingSpongeBob.requestRepaint = () => {
 		const dataURL = canvas.toDataURL("image/jpeg");
 		mirror.src = dataURL;
 		mirror.alt = captionin.value;
@@ -581,7 +594,7 @@
 			reader.readAsDataURL(imagein.files[0]);
 		} else {
 			ctx.drawImage(img, 0, 0);
-			repaint();
+			requestRepaint();
 		}
 	});
 

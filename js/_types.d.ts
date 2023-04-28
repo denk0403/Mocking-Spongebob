@@ -28,6 +28,7 @@ declare global {
 		typeEach(str: string, time: number): number;
 		typeIn(str: string, time: number): number;
 		error(): void;
+		createVideo(str: string, time: number): void;
 	}
 
 	interface MockingSpongeBobApp {
@@ -36,11 +37,17 @@ declare global {
 		toggleDarkmode: () => void;
 		mockTypes: Record<string, MockType | undefined>;
 		currentMock: MockType;
+		/** Encodes an arbitrary string to be used in a shareable URL. */
 		encodeText: (str: string) => string;
+		/** Decodes an arbitrary string used in a shareable URL. */
 		decodeText: (str: string) => string;
 		clearFields: () => void;
+		/** Resets mirror to the default image. */
 		resetTemplate: () => void;
-		repaint: () => void;
+		/** Requests a repaint of the mirror image. */
+		requestRepaint: () => void;
+		/** Async method for awaiting the next repaint. */
+		nextRepaint: (signal: AbortSignal?) => Promise<void>;
 		cameraStop: (() => void)?;
 		recognition: SpeechRecognition?;
 		stopAsyncProcesses: () => void;
