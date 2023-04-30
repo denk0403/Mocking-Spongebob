@@ -98,18 +98,47 @@
 			});
 		});
 
+	/**
+	 * Sets in the input image file.
+	 * @param {DataTransfer} dataTransfer
+	 * @param {{enforceType: boolean | undefined}?} options
+	 */
+	function setImageFile(dataTransfer, options) {
+		options = { enforceType: false, ...options };
+
+		const files = Array.from(dataTransfer.files);
+		const image = options.enforceType
+			? files.find((file) => file.type.startsWith("image/"))
+			: files[0];
+
+		if (image) {
+			const dt = new DataTransfer();
+			dt.items.add(image);
+
+			imagein.files = dt.files;
+			imagein.dispatchEvent(new InputEvent("input"));
+			imageinRadio.click();
+		}
+	}
+
 	// add drag and drop
 	box.addEventListener("dragover", (event) => {
 		event.preventDefault();
 	});
 	box.addEventListener("drop", (event) => {
 		event.preventDefault();
+		if (event.dataTransfer) {
+			setImageFile(event.dataTransfer);
+		}
+	});
 
-		const item = event.dataTransfer?.items?.[0];
-		if (item?.kind === "file") {
-			imageinRadio.click();
-			imagein.files = event.dataTransfer.files;
-			imagein.dispatchEvent(new InputEvent("input"));
+	// add image paste
+	document.addEventListener("paste", (event) => {
+		if (document.activeElement === captionin || document.activeElement === mathin) return;
+
+		if (event.clipboardData?.files?.length) {
+			event.preventDefault();
+			setImageFile(event.clipboardData, { enforceType: true });
 		}
 	});
 
