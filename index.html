@@ -75,6 +75,14 @@
             },
             toggleDarkmode: () => { mockingSpongeBob.isDarkmode = !mockingSpongeBob.isDarkmode; },
             encodeText: (str) => {
+                /**
+                 * NOTE: For reasons beyond me, iMessage does not always correctly parse
+                 * and recognize message links. So, instead of using something simple
+                 * and sensible like:
+                 * `(str) => btoa(encodeURIComponent(str));`,
+                 * this encodeText function outputs a custom encoding that
+                 * iMessage always works with (determined via manual testing0.
+                 */
                 let i = 0;
                 const result = [];
                 for (const ch of str) {
