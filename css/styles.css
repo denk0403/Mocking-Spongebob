@@ -214,6 +214,13 @@ label.inputField {
 	width: min(100%, 500px);
 }
 
+.mini-inputField {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: small;
+}
+
 .mode-controls {
 	display: none;
 	width: 100%;

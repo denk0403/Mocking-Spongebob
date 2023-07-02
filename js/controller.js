@@ -25,6 +25,10 @@
 		/** @type {HTMLImageElement} */
 		upload = document.getElementById("upload"),
 		/** @type {HTMLInputElement} */
+		imageOpacitySlider = document.getElementById("image-opacity-slider"),
+		/** @type {HTMLInputElement} */
+		imageCoverCheckbox = document.getElementById("image-cover-checkbox"),
+		/** @type {HTMLInputElement} */
 		mathin = document.getElementById("mathin"),
 		/** @type {HTMLInputElement} */
 		mathinRadio = document.getElementById("mathinRadio"),
@@ -97,50 +101,6 @@
 				signal,
 			});
 		});
-
-	/**
-	 * Sets in the input image file.
-	 * @param {DataTransfer} dataTransfer
-	 * @param {{enforceType: boolean | undefined}?} options
-	 */
-	function setImageFile(dataTransfer, options) {
-		options = { enforceType: false, ...options };
-
-		const files = Array.from(dataTransfer.files);
-		const image = options.enforceType
-			? files.find((file) => file.type.startsWith("image/"))
-			: files[0];
-
-		if (image) {
-			const dt = new DataTransfer();
-			dt.items.add(image);
-
-			imagein.files = dt.files;
-			imagein.dispatchEvent(new InputEvent("input"));
-			imageinRadio.click();
-		}
-	}
-
-	// add drag and drop
-	box.addEventListener("dragover", (event) => {
-		event.preventDefault();
-	});
-	box.addEventListener("drop", (event) => {
-		event.preventDefault();
-		if (event.dataTransfer) {
-			setImageFile(event.dataTransfer);
-		}
-	});
-
-	// add image paste
-	document.addEventListener("paste", (event) => {
-		if (document.activeElement === captionin || document.activeElement === mathin) return;
-
-		if (event.clipboardData?.files?.length) {
-			event.preventDefault();
-			setImageFile(event.clipboardData, { enforceType: true });
-		}
-	});
 
 	title.addEventListener("click", () => {
 		stopAsyncProcesses();
@@ -502,30 +462,141 @@
 		}
 	}
 
+	//#region Paint Image/Upload
+
+	/**
+	 * Sets in the input image file.
+	 * @param {DataTransfer} dataTransfer
+	 * @param {{enforceType: boolean | undefined}?} options
+	 */
+	function setImageFile(dataTransfer, options) {
+		options = { enforceType: false, ...options };
+
+		const files = Array.from(dataTransfer.files);
+		const image = options.enforceType
+			? files.find((file) => file.type.startsWith("image/"))
+			: files[0];
+
+		if (image) {
+			const dt = new DataTransfer();
+			dt.items.add(image);
+
+			imagein.files = dt.files;
+			imagein.dispatchEvent(new InputEvent("input"));
+			imageinRadio.click();
+		}
+	}
+
+	// add drag and drop
+	box.addEventListener("dragover", (event) => {
+		event.preventDefault();
+	});
+	box.addEventListener("drop", (event) => {
+		event.preventDefault();
+		if (event.dataTransfer) {
+			setImageFile(event.dataTransfer);
+		}
+	});
+
+	// add image paste
+	document.addEventListener("paste", (event) => {
+		if (document.activeElement === captionin || document.activeElement === mathin) return;
+
+		if (event.clipboardData?.files?.length) {
+			event.preventDefault();
+			setImageFile(event.clipboardData, { enforceType: true });
+		}
+	});
+
+	imagein.addEventListener("input", () => {
+		captionin.value = "";
+		mathin.value = "";
+
+		if (imagein.files[0]) {
+			reader.readAsDataURL(imagein.files[0]);
+		} else {
+			ctx.drawImage(img, 0, 0);
+			requestRepaint();
+		}
+	});
+
 	reader.onload = function () {
 		mockingSpongeBob.stopAsyncProcesses();
-		mockingSpongeBob.drawn = { mode: "image", isErrored: false };
 		upload.src = reader.result;
 	};
 
-	upload.addEventListener("load", drawUpload);
+	upload.addEventListener("load", requestDrawUpload);
 	upload.addEventListener("error", (event) => {
 		console.error(event);
 		mockingSpongeBob.drawn = { isErrored: true };
 		drawText({ lines: ["There was an error", "uploading the image"], fontSize: 45 }, "#ff0000");
 	});
 
+	imageCoverCheckbox.addEventListener("input", () => {
+		if (imageCoverCheckbox.checked && imageOpacitySlider.valueAsNumber > 0.75)
+			imageOpacitySlider.valueAsNumber = 0.5;
+		requestDrawUpload();
+	});
+	imageOpacitySlider.addEventListener("input", requestDrawUpload);
+
+	let drawUploadRequest = null;
+	function requestDrawUpload() {
+		cancelAnimationFrame(drawUploadRequest);
+		drawUploadRequest = requestAnimationFrame(drawUpload);
+	}
+
 	function drawUpload() {
-		const MAX_HEIGHT = 105;
-		const MAX_WIDTH = 450;
+		if (!upload.src) return;
+
+		const opacity = imageOpacitySlider.valueAsNumber;
 
 		ctx.drawImage(img, 0, 0);
-		let scale = Math.min(MAX_WIDTH / upload.width, MAX_HEIGHT / upload.height);
-		let newWidth = upload.width * scale;
-		let newHeight = upload.height * scale;
-		ctx.drawImage(upload, 250 - newWidth / 2, canvas.height - 5 - newHeight, newWidth, newHeight);
+		if (imageCoverCheckbox.checked) {
+			drawCoverUpload(opacity);
+		} else {
+			drawMiniUpload(opacity);
+		}
+
+		mockingSpongeBob.drawn = { mode: "image", opacity, isErrored: false };
 		requestRepaint();
 	}
+
+	function drawMiniUpload(opacity) {
+		// magic numbers that make it size kind of nice
+		const MAX_WIDTH = canvas.width - 50;
+		const MAX_HEIGHT = canvas.height / 3.33;
+
+		const scale = Math.min(MAX_WIDTH / upload.width, MAX_HEIGHT / upload.height);
+		const newWidth = upload.width * scale;
+		const newHeight = upload.height * scale;
+		const bottomMargin = 5;
+		ctx.globalAlpha = opacity;
+		ctx.drawImage(
+			upload,
+			(canvas.width - newWidth) / 2,
+			canvas.height - newHeight - bottomMargin,
+			newWidth,
+			newHeight
+		);
+		ctx.globalAlpha = 1;
+	}
+
+	function drawCoverUpload(opacity) {
+		const scale = Math.max(canvas.width / upload.width, canvas.height / upload.height);
+		const newWidth = upload.width * scale;
+		const newHeight = upload.height * scale;
+		ctx.globalAlpha = opacity;
+		ctx.drawImage(
+			upload,
+			(canvas.width - newWidth) / 2,
+			(canvas.height - newHeight) / 2,
+			newWidth,
+			newHeight
+		);
+		ctx.globalAlpha = 1;
+	}
+
+	//#endregion
 
 	/** @type {AbortController} */
 	let abortController;
@@ -613,18 +684,6 @@
 		}
 
 		updateShareButtons();
-	});
-
-	imagein.addEventListener("input", () => {
-		captionin.value = "";
-		mathin.value = "";
-
-		if (imagein.files[0]) {
-			reader.readAsDataURL(imagein.files[0]);
-		} else {
-			ctx.drawImage(img, 0, 0);
-			requestRepaint();
-		}
 	});
 
 	/** @deprecated */

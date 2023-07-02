@@ -178,7 +178,17 @@
                         <img id="camera--toggle-img" loading="lazy" class="icon" src="./img/webp/camera-icon.webp"
                             onContextMenu="return false;" draggable="false" width="30" height="30" />
                     </button>
-
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <label for="image-opacity-slider" style="flex: 1; align-self: end;" class="inputField no-margin">
+                        <span>Opacity:</span>
+                        <input id="image-opacity-slider" type="range" min="0" max="1" step="0.005" value="1"
+                            style="width: 100%;">
+                    </label>
+                    <label for="image-cover-checkbox" class="mini-inputField">
+                        <span>Cover:</span>
+                        <input id="image-cover-checkbox" type="checkbox">
+                    </label>
                 </div>
             </div>
             <div id="math-controls" class="mode-controls">

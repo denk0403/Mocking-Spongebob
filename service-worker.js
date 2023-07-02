@@ -1,5 +1,5 @@
 // Use a cacheName for cache versioning
-const cacheName = "mockSpongebob-v1.2.6";
+const cacheName = "mockSpongebob-v1.2.7";
 
 // Assets to be used for offline availability
 const precachedAssets = [
@@ -42,8 +42,7 @@ const precachedAssets = [
 self.addEventListener("install", (e) => {
 	self.skipWaiting(); // forces this service worker to become the active service worker.
 
-	// delete old cache, then
-	// precache updated assets
+	// delete old cache, then precache updated assets.
 	const refreshCacheTask = caches
 		.keys()
 		.then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
@@ -53,24 +52,38 @@ self.addEventListener("install", (e) => {
 	e.waitUntil(refreshCacheTask);
 });
 
-// Allow service worker to control current page on next load
+// Allow service worker to control current page on next load.
 self.addEventListener("activate", (e) => {
 	console.log("Activating new service worker");
 	e.waitUntil(clients.claim());
 });
 
-// Intercepts when the browser fetches a URL to check cache
-self.addEventListener("fetch", (e) => e.respondWith(cacheFirst(e.request)));
+/** Checks whether the current environment is for development. */
+function isDevelopment() {
+	return location.hostname === "127.0.0.1" || location.hostname === "localhost";
+}
 
-// Returns a match from the cache first, only making a network request if necessary
+if (!isDevelopment()) {
+	// Intercepts when the browser fetches a URL to check cache.
+	self.addEventListener("fetch", (e) => e.respondWith(cacheFirst(e.request)));
+}
+
+/**
+ * Returns a match from the cache first, only making a network request if necessary.
+ * @param {Request} req
+ */
 async function cacheFirst(req) {
 	const cache = await caches.open(cacheName);
 	const cached = await cache.match(req);
 	return cached ?? networkAndCache(cache, req);
 }
 
-// Makes the network request immediately if possible,
-// and saves the result in cache for future offline use
+/**
+ * Makes the network request immediately if possible,
+ * and saves the result in cache for future offline use.
+ * @param {Cache} cache
+ * @param {Request} req
+ */
 async function networkAndCache(cache, req) {
 	try {
 		const fresh = await fetch(req);
