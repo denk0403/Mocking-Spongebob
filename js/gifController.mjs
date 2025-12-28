@@ -44,6 +44,8 @@ window.gifuct = gifuct;
 
 	// GIF frame data storage
 	let gifFrames = [];
+	/** @type {ImageData[]} Pre-computed ImageData for each frame to avoid repeated allocations */
+	let frameImageData = [];
 	let gifWidth = 220;
 	let gifHeight = 220;
 	let gifLoaded = false;
@@ -118,15 +120,17 @@ window.gifuct = gifuct;
 	}
 
 	/**
-	 * Convert gifuct frame to ImageData
+	 * Pre-compute ImageData for all frames (called once after loading)
+	 * This avoids creating new ImageData objects on every generation
 	 */
-	function frameToImageData(frame) {
-		const imageData = new ImageData(
-			new Uint8ClampedArray(frame.patch),
-			frame.dims.width,
-			frame.dims.height
-		);
-		return imageData;
+	function precomputeFrameImageData() {
+		frameImageData = gifFrames.map((frame) => {
+			return new ImageData(
+				new Uint8ClampedArray(frame.patch),
+				frame.dims.width,
+				frame.dims.height
+			);
+		});
 	}
 
 	/**
@@ -139,6 +143,7 @@ window.gifuct = gifuct;
 			progressBar.style.width = "10%";
 
 			gifFrames = await parseGIF(GIF_SRC);
+			precomputeFrameImageData();
 			gifLoaded = true;
 
 			progressBar.style.width = "100%";
@@ -470,9 +475,8 @@ window.gifuct = gifuct;
 					patchCanvas.height = frame.dims.height;
 				}
 
-				// Draw frame patch
-				const imageData = frameToImageData(frame);
-				patchCtx.putImageData(imageData, 0, 0);
+				// Draw frame patch using pre-computed ImageData
+				patchCtx.putImageData(frameImageData[i], 0, 0);
 				compositeCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top);
 
 				// Copy composite to frame canvas and add text
