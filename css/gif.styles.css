@@ -158,9 +158,8 @@ img:not(#mirror) {
 }
 
 #mirror {
-	max-width: 100%;
 	height: auto;
-	max-height: 220px;
+	width: 400px;
 }
 
 #modeRadios * {
@@ -600,4 +599,12 @@ form :is(input, select, button) {
 #progress-text {
 	font-size: small;
 	white-space: nowrap;
+}
+
+#progress-container {
+	transition: opacity 0.2s ease;
+}
+
+#progress-container.idle {
+	opacity: 0.4;
 }

@@ -2,7 +2,7 @@ import * as gifuct from "https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm";
 
 window.gifuct = gifuct;
 
-"use strict";
+("use strict");
 {
 	// DOM Constants
 	/** @type {HTMLCanvasElement} */
@@ -32,8 +32,6 @@ window.gifuct = gifuct;
 		copyLinkTxt = document.getElementById("cpy-link-txt"),
 		/** @type {HTMLSpanElement} */
 		copyTextTxt = document.getElementById("cpy-text-txt"),
-		/** @type {HTMLButtonElement} */
-		generateBtn = document.getElementById("generate-btn"),
 		/** @type {HTMLDivElement} */
 		progressContainer = document.getElementById("progress-container"),
 		/** @type {HTMLDivElement} */
@@ -41,7 +39,7 @@ window.gifuct = gifuct;
 		/** @type {HTMLSpanElement} */
 		progressText = document.getElementById("progress-text");
 
-	const INITIAL_FONT_SIZE = 100; // in pixels
+	const INITIAL_FONT_SIZE = 67; // in pixels
 	const GIF_SRC = "./img/spongebob.gif";
 
 	// GIF frame data storage
@@ -49,6 +47,33 @@ window.gifuct = gifuct;
 	let gifWidth = 220;
 	let gifHeight = 220;
 	let gifLoaded = false;
+
+	// Abort controller for canceling in-progress generation
+	let currentAbortController = null;
+
+	// Reusable GIF encoder instance
+	let gifEncoder = null;
+	let isRendering = false;
+
+	// Reusable canvases for performance
+	const compositeCanvas = document.createElement("canvas");
+	const compositeCtx = compositeCanvas.getContext("2d", {
+		alpha: true,
+		desynchronized: true,
+		willReadFrequently: true,
+	});
+	const frameCanvas = document.createElement("canvas");
+	const frameCtx = frameCanvas.getContext("2d", {
+		alpha: true,
+		desynchronized: true,
+		willReadFrequently: true,
+	});
+	const patchCanvas = document.createElement("canvas");
+	const patchCtx = patchCanvas.getContext("2d", {
+		alpha: true,
+		desynchronized: true,
+		willReadFrequently: true,
+	});
 
 	// Initialize canvas dimensions
 	canvas.width = gifWidth;
@@ -68,18 +93,27 @@ window.gifuct = gifuct;
 	async function parseGIF(url) {
 		const response = await fetch(url);
 		const arrayBuffer = await response.arrayBuffer();
-		
+
 		// Use gifuct-js to parse the GIF
 		const gif = window.gifuct.parseGIF(arrayBuffer);
 		const frames = window.gifuct.decompressFrames(gif, true);
-		
+
 		if (frames.length > 0) {
 			gifWidth = gif.lsd.width;
 			gifHeight = gif.lsd.height;
 			canvas.width = gifWidth;
 			canvas.height = gifHeight;
+
+			// Initialize reusable canvases with correct dimensions
+			compositeCanvas.width = gifWidth;
+			compositeCanvas.height = gifHeight;
+			frameCanvas.width = gifWidth;
+			frameCanvas.height = gifHeight;
+
+			// Initialize the GIF encoder with correct dimensions
+			getGifEncoder();
 		}
-		
+
 		return frames;
 	}
 
@@ -96,53 +130,26 @@ window.gifuct = gifuct;
 	}
 
 	/**
-	 * Draw a frame onto a temporary canvas and return as ImageBitmap
-	 */
-	async function renderFrame(frame, previousCanvas) {
-		const tempCanvas = previousCanvas || document.createElement("canvas");
-		tempCanvas.width = gifWidth;
-		tempCanvas.height = gifHeight;
-		const tempCtx = tempCanvas.getContext("2d");
-		
-		// Handle disposal method
-		if (frame.disposalType === 2) {
-			// Restore to background
-			tempCtx.clearRect(0, 0, gifWidth, gifHeight);
-		}
-		
-		// Draw the frame patch at its position
-		const imageData = frameToImageData(frame);
-		const patchCanvas = document.createElement("canvas");
-		patchCanvas.width = frame.dims.width;
-		patchCanvas.height = frame.dims.height;
-		const patchCtx = patchCanvas.getContext("2d");
-		patchCtx.putImageData(imageData, 0, 0);
-		
-		tempCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top);
-		
-		return tempCanvas;
-	}
-
-	/**
 	 * Load and parse the GIF
 	 */
 	async function loadGIF() {
 		try {
-			progressContainer.hidden = false;
+			progressContainer.classList.remove("idle");
 			progressText.textContent = "Loading GIF...";
 			progressBar.style.width = "10%";
-			
+
 			gifFrames = await parseGIF(GIF_SRC);
 			gifLoaded = true;
-			
+
 			progressBar.style.width = "100%";
 			progressText.textContent = "GIF loaded!";
-			
+
 			setTimeout(() => {
-				progressContainer.hidden = true;
+				progressContainer.classList.add("idle");
 				progressBar.style.width = "0%";
+				progressText.textContent = "Ready";
 			}, 500);
-			
+
 			console.log(`Loaded ${gifFrames.length} frames from GIF`);
 		} catch (error) {
 			console.error("Error loading GIF:", error);
@@ -172,7 +179,7 @@ window.gifuct = gifuct;
 	 */
 	function formatText(str) {
 		const MIN_FONT_SIZE = 8; // in pixels
-		const MAX_LINE_BOX_WIDTH = Math.min(480, gifWidth - 10); // in pixels
+		const MAX_LINE_BOX_WIDTH = Math.min(210, gifWidth - 10); // in pixels
 		const MIN_LINE_BOX_WIDTH = 1; // in pixels
 
 		if (str === "") {
@@ -341,13 +348,64 @@ window.gifuct = gifuct;
 	}
 
 	/**
+	 * Initialize or get the reusable GIF encoder
+	 */
+	function getGifEncoder() {
+		if (!gifEncoder) {
+			gifEncoder = new GIF({
+				workers: window.navigator.hardwareConcurrency ?? 6,
+				quality: 0,
+				width: gifWidth,
+				height: gifHeight,
+				workerScript: "./js/gif.worker.js",
+			});
+		}
+		return gifEncoder;
+	}
+
+	/**
+	 * Reset the GIF encoder for a new generation
+	 */
+	function resetGifEncoder() {
+		if (gifEncoder) {
+			// Abort any in-progress rendering
+			if (isRendering) {
+				gifEncoder.abort();
+			}
+			// Clear frames array
+			gifEncoder.frames.length = 0;
+			// Remove all event listeners
+			gifEncoder.removeAllListeners();
+			// Move active workers back to free pool
+			gifEncoder.freeWorkers.push(...gifEncoder.activeWorkers);
+			gifEncoder.activeWorkers.length = 0;
+			// Reset running state
+			gifEncoder.running = false;
+			isRendering = false;
+		}
+	}
+
+	/**
+	 * Abort any in-progress GIF generation
+	 */
+	function abortCurrentGeneration() {
+		if (currentAbortController) {
+			currentAbortController.abort();
+			currentAbortController = null;
+		}
+		resetGifEncoder();
+	}
+
+	/**
 	 * Generate a GIF with text overlay
 	 */
-	async function generateCaptionedGIF() {
+	function generateCaptionedGIF() {
 		if (!gifLoaded || gifFrames.length === 0) {
-			alert("Please wait for the GIF to load.");
 			return;
 		}
+
+		// Abort any previous generation
+		abortCurrentGeneration();
 
 		const text = captionin.value.trim();
 		if (!text) {
@@ -355,6 +413,9 @@ window.gifuct = gifuct;
 			mirror.src = GIF_SRC;
 			saveLink.href = GIF_SRC;
 			saveLink.download = "spongebob.gif";
+			progressContainer.classList.add("idle");
+			progressBar.style.width = "0%";
+			progressText.textContent = "Ready";
 			updateShareButtons();
 			return;
 		}
@@ -363,82 +424,92 @@ window.gifuct = gifuct;
 		const format = formatText(transformedText);
 
 		if (format === null) {
-			alert("Input text is too large. Please use shorter text.");
+			progressContainer.classList.remove("idle");
+			progressText.textContent = "Text too large";
+			progressBar.style.width = "100%";
+			progressBar.style.background = "#ff6b6b";
 			return;
 		}
 
 		const color = captionColorInput.value;
 
+		// Create abort controller for this generation
+		currentAbortController = new AbortController();
+		const signal = currentAbortController.signal;
+
 		// Show progress
-		progressContainer.hidden = false;
-		progressText.textContent = "Generating GIF...";
+		progressContainer.classList.remove("idle");
+		progressText.textContent = "Generating...";
 		progressBar.style.width = "0%";
-		generateBtn.disabled = true;
+		progressBar.style.background = "linear-gradient(90deg, #00a6e3, #26ce42)";
 
 		try {
-			// Create GIF encoder
-			const gif = new GIF({
-				workers: 2,
-				quality: 10,
-				width: gifWidth,
-				height: gifHeight,
-				workerScript: "./js/gif.worker.js",
-			});
+			// Get reusable GIF encoder
+			const gif = getGifEncoder();
 
-			// Process each frame
-			let compositeCanvas = document.createElement("canvas");
-			compositeCanvas.width = gifWidth;
-			compositeCanvas.height = gifHeight;
-			let compositeCtx = compositeCanvas.getContext("2d");
+			// Clear composite canvas
+			compositeCtx.clearRect(0, 0, gifWidth, gifHeight);
 
 			for (let i = 0; i < gifFrames.length; i++) {
+				// Check if aborted
+				if (signal.aborted) {
+					gif.abort();
+					return;
+				}
+
 				const frame = gifFrames[i];
-				
+
 				// Handle disposal
 				if (frame.disposalType === 2) {
 					compositeCtx.clearRect(0, 0, gifWidth, gifHeight);
 				}
-				
+
+				// Resize patch canvas if needed
+				if (patchCanvas.width !== frame.dims.width || patchCanvas.height !== frame.dims.height) {
+					patchCanvas.width = frame.dims.width;
+					patchCanvas.height = frame.dims.height;
+				}
+
 				// Draw frame patch
 				const imageData = frameToImageData(frame);
-				const patchCanvas = document.createElement("canvas");
-				patchCanvas.width = frame.dims.width;
-				patchCanvas.height = frame.dims.height;
-				const patchCtx = patchCanvas.getContext("2d");
 				patchCtx.putImageData(imageData, 0, 0);
 				compositeCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top);
 
-				// Create a copy for adding text
-				const frameCanvas = document.createElement("canvas");
-				frameCanvas.width = gifWidth;
-				frameCanvas.height = gifHeight;
-				const frameCtx = frameCanvas.getContext("2d");
+				// Copy composite to frame canvas and add text
 				frameCtx.drawImage(compositeCanvas, 0, 0);
-
-				// Draw text overlay
 				drawTextOverlay(frameCtx, format, color, gifHeight);
 
 				// Add frame to GIF
-				gif.addFrame(frameCanvas, { delay: frame.delay || 100 });
+				gif.addFrame(frameCtx, { delay: frame.delay || 100, copy: true });
 
 				// Update progress
 				const progress = ((i + 1) / gifFrames.length) * 80;
 				progressBar.style.width = `${progress}%`;
-				progressText.textContent = `Processing frame ${i + 1}/${gifFrames.length}`;
+			}
 
-				// Yield to UI
-				await new Promise(resolve => setTimeout(resolve, 0));
+			// Check if aborted before rendering
+			if (signal.aborted) {
+				gif.abort();
+				return;
 			}
 
 			// Render the GIF
-			progressText.textContent = "Encoding GIF...";
+			progressText.textContent = "Encoding...";
 			progressBar.style.width = "85%";
 
 			gif.on("progress", (p) => {
-				progressBar.style.width = `${85 + p * 15}%`;
+				if (!signal.aborted) {
+					progressBar.style.width = `${85 + p * 15}%`;
+				}
 			});
 
 			gif.on("finished", (blob) => {
+				isRendering = false;
+				if (signal.aborted) return;
+
+				if (mirror.src !== GIF_SRC) {
+					URL.revokeObjectURL(mirror.src);
+				}
 				const url = URL.createObjectURL(blob);
 				mirror.src = url;
 				saveLink.href = url;
@@ -448,10 +519,12 @@ window.gifuct = gifuct;
 				progressText.textContent = "Done!";
 
 				setTimeout(() => {
-					progressContainer.hidden = true;
-					progressBar.style.width = "0%";
-					generateBtn.disabled = false;
-				}, 500);
+					if (!signal.aborted) {
+						progressContainer.classList.add("idle");
+						progressBar.style.width = "0%";
+						progressText.textContent = "Ready";
+					}
+				}, 300);
 
 				mockingSpongeBob.drawn = {
 					text,
@@ -460,38 +533,25 @@ window.gifuct = gifuct;
 					isErrored: false,
 				};
 
+				currentAbortController = null;
 				updateShareButtons();
 			});
 
+			isRendering = true;
 			gif.render();
 		} catch (error) {
-			console.error("Error generating GIF:", error);
-			progressText.textContent = "Error generating GIF";
-			generateBtn.disabled = false;
+			if (error.name !== "AbortError") {
+				console.error("Error generating GIF:", error);
+				progressText.textContent = "Error";
+			}
 		}
 	}
 
-	// Event listeners
-	generateBtn.addEventListener("click", generateCaptionedGIF);
 
-	captionin.addEventListener("keydown", (e) => {
-		if (e.key === "Enter") {
-			e.preventDefault();
-			generateCaptionedGIF();
-		}
-	});
-
-	mockSelector.addEventListener("input", () => {
-		if (captionin.value.trim()) {
-			generateCaptionedGIF();
-		}
-	});
-
-	captionColorInput.addEventListener("change", () => {
-		if (captionin.value.trim()) {
-			generateCaptionedGIF();
-		}
-	});
+	// Event listeners - trigger on input
+	captionin.addEventListener("input", generateCaptionedGIF);
+	mockSelector.addEventListener("input", generateCaptionedGIF);
+	captionColorInput.addEventListener("input", generateCaptionedGIF);
 
 	function updateShareButtons() {
 		const haveCopyPermissions = !!navigator.clipboard;
@@ -506,7 +566,7 @@ window.gifuct = gifuct;
 		if (navigator.clipboard) {
 			const resultURL = new URL(location.pathname, location.origin);
 			const trimmedStr = captionin.value.trim();
-			
+
 			if (trimmedStr !== "") {
 				resultURL.searchParams.set("mode", mockingSpongeBob.currentMock?.id || "altsl");
 				resultURL.searchParams.set("text", mockingSpongeBob.encodeText(trimmedStr));
@@ -561,7 +621,7 @@ window.gifuct = gifuct;
 			if (encodedText || quick_query) {
 				const decodedText = quick_query || mockingSpongeBob.decodeText(encodedText);
 				captionin.value = decodedText;
-				
+
 				// Wait for GIF to load, then generate
 				const waitForGIF = setInterval(() => {
 					if (gifLoaded) {
@@ -575,11 +635,10 @@ window.gifuct = gifuct;
 
 	// Initialize
 	updateShareButtons();
-	
+
 	if (location.search) {
 		processSearch(location.search);
 	} else {
 		captionin.focus();
 	}
 }
-
