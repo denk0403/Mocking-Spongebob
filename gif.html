@@ -1,0 +1,170 @@
+<!doctype html>
+
+<html lang="en-US">
+
+<head profile="http://a9.com/-/spec/opensearch/1.1/">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+    <meta name="keywords" content="SpongeBob, meme generator, meme, mock, mocking, funny, sarcastic, chicken">
+    <meta name="author" content="Dennis Kats">
+    <meta name="description" content="An over the top generator for the Mocking SpongeBob meme." />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#b7e9b4">
+    <link rel="canonical" href="https://denniskats.dev/Mocking-Spongebob/" />
+
+    <title>Mocking SpongeBob Meme Generator</title>
+
+    <!-- Open Graph protocol support -->
+    <meta property="og:title" content="Mocking SpongeBob Meme Generator" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="An over the top generator for the Mocking SpongeBob meme." />
+    <meta property="og:image" content="https://denniskats.dev/Mocking-Spongebob/img/spongebob.jpg" />
+    <meta property="og:image:alt" content="Mocking SpongeBob Meme template" />
+
+    <!-- OpenSearch protocol support -->
+    <link rel="search" href="./opensearch.xml" type="application/opensearchdescription+xml" title="Mocking SpongeBob">
+
+    <!-- Twitter Card support -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@denk0403" />
+    <meta name="twitter:creator" content="@denk0403" />
+
+    <!-- Google Search Console verification -->
+    <meta name="google-site-verification" content="JIVlpHfkqP_v3ESYiV5e0IQyoSESkANczsnTydV37GY" />
+
+    <!-- Stylesheets -->
+    <link href="./css/gif.styles.css" rel="stylesheet" type="text/css" />
+    <!-- Manifest file for PWA -->
+    <!-- <link rel="manifest" href="./manifest.json"> -->
+
+    <link rel="preload" href="./img/spongebob.gif" as="image" fetchpriority="high">
+
+    <!-- Offline PWA support -->
+    <!-- <script type="text/javascript" async src="./js/sw-registrar.js"></script> -->
+
+    <!-- GIF parsing library -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/lib/index.min.js"></script> -->
+    <!-- GIF encoding library -->
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+
+    <!-- Shared object across scripts for website, and darkmode support -->
+    <script type="text/javascript">
+        "use strict";
+        const html = document.documentElement;
+
+        window.mockingSpongeBob = {
+            isDarkmode: localStorage.getItem("darkmode") === "true" ||
+                (localStorage.getItem("darkmode") === null &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches),
+            toggleDarkmode: function () {
+                this.isDarkmode = !this.isDarkmode;
+                localStorage.setItem("darkmode", this.isDarkmode);
+                html.classList.toggle("darkmode", this.isDarkmode);
+            },
+            encodeText: (str) => btoa(unescape(encodeURIComponent(str))),
+            decodeText: (str) => decodeURIComponent(escape(atob(str))),
+            drawn: { text: "", color: "#ffffff", mode: "altsl", isErrored: false },
+            currentMock: null,
+            mockTypes: {},
+        };
+
+        if (mockingSpongeBob.isDarkmode) {
+            html.classList.add("darkmode");
+        } else {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                mockingSpongeBob.isDarkmode = event.matches;
+            });
+        }
+    </script>
+
+    <!-- Mock types -->
+    <script type="text/javascript" defer src="./js/mockTypes.js" fetchpriority="high"></script>
+    <!-- GIF Page controller -->
+    <script type="module" src="./js/gifController.mjs"></script>
+
+    <!-- generic icon -->
+    <link rel="icon" href="./img/icon.png" />
+    <!-- Android icon -->
+    <link rel="shortcut icon" href="./img/icon-144.png" sizes="144x144">
+    <!-- iOS icons-->
+    <link rel="apple-touch-icon" href="./img/apple_app_icon.png" sizes="144x144">
+</head>
+
+<body>
+    <div id="box">
+        <h1 id="title">Mocking SpongeBob GIF Generator</h1>
+        
+        <div id="views">
+            <img id="mirror" src="./img/spongebob.gif" width="220" height="220" alt="Mocking SpongeBob meme"
+                decoding="sync" />
+            <canvas id="canvas" width="220" height="220" hidden></canvas>
+        </div>
+
+        <form id="controls" onsubmit="return false;">
+            <div id="caption-controls" class="mode-controls">
+                <div class="inputField">
+                    <input id="caption" type="text" placeholder="Enter mocking text..." autocomplete="off" autofocus />
+                </div>
+                <div class="inputField">
+                    <select id="mockType-selector" title="Select mocking style"></select>
+                    <input id="caption-color" class="color-picker" type="color" value="#ffffff" title="Text color" />
+                </div>
+                <div class="inputField">
+                    <button type="button" id="generate-btn" class="btn">
+                        Generate GIF 🎬
+                    </button>
+                </div>
+                <div id="progress-container" class="inputField" hidden>
+                    <div id="progress-wrapper">
+                        <div id="progress-bar"></div>
+                    </div>
+                    <span id="progress-text">Ready</span>
+                </div>
+            </div>
+        </form>
+
+        <div class="btn-group">
+            <button type="button" class="btn" id="cpy-text-btn" title="Copy the mocking form of the text"><span
+                    id="cpy-text-txt">
+                    Copy Mocking
+                    Text
+                </span><img class="icon" alt="Copy text icon" width="22" height="22"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAAu0lEQVRIie2WTQ6CQAyFPz0C11H3GvecwI0mXlo4BBvQBRjHSefHDpIY+5KXkNLpN+R1AZj+UUegBe5ALdRi7oCzFtw4gyqhFvMw+aIBu4OkWswnoJ/g1yXBlMBLwWr4HGAYl+yZedbClYC3AXjnQ1YBsP/e/xqN3ljrGQaqZOBcbRgzC3n3LXDqnLS0yQbbakmhjJPZloJD55LZxhot48XArfNcCTWNmpymA69/rFqofeobsC+8uOkH9QCUQIZu2oAw+AAAAABJRU5ErkJggg=="></button>
+            <button type="button" class="btn" id="cpy-link-btn" title="Copy a shareable link to your clipboard">
+                <span id="cpy-link-txt">
+                    Copy
+                    Shareable Link
+                </span> <img class="icon" alt="Copy link icon" width="22" height="22"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAsElEQVRIie2SzQ3CMAxGH7AEdCVaMQFrkAFQJZYCOkCnIb1wKgcMWJZT/noAKU+yIn1O7C9xIJP5O1ZAA3RAb8Ji8x1wBKpU8Z1z6J0GOmrPeQ+cgQ1QDF/UpQCC1OiBUicbEcMHhS1Bah20GEVcmM1Dz5B6vrloJ4CpSU6+tQ/MlLl7g1bWtdPwldDcarRarHgMOTDOkJd2Q81433SbclFynX50Dj1rEIG95zyT+XEuFRpXEhVovf0AAAAASUVORK5CYII="></button>
+            <a id="sv-link" href="./img/spongebob.gif" download="spongebob.gif"><button type="button" class="btn"
+                    id="sv-btn" title="Save this GIF to your device">Save
+                    GIF <img class="icon" alt="Save icon" width="22" height="22"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAA1ElEQVRIie2WSw7CIBRFj5/FONCROLLOdRHWfenGTJ2pibEr0BEOhKRt0EKBRGJvQkLovZw+2uQBvf5VQ+AAPAHZcTyAvdrLWlsPYHPkttARcHQNGbRTe5yAsU0gdw18kHMBhYu5RbrqovlgYDDLAECTaiynPy6kkgQvgaxr2Ocb66yrH0j0qHtwVHAGLICyslYCAlj5vsy3TjNXnmnFr+eiJesFLoGZITMBbjHBJrgNNAhYAnfeRyvU3CZT0091p2sE6MXGtFHGUHeuM7AOWESvRPQCoA2TcvzCpGcAAAAASUVORK5CYII="></button>
+            </a>
+            <button type="button" class="btn" id="share-btn" disabled hidden
+                title="Share this GIF with other apps">Share
+                GIF <img class="icon" alt="Share icon" width="22" height="22"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAAA1ElEQVRIie2WbQqCQBCGHyK8QUJHyc5X1r0EIf1VP7pAeg37M4uipu0nRr4wjMx+PDujuyv8mGIgAwp5DqIdcAcasSewDw0NAo+Bh4CUb3oxL2UvegAF7i7o5gOcAyVtVgqMxErp411dsLY2DhfiDBwBV6Dm++xUvwpIZQ5tXRhumzHIWEzZ2QRcyeDDh/apKiS0mWtrrrxW7Yv8uFawU20txmZYnFxTsjoS58b/3ztewYsA1+ITg3mP4o0uiZThNadrJxNwJHB1PerYS6BGPwKrnOoNnOBnj128ZTsAAAAASUVORK5CYII="></button>
+        </div>
+        <p>
+            Created by <a class="external-link" href="https://denniskats.dev/" title="Go to personal website">Dennis
+                Kats</a>.
+            View on <a class="external-link" href="https://github.com/denk0403/Mocking-Spongebob"
+                title="Go to project page on GitHub">GitHub</a>.
+
+        </p>
+        <a href="https://www.buymeacoffee.com/denniskats"><img loading="lazy" decoding="async"
+                src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"
+                style="height: 60px !important; width: 217px !important" /></a>
+    </div>
+    <label class="darkmode-toggle-wrapper">
+        Dark Mode 🌓:
+        <input id="darkmode-toggle" class="toggle" type="checkbox" role="switch"
+            onclick="mockingSpongeBob.toggleDarkmode()" />
+        <script>
+            document.getElementById("darkmode-toggle").checked = mockingSpongeBob.isDarkmode;
+        </script>
+    </label>
+</body>
+
+</html>
