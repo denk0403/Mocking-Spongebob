@@ -24,6 +24,8 @@
 	--divider: gray;
 
 	--color-transitions: color .25s linear, background-color .25s linear, background .25s linear;
+	
+	color: black;
 }
 
 .darkmode:root {
@@ -141,6 +143,7 @@ body {
 }
 
 #title {
+	margin-bottom: 5px;
 	transition: var(--color-transitions);
 }
 
@@ -150,6 +153,50 @@ body {
 
 #title:active {
 	filter: brightness(0.95);
+}
+
+.beta-promo {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-block: 0 10px;
+	padding: 5px 12px;
+	border-radius: 14px;
+	background: rgba(0, 0, 0, 0.06);
+	color: #444;
+	text-decoration: none;
+	font-size: 0.85rem;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.beta-promo:hover {
+	background: rgba(0, 0, 0, 0.1);
+	color: #222;
+}
+
+.beta-promo .beta-tag {
+	font-size: 0.7em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 2px 5px;
+	border-radius: 4px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+}
+
+.darkmode .beta-promo {
+	background: rgba(255, 255, 255, 0.1);
+	color: #ccc;
+}
+
+.darkmode .beta-promo:hover {
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+}
+
+.darkmode .beta-promo .beta-tag {
+	background: linear-gradient(135deg, #f093fb, #f5576c);
 }
 
 img:not(#mirror) {

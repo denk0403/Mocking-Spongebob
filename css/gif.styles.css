@@ -141,7 +141,57 @@ body {
 }
 
 #title {
+	margin-bottom: 5px;
 	transition: var(--color-transitions);
+}
+
+.beta-badge {
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 0.4em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	padding: 0.25em 0.6em;
+	margin-left: 0.3em;
+	border-radius: 4px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+	transform: translateY(-0.15em);
+}
+
+.darkmode .beta-badge {
+	background: linear-gradient(135deg, #f093fb, #f5576c);
+	color: var(--white);
+	box-shadow: 0 2px 4px rgba(255, 142, 83, 0.4);
+}
+
+.subtitle-link {
+	display: inline-block;
+	margin-bottom: 10px;
+	padding: 5px 12px;
+	border-radius: 14px;
+	background: rgba(0, 0, 0, 0.06);
+	color: #444;
+	text-decoration: none;
+	font-size: 0.85rem;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.subtitle-link:hover {
+	background: rgba(0, 0, 0, 0.1);
+	color: #222;
+}
+
+.darkmode .subtitle-link {
+	background: rgba(255, 255, 255, 0.1);
+	color: #ccc;
+}
+
+.darkmode .subtitle-link:hover {
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
 }
 
 #title:hover {

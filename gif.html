@@ -43,7 +43,10 @@
     <!-- <script type="text/javascript" async src="./js/sw-registrar.js"></script> -->
 
     <!-- GIF parsing library -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/lib/index.min.js"></script> -->
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/js-binary-schema-parser@2.0.3/lib/schemas/gif/+esm">
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/js-binary-schema-parser@2.0.3/+esm">
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/js-binary-schema-parser@2.0.3/lib/parsers/uint8/+esm">
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm">
     <!-- GIF encoding library -->
     <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
 
@@ -92,8 +95,10 @@
 
 <body>
     <div id="box">
-        <h1 id="title">Mocking SpongeBob GIF Generator</h1>
-        
+        <h1 id="title">Mocking SpongeBob GIF Generator <span class="beta-badge">beta</span></h1>
+
+        <a href="./index.html" class="subtitle-link">← Back to Meme Generator</a>
+
         <div id="views">
             <img id="mirror" src="./img/spongebob.gif" width="220" height="220" alt="Mocking SpongeBob meme"
                 decoding="sync" />
