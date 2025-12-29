@@ -37,7 +37,7 @@
     <!-- Manifest file for PWA -->
     <link rel="manifest" href="./manifest.json">
 
-    <link rel="preload" href="./img/spongebob.jpg" as="image">
+    <link rel="preload" href="./img/spongebob.jpg" as="image" fetchpriority="high">
 
     <!-- Math support -->
     <script id="mathjax" type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
@@ -110,18 +110,18 @@
     </script>
 
     <!-- Mock types -->
-    <script type="text/javascript" defer src="./js/mockTypes.js"></script>
-    <!-- Demo Tools -->
-    <script type="text/javascript" defer src="./js/demonstration.js"></script>
+    <script type="text/javascript" defer src="./js/mockTypes.js" fetchpriority="high"></script>
     <!-- Website controller -->
-    <script type="text/javascript" defer src="./js/controller.js"></script>
+    <script type="text/javascript" defer src="./js/controller.js" fetchpriority="high"></script>
     <!-- Math support -->
     <script type="text/javascript" defer src="./js/math.js"></script>
     <!-- Camera support -->
     <script type="text/javascript" defer src="./js/camera.js"></script>
     <!-- Web speech support -->
     <script type="text/javascript" defer src="./js/webSpeech.js"></script>
-
+    <!-- Demo Tools -->
+    <script type="text/javascript" defer src="./js/demonstration.js"></script>
+    
     <!-- generic icon -->
     <link rel="icon" href="./img/icon.png" />
     <!-- Android icon -->
@@ -133,6 +133,8 @@
 <body>
     <div id="box">
         <h1 id="title">Mocking SpongeBob Meme Generator</h1>
+
+        <a href="./gif.html" class="beta-promo">Try the new GIF Generator <span class="beta-tag">beta</span> →</a>
 
         <span id="modeRadios">
             <label for="captionRadio">

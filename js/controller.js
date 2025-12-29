@@ -88,7 +88,7 @@
 	});
 
 	const stopAsyncProcesses = (mockingSpongeBob.stopAsyncProcesses = () => {
-		mockingSpongeBob.demo.stopTimer();
+		mockingSpongeBob.demo?.stopTimer();
 		mockingSpongeBob.cameraStop?.();
 		mockingSpongeBob.recognition?.abort();
 	});
@@ -768,6 +768,7 @@
 	updateShareButtons();
 	if (location.search) {
 		processSearch(location.search);
+		console.log(performance.now())
 	} else {
 		captionin.focus();
 	}

@@ -24,8 +24,6 @@
 	--divider: gray;
 
 	--color-transitions: color .25s linear, background-color .25s linear, background .25s linear;
-	
-	color: black;
 }
 
 .darkmode:root {
@@ -147,19 +145,31 @@ body {
 	transition: var(--color-transitions);
 }
 
-#title:hover {
-	color: var(--title-hover-color);
+.beta-badge {
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 0.4em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	padding: 0.25em 0.6em;
+	margin-left: 0.3em;
+	border-radius: 4px;
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+	transform: translateY(-0.15em);
 }
 
-#title:active {
-	filter: brightness(0.95);
+.darkmode .beta-badge {
+	background: linear-gradient(135deg, #f093fb, #f5576c);
+	color: var(--white);
+	box-shadow: 0 2px 4px rgba(255, 142, 83, 0.4);
 }
 
-.beta-promo {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	margin-block: 0 10px;
+.subtitle-link {
+	display: inline-block;
+	margin-bottom: 10px;
 	padding: 5px 12px;
 	border-radius: 14px;
 	background: rgba(0, 0, 0, 0.06);
@@ -169,34 +179,27 @@ body {
 	transition: background 0.15s ease, color 0.15s ease;
 }
 
-.beta-promo:hover {
+.subtitle-link:hover {
 	background: rgba(0, 0, 0, 0.1);
 	color: #222;
 }
 
-.beta-promo .beta-tag {
-	font-size: 0.7em;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	padding: 2px 5px;
-	border-radius: 4px;
-	background: linear-gradient(135deg, #667eea, #764ba2);
-	color: white;
-}
-
-.darkmode .beta-promo {
+.darkmode .subtitle-link {
 	background: rgba(255, 255, 255, 0.1);
 	color: #ccc;
 }
 
-.darkmode .beta-promo:hover {
+.darkmode .subtitle-link:hover {
 	background: rgba(255, 255, 255, 0.15);
 	color: #fff;
 }
 
-.darkmode .beta-promo .beta-tag {
-	background: linear-gradient(135deg, #f093fb, #f5576c);
+#title:hover {
+	color: var(--title-hover-color);
+}
+
+#title:active {
+	filter: brightness(0.95);
 }
 
 img:not(#mirror) {
@@ -205,9 +208,8 @@ img:not(#mirror) {
 }
 
 #mirror {
-	max-width: 100%;
 	height: auto;
-	max-height: 350px;
+	width: 400px;
 }
 
 #modeRadios * {
@@ -460,7 +462,7 @@ form :is(input, select, button) {
 #camera--view {
 	object-fit: cover;
 	max-width: 100%;
-	height: max(auto, 350px);
+	height: max(auto, 220px);
 	object-position: center;
 	background-color: black;
 }
@@ -618,4 +620,41 @@ form :is(input, select, button) {
 		min-width: fit-content;
 		width: 100%;
 	}
+}
+
+/* GIF Generator specific styles */
+#caption-controls {
+	display: flex;
+}
+
+#generate-btn {
+	width: 100%;
+}
+
+#progress-wrapper {
+	width: 100%;
+	background: #ddd;
+	border-radius: 5px;
+	overflow: hidden;
+	height: 24px;
+}
+
+#progress-bar {
+	width: 0%;
+	height: 100%;
+	background: linear-gradient(90deg, #00a6e3, #26ce42);
+	transition: width 0.2s;
+}
+
+#progress-text {
+	font-size: small;
+	white-space: nowrap;
+}
+
+#progress-container {
+	transition: opacity 0.2s ease;
+}
+
+#progress-container.idle {
+	opacity: 0.4;
 }
