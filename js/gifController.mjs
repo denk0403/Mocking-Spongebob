@@ -39,15 +39,15 @@ window.gifuct = gifuct;
 		/** @type {HTMLSpanElement} */
 		progressText = document.getElementById("progress-text");
 
-	const INITIAL_FONT_SIZE = 67; // in pixels
+	const INITIAL_FONT_SIZE = 75; // in pixels
 	const GIF_SRC = "./img/spongebob.gif";
 
 	// GIF frame data storage
 	let gifFrames = [];
 	/** @type {ImageData[]} Pre-computed ImageData for each frame to avoid repeated allocations */
 	let frameImageData = [];
-	let gifWidth = 220;
-	let gifHeight = 220;
+	let gifWidth = 300;
+	let gifHeight = 300;
 	let gifLoaded = false;
 
 	// Abort controller for canceling in-progress generation
@@ -184,7 +184,7 @@ window.gifuct = gifuct;
 	 */
 	function formatText(str) {
 		const MIN_FONT_SIZE = 8; // in pixels
-		const MAX_LINE_BOX_WIDTH = Math.min(210, gifWidth - 10); // in pixels
+		const MAX_LINE_BOX_WIDTH = Math.min(290, gifWidth - 10); // in pixels
 		const MIN_LINE_BOX_WIDTH = 1; // in pixels
 
 		if (str === "") {
